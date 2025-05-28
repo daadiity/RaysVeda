@@ -34,7 +34,7 @@ const HomePage = () => {
       id: 2,
       title: "Puja",
       description: "Traditional worship ritual to honor deities, seeking blessings and divine grace.",
-      image: "https://https://media.gettyimages.com/id/1427967072/photo/woman-from-bihar-offers-prayers-to-the-sun-in-the-early-morning-hours-during-chhath-puja.jpg?s=612x612&w=gi&k=20&c=jFVXluKx8eGpwwQYA_4VxRApuKSSzmwO8qsR28b-L9s=.pexels.com/photos/12366057/pexels-photo-12366057.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.gettyimages.com%2Fphotos%2Fchhath-puja&psig=AOvVaw3ViTmyrkUPCf65chfE-3EA&ust=1748494117083000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCJDNwbiuxY0DFQAAAAAdAAAAABAL",
+      image: "https://t4.ftcdn.net/jpg/12/33/33/13/240_F_1233331310_4Qx5hQxoAKNDSAVUz7xNog81BTb4Yv5W.jpg",
       link: "/services/puja"
     },
     {
@@ -48,21 +48,21 @@ const HomePage = () => {
       id: 4,
       title: "Kundli",
       description: "Vedic astrology chart analysis to understand planetary influences and life predictions.",
-      image: "https://images.pexels.com/photos/338936/pexels-photo-338936.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+      image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSl4KAaNMhL3H1BGTJbDXVCDw1E_ZIGg2UVbg&s",
       link: "/services/kundli"
     },
     {
       id: 5,
       title: "Numerology",
       description: "Uncover insights into your personality, destiny, and life path through the power of numbers.",
-      image: "https://images.pexels.com/photos/380769/pexels-photo-380769.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+      image:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRoY2LtP4XwWW5girdLUuxajspdx0j0FfaYZg&s",
       link: "/services/numerology"
     },
     {
       id: 6,
       title: "Vastu",
       description: "Harmonize your living and working spaces with ancient architectural principles for prosperity and well-being.",
-      image: "https://images.pexels.com/photos/323780/pexels-photo-323780.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+      image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTE9-X11LFgzYr1rByGQwk8XCr3Q5iEzXaE_A&s",
       link: "/services/vastu"
     },
   ]
@@ -148,7 +148,7 @@ const HomePage = () => {
             <div className="flex flex-col md:flex-row items-center gap-8">
               <div className="md:w-1/2">
                 <img 
-                  src="https://images.pexels.com/photos/2559941/pexels-photo-2559941.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" 
+                  src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTrWnv5izXi1T-EGQLFHW2MyQ39J-aXc08jyg&s" 
                   alt="Vedic knowledge" 
                   className="rounded-lg shadow-lg w-full h-auto"
                 />

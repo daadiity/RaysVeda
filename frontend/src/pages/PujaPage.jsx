@@ -20,7 +20,7 @@ const PujaPage = () => {
       id: 1,
       title: "Shri Narayan Puja",
       description: "This Pooja calms down your mind, sharpens your focus in life, helps in the overcoming of financial issues, delivers good fortune, avoids evil and helps to gain happiness!",
-      image: "https://w0.peakpx.com/wallpaper/627/1008/HD-wallpaper-lord-vishnu-animated-lord-vishnu-animated-lord-narayana-preserver-god",
+      image: "https://t4.ftcdn.net/jpg/12/33/33/13/240_F_1233331310_4Qx5hQxoAKNDSAVUz7xNog81BTb4Yv5W.jpg",
       price: "₹1,501",
       link: "/puja/shri-narayan"
     },
