@@ -21,25 +21,44 @@ const AboutPage = () => {
   const teamInView = useInView(teamRef, { once: true, margin: "-100px" })
 
   const team = [
-    {
-      name: "Abhay Ray Sir",
-      role: "CEO & Founder",
-      bio: "With over  years of experience in tech fieldFounder & CEO @ GetMyIndia.com,",
-      image: "https://images.pexels.com/photos/8108063/pexels-photo-8108063.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
-    },
-    {
-      name: "Aaditya Yadav",
-      role: "Vedic Scholar",
-      bio: "Developer and programmer with a passion for spirituality, Aaditya combines his technical expertise with deep knowledge of Vedic scriptures to create innovative spiritual solutions.",
-      image: "https://images.pexels.com/photos/5717660/pexels-photo-5717660.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
-    },
-    {
-      name: "Shirinivash",
-      role: "Backend Expert",
-      bio: "A renowned backend developer with deep knowledge of spirituality , always open to new area of interests.",
-      image: "https://images.pexels.com/photos/9956432/pexels-photo-9956432.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
-    }
-  ]
+  {
+    name: "Abhay Ray Sir",
+    role: "CEO & Founder",
+    bio: "Get My India was founded by Abhay Kumar Ray, a visionary leader with a passion for purpose-driven work. As Founder and CEO, he aims to channel the company’s success into educating people about the timeless wisdom of the Vedas and the Bhagavad Gita. His mission is to blend modern business with ancient values, building a future rooted in knowledge and service,",
+    image: "https://media.licdn.com/dms/image/v2/D4D03AQF8e70NhezoYw/profile-displayphoto-shrink_400_400/B4DZagp3LyGwAo-/0/1746452051588?e=1753920000&v=beta&t=feJIZGE9HNt4zzwIWrKfRUTmBT8hzCdyzMI4w--4kes"
+  },
+  {
+    name: "Ankit Srivastava ",
+    role: "Senior Software Developer",
+    bio: "Ankit Srivastava is a  Senior Software Engineer with over 10 years of experience specializing in PHP development. Known for delivering efficient, scalable solutions, he brings a strong technical foundation to every project.Beyond coding, Ankit is a spiritually grounded individual who values mindfulness and purpose in his work. His unique blend of technical skill and thoughtful approach ensures solutions that are not only effective but also meaningful.",
+    image: "https://media.licdn.com/dms/image/v2/D4D16AQHFm_l82xJdZQ/profile-displaybackgroundimage-shrink_350_1400/B4DZU3Eiv8HwAg-/0/1740385696308?e=1753920000&v=beta&t=zxPsoCLGwRoxTYJyVEiHeGBsHIrpo3AMXw7a9UujkkQ"
+  },
+  {
+    name: "Aaditya Yadav",
+    role: "Software developer",
+    bio: "Developer and programmer with a passion for spirituality, Aaditya combines his technical expertise with deep knowledge of Vedic scriptures to create innovative spiritual solutions.",
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcScaGl0_ogzFlOeFIf-4d-veKtmiXoZm6uexQ&s"
+  },
+  {
+    name: "Shirinivash",
+    role: "Backend Expert",
+    bio: "A backend expert whose code is as clean as his conscience. Deeply rooted in spiritual wisdom, Shirinivash approaches technology with mindfulness and purpose. Always eager to explore new realms—be it in backend systems or inner self—he believes true innovation flows from inner clarity",
+    image: "https://media.licdn.com/dms/image/v2/D5635AQH8OVCAoBvM9A/profile-framedphoto-shrink_400_400/profile-framedphoto-shrink_400_400/0/1727831345266?e=1749020400&v=beta&t=6S9R-Hu9a40bFtlZ1u3o_6Pjd7piAKi_ATMXu6kzXV0"
+  },
+  {
+    name: "MD Kaif",
+    role: "ML Expert",
+    bio: "Web developer| Data Scientist | ML Engineer | React, Python, TensorFlow, Scikit-learn | NLP & LLMs | Final-Year B.Tech @ MNNIT",
+    image: "https://media.licdn.com/dms/image/v2/D4D03AQHyeMVTk3m7CQ/profile-displayphoto-shrink_400_400/B4DZYHu.rnG8Ag-/0/1743886478839?e=1753920000&v=beta&t=kBTAOUcn41TZm_QIxtsRZX0aIC-iewuNCtBCaQEMOo0"
+  },
+   {
+    name: "Saurabh Rajput",
+    role: "AI Expert",
+    bio: "I'm not just a coder; I'm a modern-day Rishi, interpreting the subtle energies of data and transforming them into tools that empower and uplift.",
+    image: "https://media.licdn.com/dms/image/v2/C4E03AQFc5kNUx7PgWg/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1644340089278?e=1753920000&v=beta&t=6mq_EwaiFht-DMd84vTTVsCTSg0AM7_kLeZenzSU6Ow"
+  }
+  
+];
 
   return (
     <>
@@ -78,13 +97,13 @@ const AboutPage = () => {
           <div className="max-w-3xl mx-auto text-center">
             <h2 className="section-heading">Our Story</h2>
             <p className="text-gray-700 mb-6 leading-relaxed">
-              Divine Harmony was founded in 2020 with a vision to bridge the gap between ancient spiritual traditions and modern technology. Our journey began when a group of devoted practitioners recognized the growing disconnect between people and their spiritual heritage.
+              RaysVeda was founded in 2024 with a vision to bridge the gap between ancient spiritual traditions and modern technology. Our journey began when a group of devoted practitioners recognized the growing disconnect between people and their spiritual heritage.
             </p>
             <p className="text-gray-700 mb-6 leading-relaxed">
               In a world becoming increasingly digital, we saw an opportunity to make spiritual practices more accessible while maintaining their authenticity and sacred nature. We partnered with respected priests, scholars, and temples across India to create a platform that brings the divine into homes worldwide.
             </p>
             <p className="text-gray-700 leading-relaxed">
-              Today, Divine Harmony serves thousands of devotees globally, offering authentic pujas, spiritual guidance, and educational resources. We continue to grow our offerings while staying true to the essence of Vedic traditions, helping people find peace, prosperity, and spiritual fulfillment in their lives.
+              Today, RaysVeda serves thousands of devotees globally, offering authentic pujas, spiritual guidance, and educational resources. We continue to grow our offerings while staying true to the essence of Vedic traditions, helping people find peace, prosperity, and spiritual fulfillment in their lives.
             </p>
           </div>
         </div>
@@ -102,7 +121,7 @@ const AboutPage = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
               <div>
                 <p className="text-gray-700 mb-6 leading-relaxed">
-                  At Divine Harmony, our mission is to revive and promote Vedic traditions by making them accessible and relevant in the modern world. We are committed to preserving the authenticity of ancient practices while leveraging technology to reach a global audience.
+                  At RaysVeda, our mission is to revive and promote Vedic traditions by making them accessible and relevant in the modern world. We are committed to preserving the authenticity of ancient practices while leveraging technology to reach a global audience.
                 </p>
                 <p className="text-gray-700 mb-6 leading-relaxed">
                   We aim to create a spiritual ecosystem where individuals can connect with their roots, experience divine grace, and cultivate inner peace regardless of their location or circumstances. Through our platform, we provide personalized spiritual services that address the unique needs of each devotee.
@@ -113,7 +132,7 @@ const AboutPage = () => {
               </div>
               <div className="relative">
                 <img 
-                  src="https://images.pexels.com/photos/7108244/pexels-photo-7108244.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" 
+                  src="https://i.pinimg.com/736x/1f/2b/a9/1f2ba9c27ee248e732f8851c79018276.jpg" 
                   alt="Temple ceremony" 
                   className="rounded-lg shadow-xl w-full h-auto object-cover"
                 />

@@ -20,7 +20,7 @@ const PujaPage = () => {
       id: 1,
       title: "Shri Narayan Puja",
       description: "This Pooja calms down your mind, sharpens your focus in life, helps in the overcoming of financial issues, delivers good fortune, avoids evil and helps to gain happiness!",
-      image: "https://t4.ftcdn.net/jpg/12/33/33/13/240_F_1233331310_4Qx5hQxoAKNDSAVUz7xNog81BTb4Yv5W.jpg",
+      image: "https://i.pinimg.com/736x/47/a2/37/47a23755394a44cd1b8e543472160e13.jpg",
       price: "₹1,501",
       link: "/puja/shri-narayan"
     },
@@ -28,7 +28,7 @@ const PujaPage = () => {
       id: 2,
       title: "Shri Ganpati Puja",
       description: "Represents sweetness & auspicious beginnings & offers blessings for achieving goals, aspirations as well as remove obstacles & bring good fortune!",
-      image: "https://images.pexels.com/photos/6150432/pexels-photo-6150432.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+      image: "https://i.pinimg.com/736x/2e/6d/6f/2e6d6f7119a936f6caabce62b5018d4b.jpg",
       price: "₹1,101",
       link: "/puja/shri-ganpati"
     },
@@ -36,7 +36,7 @@ const PujaPage = () => {
       id: 3,
       title: "Maa Lakshmi Puja",
       description: "The blessings of the goddess come in the form of prosperity, she keeps the chanter in her good graces, health, wealth & prosperity into home!",
-      image: "https://images.pexels.com/photos/5799810/pexels-photo-5799810.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+      image: "https://i.pinimg.com/736x/50/b0/dc/50b0dc13deb8d141838f77c216549560.jpg",
       price: "₹2,101",
       link: "/puja/maa-lakshmi"
     },
@@ -44,7 +44,7 @@ const PujaPage = () => {
       id: 4,
       title: "Shri Shiva Puja",
       description: "Lord Shiva destroys negative energies and brings positive transformation. This puja helps overcome obstacles, provides protection, and grants inner peace.",
-      image: "https://images.pexels.com/photos/6044219/pexels-photo-6044219.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+      image: "https://i.pinimg.com/736x/c6/da/a2/c6daa23adb2fce39cc1c7c9d45e745b1.jpg",
       price: "₹1,501",
       link: "/puja/shri-shiva"
     },
@@ -52,7 +52,7 @@ const PujaPage = () => {
       id: 5,
       title: "Durga Puja",
       description: "Worship of the divine mother for strength, courage, and protection. Helps overcome enemies, removes obstacles, and provides divine protection.",
-      image: "https://images.pexels.com/photos/19123210/pexels-photo-19123210/free-photo-of-maa-durga-statue.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+      image: "https://i.pinimg.com/736x/74/c3/7c/74c37ccfb43ecb7ff135e16514d26d50.jpg",
       price: "₹2,501",
       link: "/puja/durga"
     },
@@ -60,7 +60,7 @@ const PujaPage = () => {
       id: 6,
       title: "Satyanarayan Puja",
       description: "A ritual worship of Lord Vishnu that brings prosperity, peace, happiness, and spiritual growth to the devotees and their families.",
-      image: "https://images.pexels.com/photos/3964341/pexels-photo-3964341.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+      image: "https://i.pinimg.com/736x/37/b4/b8/37b4b827e49fe360d930bdfc39081caa.jpg",
       price: "₹3,101",
       link: "/puja/satyanarayan"
     }
