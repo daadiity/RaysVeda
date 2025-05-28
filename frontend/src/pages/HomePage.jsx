@@ -72,7 +72,7 @@ const HomePage = () => {
       id: 1,
       title: "Shri Narayan Puja",
       description: "This Pooja calms down your mind, sharpens your focus in life, helps in the overcoming of financial issues, delivers good fortune, avoids evil and helps to gain happiness!",
-      image: "https://w0.peakpx.com/wallpaper/627/1008/HD-wallpaper-lord-vishnu-animated-lord-vishnu-animated-lord-narayana-preserver-god",
+      image: "https://i.pinimg.com/736x/47/a2/37/47a23755394a44cd1b8e543472160e13.jpg",
       price: "₹1,501",
       link: "/puja/shri-narayan"
     },
@@ -80,7 +80,7 @@ const HomePage = () => {
       id: 2,
       title: "Shri Ganpati Puja",
       description: "Represents sweetness & auspicious beginnings & offers blessings for achieving goals, aspirations as well as remove obstacles & bring good fortune!",
-      image: "https://images.pexels.com/photos/6150432/pexels-photo-6150432.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+      image: "https://i.pinimg.com/736x/2e/6d/6f/2e6d6f7119a936f6caabce62b5018d4b.jpg",
       price: "₹1,801",
       link: "/puja/shri-ganpati"
     },
@@ -88,7 +88,7 @@ const HomePage = () => {
       id: 3,
       title: "Shri Shiv Puja",
       description: "For blessings of Lord Shiva for spiritual growth, inner peace, and removal of obstacles, ensuring prosperity and well-being.",
-      image: "https://images.pexels.com/photos/7919833/pexels-photo-7919833.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+      image: "https://i.pinimg.com/736x/c6/da/a2/c6daa23adb2fce39cc1c7c9d45e745b1.jpg",
       price: "₹2,101",
       link: "/puja/shri-shiv"
     }
@@ -100,7 +100,7 @@ const HomePage = () => {
       <section className="relative h-screen flex items-center justify-center text-white text-center">
         <div 
           className="absolute inset-0 bg-cover bg-center" 
-          style={{ backgroundImage: `url('https://images.pexels.com/photos/220201/pexels-photo-220201.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1')` }}
+          style={{ backgroundImage: `url('https://res.cloudinary.com/dufvitqpb/image/upload/v1748418174/generated-image_7_z71loi.png')` }}
         >
           <div className="absolute inset-0 bg-black opacity-50"></div>
         </div>

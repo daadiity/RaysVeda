@@ -87,15 +87,16 @@ const Footer = () => {
             <ul className="space-y-3">
               <li className="flex items-center">
                 <FaMapMarkerAlt className="text-primary-400 mr-3" />
-                <span className="text-gray-300">123 Spiritual Path, Vedic City, VK 98765</span>
+                <span className="text-gray-300">11/13/4C, Tashkand Marg, Civil Lines, Allahabad,
+Uttar Pradesh, India - 211001</span>
               </li>
               <li className="flex items-center">
                 <FaPhoneAlt className="text-primary-400 mr-3" />
-                <span className="text-gray-300">+91 98765 43210</span>
+                <span className="text-gray-300">+91-9161-110-130</span>
               </li>
               <li className="flex items-center">
                 <FaEnvelope className="text-primary-400 mr-3" />
-                <span className="text-gray-300">info@raysveda.com</span>
+                <span className="text-gray-300">support@raysveda.com</span>
               </li>
             </ul>
             <div className="mt-4">
