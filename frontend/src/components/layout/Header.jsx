@@ -165,7 +165,6 @@ const Header = ({ scrolled }) => {
         >
           <div className="flex justify-between items-center p-4 border-b">
             {/* The Logo component is just an icon now */}
-            <Logo /> 
             {/* Also change the text for mobile menu here if desired, otherwise it will display Divine Harmony */}
             <span className="ml-2 text-xl font-serif font-bold text-gray-800">Rays<span className="text-primary-600">Veda</span></span>
             <button 
