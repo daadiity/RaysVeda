@@ -9,6 +9,7 @@ import AboutPage from './pages/AboutPage'
 import ContactPage from './pages/ContactPage'
 import WhatsAppButton from './components/common/WhatsAppButton'
 import ScrollToTop from './components/common/ScrollToTop'
+import Vedas from './pages/Vedas'
 
 function App() {
   const [scrolled, setScrolled] = useState(false)
@@ -32,6 +33,8 @@ function App() {
           <Route path="/services" element={<ServicesPage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/contact" element={<ContactPage />} />
+          <Route path="/vidya/vedas" element={<Vedas />} />
+
         </Routes>
       </main>
       <Footer />
