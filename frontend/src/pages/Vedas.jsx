@@ -164,10 +164,10 @@ export default function Vedas() {
 
   return (
     <>
-      <div className="relative w-full aspect-[3/1]">
+      <div className="relative w-full aspect-[3/2]">
         <img
-          src="https://i.pinimg.com/736x/15/2f/18/152f187b13678e1282b667403b16fad1.jpg"
-          className="absolute inset-0 w-full h-full object-cover"
+          src="https://smppr-userpub-cdn.simplified.com/usetldr/15185516/u/15561954/t2i/2083c491-bf74-41ea-b2de-d1cb7af8bb6e/IG_cpoDhEIcYibs.png"
+          className="absolute inset-0 w-full h-full object-cover object-centre"
         />
       </div>
       {/* Vedas Section */}
