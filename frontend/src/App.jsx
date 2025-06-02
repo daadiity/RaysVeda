@@ -10,10 +10,8 @@ import ContactPage from './pages/ContactPage'
 import WhatsAppButton from './components/common/WhatsAppButton'
 import ScrollToTop from './components/common/ScrollToTop'
 import Vedas from './pages/Vedas'
-import RigVeda from './pages/RigVeda' // Ensure this import matches your file structure
-import CharitablePrograms from './pages/CharitablePrograms' // Ensure this import matches your file structure
-import CommunityService from './pages/CommunityService'
-import DonatePage from './pages/DonatePage'
+import SacredMantras from './pages/SacredMantras'
+import Meditation from './pages/Meditation';
 
 function App() {
   const [scrolled, setScrolled] = useState(false)
@@ -38,11 +36,8 @@ function App() {
           <Route path="/about" element={<AboutPage />} />
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/vidya/vedas" element={<Vedas />} />
-          <Route path="/veda/rig-veda" element={<RigVeda />} />
-          <Route path="/seva/charitable-programs" element={<CharitablePrograms />} />
-          <Route path="/seva/community-service" element={<CommunityService />} />
-          <Route path="/seva/donate" element={<DonatePage />} />
-          {/* Add more routes as needed */}
+          <Route path="/vidya/mantras" element={<SacredMantras />} />
+          <Route path="/vidya/meditation" element={<Meditation />} />
 
         </Routes>
       </main>
