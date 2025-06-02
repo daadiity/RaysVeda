@@ -4,7 +4,7 @@ import { motion } from 'framer-motion'
 const Logo = ({ className = '' }) => {
   return (
     <motion.div 
-      className={`h-10 w-10 flex items-center justify-center ${className}`}
+      className={`h-10 w-10 flex items-center justify-center rounded-full overflow-hidden ${className}`}
       whileHover={{ rotate: 10, scale: 1.05 }}
       transition={{ duration: 0.3 }}
     >

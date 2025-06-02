@@ -3,6 +3,7 @@ import { Link, NavLink } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { FaChevronDown } from 'react-icons/fa'
 import Logo from '../common/Logo'
+import Vedas from '../../pages/Vedas'
 
 const Header = ({ scrolled }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -101,7 +102,7 @@ const Header = ({ scrolled }) => {
                 exit={{ opacity: 0, y: 10 }}
                 className="absolute mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10"
               >
-                <Link to="/vidya/vedic-scriptures" className="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-100">Vedic Scriptures</Link>
+                <Link to="/vidya/vedas" className="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-100">Vedas</Link>
                 <Link to="/vidya/mantras" className="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-100">Sacred Mantras</Link>
                 <Link to="/vidya/meditation" className="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-100">Meditation</Link>
               </motion.div>
