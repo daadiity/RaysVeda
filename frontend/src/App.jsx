@@ -9,6 +9,7 @@ import AboutPage from './pages/AboutPage'
 import ContactPage from './pages/ContactPage'
 import WhatsAppButton from './components/common/WhatsAppButton'
 import ScrollToTop from './components/common/ScrollToTop'
+import KundliPage from './pages/KundliPage'
 
 function App() {
   const [scrolled, setScrolled] = useState(false)
@@ -23,15 +24,16 @@ function App() {
   }, [])
 
   return (
-    <div className="min-h-screen bg-orange-50 flex flex-col">
+    <div className="min-vh-100 bg-light d-flex flex-column">
       <Header scrolled={scrolled} />
-      <main className="flex-grow">
+      <main className="flex-grow-1">
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/puja" element={<PujaPage />} />
           <Route path="/services" element={<ServicesPage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/contact" element={<ContactPage />} />
+          <Route path="/services/kundli" element={<KundliPage />} />
         </Routes>
       </main>
       <Footer />
