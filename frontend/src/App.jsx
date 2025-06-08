@@ -12,6 +12,12 @@ import ScrollToTop from './components/common/ScrollToTop'
 import Vedas from './pages/Vedas'
 import SacredMantras from './pages/SacredMantras'
 import Meditation from './pages/Meditation';
+import PranPratishtha from "./pages/PranPratishtha";
+import SignupPage from './pages/SignupPage';
+import LoginPage from './pages/LoginPage';
+import UserDashboard from './pages/UserDashboard';
+import ProtectedRoute from './components/auth/ProtectedRoute';
+import BookingHistory from "./pages/BookingHistory";
 
 function App() {
   const [scrolled, setScrolled] = useState(false)
@@ -26,7 +32,7 @@ function App() {
   }, [])
 
   return (
-    <div className="min-h-screen bg-orange-50 flex flex-col">
+     <div className="min-h-screen bg-white text-black dark:bg-gray-900 dark:text-white transition-colors duration-300 flex flex-col">
       <Header scrolled={scrolled} />
       <main className="flex-grow">
         <Routes>
@@ -38,7 +44,19 @@ function App() {
           <Route path="/vidya/vedas" element={<Vedas />} />
           <Route path="/vidya/mantras" element={<SacredMantras />} />
           <Route path="/vidya/meditation" element={<Meditation />} />
-
+          <Route path="/services/pran-pratishtha" element={<PranPratishtha />} />
+          <Route path="/signup" element={<SignupPage />} />
+          <Route path="/login" element={<LoginPage />} />   
+          <Route path="/dashboard" element={
+               <ProtectedRoute>
+               <UserDashboard />
+              </ProtectedRoute>
+            } />
+           <Route path="/booking-history/:id" element={
+               <ProtectedRoute>
+               <BookingHistory />
+              </ProtectedRoute>
+            } />  
         </Routes>
       </main>
       <Footer />
