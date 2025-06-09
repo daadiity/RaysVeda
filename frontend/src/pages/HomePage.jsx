@@ -1,8 +1,10 @@
-import { useEffect, useRef } from 'react'
+import { useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, useInView } from 'framer-motion'
 import ServiceCard from '../components/home/ServiceCard'
 import PujaCard from '../components/home/PujaCard'
+import { useAuth } from '../context/AuthContext'
+import BookPoojaForm from '../components/BookPoojaForm'
 
 const fadeIn = {
   hidden: { opacity: 0, y: 20 },
@@ -17,7 +19,10 @@ const HomePage = () => {
   const aboutRef = useRef(null)
   const servicesRef = useRef(null)
   const pujaRef = useRef(null)
-  
+  const [showBooking, setShowBooking] = useState(false)
+  const [showLoginMsg, setShowLoginMsg] = useState(false)
+  const { user } = useAuth()
+
   const aboutInView = useInView(aboutRef, { once: true, margin: "-100px" })
   const servicesInView = useInView(servicesRef, { once: true, margin: "-100px" })
   const pujaInView = useInView(pujaRef, { once: true, margin: "-100px" })
@@ -94,6 +99,16 @@ const HomePage = () => {
     }
   ]
 
+  // Handler for Book a Puja Now button (used in both hero and CTA)
+  const handleBookPujaClick = () => {
+    if (user && user._id) {
+      setShowBooking(true)
+    } else {
+      setShowLoginMsg(true)
+      setTimeout(() => setShowLoginMsg(false), 3000)
+    }
+  }
+
   return (
     <>
       {/* Hero Section */}
@@ -126,9 +141,14 @@ const HomePage = () => {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8, delay: 0.4 }}
           >
-            <Link to="/puja/booking" className="btn-primary">
+            <button className="btn-primary" onClick={handleBookPujaClick}>
               Book a Puja Now
-            </Link>
+            </button>
+            {showLoginMsg && (
+              <div className="mt-4 bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded inline-block">
+                Please log in or sign up to book a puja.
+              </div>
+            )}
           </motion.div>
         </div>
       </section>
@@ -216,9 +236,9 @@ const HomePage = () => {
               ))}
             </div>
             <div className="text-center mt-12">
-              <Link to="/puja" className="btn-primary">
-                Explore More Pujas
-              </Link>
+              <button className="btn-primary" onClick={handleBookPujaClick}>
+                Book a Puja Now
+              </button>
             </div>
           </motion.div>
         </div>
@@ -233,11 +253,18 @@ const HomePage = () => {
           <p className="text-xl max-w-3xl mx-auto mb-8">
             Experience the divine blessings and inner peace through our authentic spiritual services
           </p>
-          <Link to="/puja/booking" className="btn bg-white text-primary-700 hover:bg-gray-100">
+          <button className="btn bg-white text-primary-700 hover:bg-gray-100" onClick={handleBookPujaClick}>
             Book a Puja
-          </Link>
+          </button>
+          {showLoginMsg && (
+            <div className="mt-4 bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded inline-block">
+              Please log in or sign up to book a puja.
+            </div>
+          )}
         </div>
       </section>
+
+      {showBooking && <BookPoojaForm onClose={() => setShowBooking(false)} />}
     </>
   )
 }
