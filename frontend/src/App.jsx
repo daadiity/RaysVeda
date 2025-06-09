@@ -12,6 +12,15 @@ import ScrollToTop from './components/common/ScrollToTop'
 import KundliIntroPage from './pages/KundliIntroPage'
 import KundliFormPage from './pages/KundliFormPage'
 import KundliResultPage from './pages/KundliResultPage'
+import Vedas from './pages/Vedas'
+import SacredMantras from './pages/SacredMantras'
+import Meditation from './pages/Meditation';
+import PranPratishtha from "./pages/PranPratishtha";
+import SignupPage from './pages/SignupPage';
+import LoginPage from './pages/LoginPage';
+import UserDashboard from './pages/UserDashboard';
+import ProtectedRoute from './components/auth/ProtectedRoute';
+import BookingHistory from "./pages/BookingHistory";
 
 function App() {
   const [scrolled, setScrolled] = useState(false)
@@ -26,7 +35,9 @@ function App() {
   }, [])
 
   return (
+
     <div className="min-vh-100 bg-light d-flex flex-column">
+   
       <Header scrolled={scrolled} />
       <main className="flex-grow-1">
         <Routes>
@@ -38,6 +49,23 @@ function App() {
           <Route path="/services/kundli" element={<KundliIntroPage />} />
           <Route path="/services/kundli/form" element={<KundliFormPage />} />
           <Route path="/services/kundli/result" element={<KundliResultPage />} />
+          <Route path="/vidya/vedas" element={<Vedas />} />
+          <Route path="/vidya/mantras" element={<SacredMantras />} />
+          <Route path="/vidya/meditation" element={<Meditation />} />
+          <Route path="/services/pran-pratishtha" element={<PranPratishtha />} />
+          <Route path="/signup" element={<SignupPage />} />
+          <Route path="/login" element={<LoginPage />} />   
+          <Route path="/dashboard" element={
+               <ProtectedRoute>
+               <UserDashboard />
+              </ProtectedRoute>
+            } />
+           <Route path="/booking-history/:id" element={
+               <ProtectedRoute>
+               <BookingHistory />
+              </ProtectedRoute>
+            } />  
+
         </Routes>
       </main>
       <Footer />
