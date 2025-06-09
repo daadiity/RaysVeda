@@ -1,6 +1,8 @@
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, useInView } from 'framer-motion'
+import BookPoojaForm from '../components/BookPoojaForm'
+import { useAuth } from '../context/AuthContext'
 
 const fadeIn = {
   hidden: { opacity: 0, y: 20 },
@@ -14,6 +16,9 @@ const fadeIn = {
 const PujaPage = () => {
   const pujasRef = useRef(null)
   const pujasInView = useInView(pujasRef, { once: true, margin: "-100px" })
+  const [showBooking, setShowBooking] = useState(false)
+  const [showLoginMsg, setShowLoginMsg] = useState(false)
+  const { user } = useAuth()
 
   const pujas = [
     {
@@ -66,6 +71,16 @@ const PujaPage = () => {
     }
   ]
 
+  // Handler for Book a Puja Now button (used in both hero and CTA)
+  const handleBookPujaClick = () => {
+    if (user && user._id) {
+      setShowBooking(true)
+    } else {
+      setShowLoginMsg(true)
+      setTimeout(() => setShowLoginMsg(false), 3000)
+    }
+  }
+
   return (
     <>
       {/* Hero Section */}
@@ -93,9 +108,17 @@ const PujaPage = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.4 }}
             >
-              <Link to="/puja/booking" className="btn bg-white text-primary-700 hover:bg-gray-100">
+              <button
+                className="btn bg-white text-primary-700 hover:bg-gray-100"
+                onClick={handleBookPujaClick}
+              >
                 Book a Puja Now
-              </Link>
+              </button>
+              {showLoginMsg && (
+                <div className="mt-4 bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded">
+                  Please log in or sign up to book a puja.
+                </div>
+              )}
             </motion.div>
           </div>
         </div>
@@ -262,11 +285,24 @@ const PujaPage = () => {
           <p className="text-xl max-w-3xl mx-auto mb-8">
             Book a puja today and invite peace, prosperity, and divine grace into your life
           </p>
-          <Link to="/puja/booking" className="btn bg-white text-primary-700 hover:bg-gray-100">
+          <button
+            className="btn bg-white text-primary-700 hover:bg-gray-100"
+            onClick={handleBookPujaClick}
+          >
             Book a Puja Now
-          </Link>
+          </button>
+          {showLoginMsg && (
+            <div className="mt-4 bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded inline-block">
+              Please log in or sign up to book a puja.
+            </div>
+          )}
         </div>
       </section>
+
+      {/* Booking Modal */}
+      {showBooking && (
+        <BookPoojaForm onClose={() => setShowBooking(false)} />
+      )}
     </>
   )
 }
