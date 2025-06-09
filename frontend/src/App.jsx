@@ -9,7 +9,9 @@ import AboutPage from './pages/AboutPage'
 import ContactPage from './pages/ContactPage'
 import WhatsAppButton from './components/common/WhatsAppButton'
 import ScrollToTop from './components/common/ScrollToTop'
-import KundliPage from './pages/KundliPage'
+import KundliIntroPage from './pages/KundliIntroPage'
+import KundliFormPage from './pages/KundliFormPage'
+import KundliResultPage from './pages/KundliResultPage'
 
 function App() {
   const [scrolled, setScrolled] = useState(false)
@@ -33,7 +35,9 @@ function App() {
           <Route path="/services" element={<ServicesPage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/contact" element={<ContactPage />} />
-          <Route path="/services/kundli" element={<KundliPage />} />
+          <Route path="/services/kundli" element={<KundliIntroPage />} />
+          <Route path="/services/kundli/form" element={<KundliFormPage />} />
+          <Route path="/services/kundli/result" element={<KundliResultPage />} />
         </Routes>
       </main>
       <Footer />
