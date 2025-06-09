@@ -1,27 +1,32 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { Link, useNavigate } from "react-router-dom"; // Import useNavigate
-import { useAuth } from "../../context/AuthContext"; // Import useAuth
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 
 export default function SignupForm() {
-  const [form, setForm] = useState({ name: "", phone: "", address: "", password: "" });
+  const [form, setForm] = useState({
+    name: "",
+    phone: "",
+    address: "",
+    email: "",      // <-- Added email field
+    password: ""
+  });
   const [message, setMessage] = useState("");
-  const navigate = useNavigate(); // Initialize useNavigate
-  const { login } = useAuth(); // Get login from context
+  const navigate = useNavigate();
+  const { login } = useAuth();
 
-  const handleChange = e => setForm({ ...form, [e.target.name]: e.target.value });
+  const handleChange = e =>
+    setForm({ ...form, [e.target.name]: e.target.value });
 
   const handleSubmit = async e => {
     e.preventDefault();
-    setMessage(""); // Clear any previous messages
+    setMessage("");
     try {
       const res = await axios.post("/api/auth/signup", form);
-      // Backend should send { user: ..., token: ..., message: ... }
-      const { user, token, message: successMessage } = res.data; // Destructure all needed data
-
+      const { user, token, message: successMessage } = res.data;
       setMessage(successMessage || "Account created successfully!");
-      login(user, token); // Automatically log in the user and store the token
-      navigate("/dashboard"); // Redirect to dashboard
+      login(user, token);
+      navigate("/dashboard");
     } catch (err) {
       console.error("Signup error:", err.response?.data || err.message);
       setMessage(err.response?.data?.message || "Signup failed. Please try again.");
@@ -63,6 +68,18 @@ export default function SignupForm() {
               onChange={handleChange}
               required
               placeholder="Enter your address"
+              className="input w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-400"
+            />
+          </div>
+          <div>
+            <label className="block text-gray-700 mb-1">Email</label>
+            <input
+              name="email"
+              type="email"
+              value={form.email}
+              onChange={handleChange}
+              required
+              placeholder="Enter your email"
               className="input w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-400"
             />
           </div>
