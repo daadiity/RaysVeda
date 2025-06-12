@@ -14,13 +14,16 @@ const generateToken = (id) => {
 
 // Signup (no OTP)
 router.post('/signup', async (req, res) => {
-  const { name, phone, address, password } = req.body;
+  const { name, phone, address, email, password } = req.body;
+    if (!email) {
+    return res.status(400).json({ message: 'Email is required' });
+    }
   const existing = await User.findOne({ phone });
   if (existing) return res.status(400).json({ success: false, message: 'User already exists' });
 
   try {
     const hashed = await bcrypt.hash(password, 10);
-    const user = new User({ name, phone, address, password: hashed });
+    const user = new User({ name, phone, address, email, password: hashed });
     await user.save();
 
     // Generate token after successful signup
@@ -35,6 +38,7 @@ router.post('/signup', async (req, res) => {
         name: user.name,
         phone: user.phone,
         address: user.address,
+        email: user.email, 
       },
     });
   } catch (error) {
