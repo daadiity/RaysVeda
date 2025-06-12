@@ -6,8 +6,8 @@ const mongoose = require('mongoose');
 
 const poojaBookingRoutes = require('./routes/poojaBooking');
 const webhookRoute = require('./routes/webhook');
-const authRoutes = require('../routes/auth');
-const bookingRoutes = require('../routes/booking');
+const authRoutes = require('./routes/auth');
+const bookingRoutes = require('./routes/booking');
 
 const app = express();
 
