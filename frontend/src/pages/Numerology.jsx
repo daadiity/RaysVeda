@@ -1,13 +1,46 @@
-import React from "react";
+import React, { useState } from 'react';
+import axios from 'axios';
 
 const Numerology = () => {
+  const [formVisible, setFormVisible] = useState(false); // State to toggle form visibility
+  const [formData, setFormData] = useState({
+    name: '',
+    birthDate: '',
+    email: '',
+    serviceType: 'Life Path Analysis',
+    message: '',
+  });
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await axios.post('http://localhost:5000/api/numerology', formData);
+      alert('Request submitted successfully!');
+      setFormData({
+        name: '',
+        birthDate: '',
+        email: '',
+        serviceType: 'Life Path Analysis',
+        message: '',
+      });
+      setFormVisible(false); // Hide the form after submission
+    } catch (error) {
+      console.error('Error submitting request:', error);
+      alert('Failed to submit request.');
+    }
+  };
+
   return (
     <div className="bg-orange-50 min-h-screen">
       {/* Hero Section */}
       <section className="relative h-[60vh] overflow-hidden">
         <div className="absolute inset-0">
           <img
-            src="https://i.pinimg.com/736x/ad/2d/90/ad2d9025aa9082d56ee9817273cdf2e1.jpg" // Replace with your image URL
+            src="https://i.pinimg.com/736x/ad/2d/90/ad2d9025aa9082d56ee9817273cdf2e1.jpg"
             alt="Numerology"
             className="w-full h-full object-cover"
           />
@@ -73,11 +106,89 @@ const Numerology = () => {
           <p className="text-lg mb-8">
             Unlock the secrets of your destiny with our expert numerologists.
           </p>
-          <button className="bg-white text-orange-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition">
+          <button
+            onClick={() => setFormVisible(true)} // Show the form when clicked
+            className="bg-white text-orange-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition"
+          >
             Book Now
           </button>
         </div>
       </section>
+
+      {/* Form Section (Visible Only When Book Now is Clicked) */}
+      {formVisible && (
+        <section className="py-16 bg-white">
+          <div className="container mx-auto px-4">
+            <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">
+              Request a Numerology Service
+            </h2>
+            <form onSubmit={handleSubmit} className="max-w-3xl mx-auto bg-gray-100 p-6 rounded-lg shadow-lg">
+              <div className="mb-4">
+                <label className="block text-gray-700 font-bold mb-2">Name</label>
+                <input
+                  type="text"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  className="w-full p-3 border rounded"
+                  required
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block text-gray-700 font-bold mb-2">Birth Date</label>
+                <input
+                  type="date"
+                  name="birthDate"
+                  value={formData.birthDate}
+                  onChange={handleChange}
+                  className="w-full p-3 border rounded"
+                  required
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block text-gray-700 font-bold mb-2">Email</label>
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  className="w-full p-3 border rounded"
+                  required
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block text-gray-700 font-bold mb-2">Service Type</label>
+                <select
+                  name="serviceType"
+                  value={formData.serviceType}
+                  onChange={handleChange}
+                  className="w-full p-3 border rounded"
+                >
+                  <option>Life Path Analysis</option>
+                  <option>Name Numerology</option>
+                  <option>Compatibility Check</option>
+                </select>
+              </div>
+              <div className="mb-4">
+                <label className="block text-gray-700 font-bold mb-2">Message</label>
+                <textarea
+                  name="message"
+                  value={formData.message}
+                  onChange={handleChange}
+                  className="w-full p-3 border rounded"
+                  rows="4"
+                ></textarea>
+              </div>
+              <button
+                type="submit"
+                className="bg-orange-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-orange-700"
+              >
+                Submit
+              </button>
+            </form>
+          </div>
+        </section>
+      )}
     </div>
   );
 };

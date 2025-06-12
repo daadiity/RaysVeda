@@ -5,6 +5,7 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 
 const poojaBookingRoutes = require('./routes/poojaBooking');
+const numerologyRoutes = require('./routes/numerologyRoutes'); // Import numerology routes
 
 const app = express();
 
@@ -20,6 +21,11 @@ app.use(bodyParser.json());
 // Stripe webhook needs raw body
 app.use('/api/webhook', express.raw({type: 'application/json'}));
 app.use('/api', poojaBookingRoutes);
+app.use('/api/numerology', numerologyRoutes);
+
+
+
+
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
