@@ -1,5 +1,3 @@
-import React from "react";
-
 export default function Vedas() {
   const vedas = [
     {
@@ -123,7 +121,7 @@ export default function Vedas() {
         </div>
       </section>
 
-      {/* Branches of the Vedas Section */}}
+      {/* Branches of the Vedas Section */}
       <section className="text-gray-600 body-font">
         <div className="container px-5 py-24 mx-auto">
           <div className="flex flex-col text-center w-full mb-20">
