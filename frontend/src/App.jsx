@@ -15,16 +15,13 @@ import KundliResultPage from './pages/KundliResultPage'
 import Vedas from './pages/Vedas'
 import SacredMantras from './pages/SacredMantras'
 import Meditation from './pages/Meditation';
-<<<<<<< HEAD
 import Numerology from './pages/Numerology';
-=======
 import PranPratishtha from "./pages/PranPratishtha";
 import SignupPage from './pages/SignupPage';
 import LoginPage from './pages/LoginPage';
 import UserDashboard from './pages/UserDashboard';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import BookingHistory from "./pages/BookingHistory";
->>>>>>> d5915cb70b0cf47041ce70aabee121ff6c77a673
 
 function App() {
   const [scrolled, setScrolled] = useState(false)
@@ -56,9 +53,7 @@ function App() {
           <Route path="/vidya/vedas" element={<Vedas />} />
           <Route path="/vidya/mantras" element={<SacredMantras />} />
           <Route path="/vidya/meditation" element={<Meditation />} />
-<<<<<<< HEAD
           <Route path="/services/numerology" element={<Numerology />} />
-=======
           <Route path="/services/pran-pratishtha" element={<PranPratishtha />} />
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/login" element={<LoginPage />} />   
@@ -72,7 +67,6 @@ function App() {
                <BookingHistory />
               </ProtectedRoute>
             } />  
->>>>>>> d5915cb70b0cf47041ce70aabee121ff6c77a673
 
         </Routes>
       </main>
