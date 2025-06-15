@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import AdminLayout from "../components/admin/AdminLayout";
+import AdminLayout from "../components/Dashboard/AdminLayout";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 import { Paper, Typography, Grid } from "@mui/material";
 

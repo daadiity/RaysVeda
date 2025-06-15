@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import AdminLayout from "../components/admin/AdminLayout";
+import AdminLayout from "../components/Dashboard/AdminLayout";
 import { Table, TableHead, TableRow, TableCell, TableBody, IconButton, Paper, Typography } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 
