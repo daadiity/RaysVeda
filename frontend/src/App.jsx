@@ -22,6 +22,12 @@ import LoginPage from './pages/LoginPage';
 import UserDashboard from './pages/UserDashboard';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import BookingHistory from "./pages/BookingHistory";
+// import { BrowserRouter} from "react-router-dom";
+import AdminLogin from "./pages/AdminLogin";
+import AdminDashboard from "./pages/AdminDashboard";
+import AdminUsers from "./pages/AdminUsers";
+import AdminBookings from "./pages/AdminBookings";
+import AdminStats from './pages/AdminStats';
 
 function App() {
   const [scrolled, setScrolled] = useState(false)
@@ -41,6 +47,7 @@ function App() {
    
       <Header scrolled={scrolled} />
       <main className="flex-grow-1">
+        
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/puja" element={<PujaPage />} />
@@ -68,7 +75,14 @@ function App() {
               </ProtectedRoute>
             } />  
 
+          <Route path="/admin/login" element={<AdminLogin />} />
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route path="/admin/users" element={<AdminUsers />} />
+          <Route path="/admin/bookings" element={<AdminBookings />} />
+          <Route path="/admin/stats" element={<AdminStats />} />
+
         </Routes>
+      
       </main>
       <Footer />
       <WhatsAppButton />
@@ -77,4 +91,4 @@ function App() {
   )
 }
 
-export default App
+export default App;
