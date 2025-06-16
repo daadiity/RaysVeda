@@ -29,8 +29,19 @@ import BookingHistory from "./pages/BookingHistory";
 import ProtectedRoute from './components/auth/ProtectedRoute';
 
 import AdminLogin from "./pages/AdminLogin";
-import AdminDashboard from "./components/AdminDashboard"
+// import AdminDashboard from "./components/AdminDashboard"
 import "./index.css"
+
+
+import AdminLayout from "./components/adminDashboardLayout/AdminLayout";
+import Dashboard from "./pages/admin/Dashboard";
+import Users from "./pages/admin/Users";
+import Bookings from "./pages/admin/Bookings";
+import Stats from "./pages/admin/Stats";
+import Poojas from "./pages/admin/Poojas";
+import Reports from "./pages/admin/Reports";
+import Settings from "./pages/admin/Settings";
+import Notifications from "./pages/admin/Notifications";
 
 // import AdminUsers from "./pages/AdminUsers";
 // import AdminBookings from "./pages/AdminBookings";
@@ -85,10 +96,16 @@ function App() {
 
           {/* Admin Routes */}
           <Route path="/admin/login" element={<AdminLogin />} />
-          <Route path="/admin/dashboard" element={<AdminDashboard />} />
-          {/* <Route path="/admin/users" element={<AdminUsers />} /> */}
-          {/* <Route path="/admin/bookings" element={<AdminBookings />} /> */}
-          {/* <Route path="/admin/stats" element={<AdminStats />} /> */}
+          <Route path="/admin" element={<AdminLayout />}>
+            <Route path="dashboard" element={<Dashboard />} />
+            <Route path="users" element={<Users />} />
+            <Route path="bookings" element={<Bookings />} />
+            <Route path="stats" element={<Stats />} />
+            <Route path="poojas" element={<Poojas />} />
+            <Route path="reports" element={<Reports />} />
+            <Route path="settings" element={<Settings />} />
+            <Route path="notifications" element={<Notifications />} />
+          </Route>
         </Routes>
       </main>
 
