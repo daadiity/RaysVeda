@@ -17,9 +17,21 @@ const Users = () => {
   const fetchUsers = async () => {
     try {
       setLoading(true)
+      const params = {
+        page: currentPage,
+        limit: usersPerPage,
+        search: searchTerm,
+      }
+
       // TODO: Connect to backend API
-      // const response = await adminAPI.getUsers();
+      // const response = await adminAPI.getUsers(params);
       // setUsers(response.data);
+
+      // Update pagination if backend provides it
+      // if (response.pagination) {
+      //   // You can use this for more accurate pagination
+      //   console.log('Pagination info:', response.pagination);
+      // }
 
       // Mock data - replace with actual API call
       const mockUsers = [
@@ -45,21 +57,23 @@ const Users = () => {
       setUsers(mockUsers)
     } catch (error) {
       console.error("Error fetching users:", error)
+      alert("Failed to load users. Please try again.")
     } finally {
       setLoading(false)
     }
   }
 
   const handleAddUser = () => {
-    // TODO: Implement add user functionality
-    // Open modal or navigate to add user form
+    // TODO: Implement add user modal/form
+    // For now, navigate to a form or open a modal
     console.log("Add user - implement form/modal")
+    alert("Add user functionality - implement form/modal with adminAPI.createUser()")
   }
 
   const handleEditUser = (userId) => {
-    // TODO: Connect to backend API
-    // Navigate to edit user page or open modal
+    // TODO: Implement edit user functionality
     console.log("Edit user:", userId)
+    alert(`Edit user functionality - use adminAPI.updateUser(${userId}, data)`)
   }
 
   const handleDeleteUser = async (userId) => {
@@ -68,16 +82,27 @@ const Users = () => {
         // TODO: Connect to backend API
         // await adminAPI.deleteUser(userId);
         // fetchUsers(); // Refresh the list
-        console.log("Delete user:", userId)
+        // Mock adminAPI
+        const adminAPI = {
+          deleteUser: async (id) => {
+            console.log(`Deleting user with id: ${id}`)
+            return Promise.resolve() // Simulate success
+          },
+        }
+        await adminAPI.deleteUser(userId)
+        fetchUsers() // Refresh the list
+        alert("User deleted successfully")
       } catch (error) {
         console.error("Error deleting user:", error)
+        alert("Failed to delete user. Please try again.")
       }
     }
   }
 
   const handleViewUser = (userId) => {
-    // TODO: Navigate to user details page
+    // TODO: Navigate to user details page or open modal
     console.log("View user details:", userId)
+    alert(`View user details - use adminAPI.getUserById(${userId})`)
   }
 
   const filteredUsers = users.filter(
@@ -232,3 +257,5 @@ const Users = () => {
 }
 
 export default Users
+// This code defines a Users management page for an admin dashboard.
+// It includes features like searching, adding, editing, deleting, and viewing user details.

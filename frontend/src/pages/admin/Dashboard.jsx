@@ -7,6 +7,7 @@ import StatsCard from "../../components/dashboard/StatsCard"
 import RecentBookings from "../../components/dashboard/RecentBookings"
 import QuickActions from "../../components/dashboard/QuickActions"
 import DashboardCharts from "../../components/charts/DashboardCharts"
+import { adminAPI } from "../../services/api" // Import adminAPI
 
 const Dashboard = () => {
   const navigate = useNavigate()
@@ -28,26 +29,26 @@ const Dashboard = () => {
     try {
       setLoading(true)
 
-      // TODO: Replace with actual API calls
-      // const [statsResponse, bookingsResponse, chartsResponse] = await Promise.all([
-      //   adminAPI.getDashboardStats(),
-      //   adminAPI.getRecentBookings(),
-      //   adminAPI.getChartData()
-      // ]);
+      // Fetch real data from backend
+      const [statsResponse, bookingsResponse, chartsResponse] = await Promise.all([
+        adminAPI.getDashboardStats(),
+        adminAPI.getRecentBookings(5),
+        adminAPI.getChartData(),
+      ])
 
-      // Mock data - replace with actual API responses
-      const mockStats = [
+      // Transform stats data to match component format
+      const statsData = [
         {
           title: "Total Bookings",
-          value: "1,234",
-          change: "+12%",
+          value: statsResponse.data.totalBookings.toString(),
+          change: "+12%", // You can calculate this from historical data
           icon: Calendar,
           color: "text-orange-600",
           bgColor: "bg-orange-50",
         },
         {
           title: "Active Users",
-          value: "856",
+          value: statsResponse.data.totalUsers.toString(),
           change: "+8%",
           icon: Users,
           color: "text-blue-600",
@@ -55,7 +56,7 @@ const Dashboard = () => {
         },
         {
           title: "Revenue",
-          value: "₹45,678",
+          value: `₹${statsResponse.data.totalRevenue.toLocaleString()}`,
           change: "+15%",
           icon: DollarSign,
           color: "text-green-600",
@@ -63,7 +64,7 @@ const Dashboard = () => {
         },
         {
           title: "Avg Rating",
-          value: "4.8",
+          value: "4.8", // You can calculate this from booking ratings
           change: "+0.2",
           icon: Star,
           color: "text-yellow-600",
@@ -71,64 +72,13 @@ const Dashboard = () => {
         },
       ]
 
-      const mockBookings = [
-        {
-          _id: "1",
-          user: { name: "Rajesh Kumar" },
-          poojaType: "Ganesh Puja",
-          date: "2024-01-15",
-          time: "10:00 AM",
-          status: "Confirmed",
-          amount: "2500",
-        },
-        {
-          _id: "2",
-          user: { name: "Priya Sharma" },
-          poojaType: "Lakshmi Puja",
-          date: "2024-01-16",
-          time: "6:00 PM",
-          status: "Pending",
-          amount: "3200",
-        },
-      ]
-
-      const mockChartData = {
-        monthlyBookings: [
-          { month: "Jan", bookings: 65 },
-          { month: "Feb", bookings: 78 },
-          { month: "Mar", bookings: 90 },
-          { month: "Apr", bookings: 81 },
-          { month: "May", bookings: 95 },
-          { month: "Jun", bookings: 110 },
-        ],
-        monthlyRevenue: [
-          { month: "Jan", revenue: 45000 },
-          { month: "Feb", revenue: 52000 },
-          { month: "Mar", revenue: 48000 },
-          { month: "Apr", revenue: 61000 },
-          { month: "May", revenue: 55000 },
-          { month: "Jun", revenue: 67000 },
-        ],
-        popularPoojas: [
-          { name: "Ganesh Puja", count: 45 },
-          { name: "Lakshmi Puja", count: 38 },
-          { name: "Saraswati Puja", count: 32 },
-          { name: "Durga Puja", count: 28 },
-          { name: "Shiva Puja", count: 25 },
-        ],
-        bookingStatus: [
-          { name: "Confirmed", value: 45 },
-          { name: "Pending", value: 25 },
-          { name: "Completed", value: 20 },
-          { name: "Cancelled", value: 10 },
-        ],
-      }
-
-      setStatsData(mockStats)
-      setRecentBookings(mockBookings)
-      setChartData(mockChartData)
+      setStatsData(statsData)
+      setRecentBookings(bookingsResponse.data)
+      setChartData(chartsResponse.data)
     } catch (error) {
       console.error("Error fetching dashboard data:", error)
+      // Show error message to user
+      alert("Failed to load dashboard data. Please try again.")
     } finally {
       setLoading(false)
     }

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { Bell, Check, Trash2 } from "lucide-react"
+import { adminAPI } from "../../services/api"
 
 const Notifications = () => {
   const [notifications, setNotifications] = useState([])
@@ -15,52 +16,11 @@ const Notifications = () => {
   const fetchNotifications = async () => {
     try {
       setLoading(true)
-      // TODO: Connect to backend API
-      // const response = await adminAPI.getNotifications();
-      // setNotifications(response.data);
-
-      // Mock data - replace with actual API call
-      const mockNotifications = [
-        {
-          _id: "1",
-          title: "New Booking Received",
-          message: "Rajesh Kumar has booked Ganesh Puja for January 15th",
-          type: "booking",
-          read: false,
-          createdAt: "2024-01-10T10:30:00Z",
-          priority: "high",
-        },
-        {
-          _id: "2",
-          title: "Payment Received",
-          message: "Payment of ₹2,500 received for booking #12345",
-          type: "payment",
-          read: false,
-          createdAt: "2024-01-10T09:15:00Z",
-          priority: "medium",
-        },
-        {
-          _id: "3",
-          title: "New User Registration",
-          message: "Priya Sharma has registered as a new user",
-          type: "user",
-          read: true,
-          createdAt: "2024-01-09T16:45:00Z",
-          priority: "low",
-        },
-        {
-          _id: "4",
-          title: "System Backup Completed",
-          message: "Daily system backup completed successfully",
-          type: "system",
-          read: true,
-          createdAt: "2024-01-09T02:00:00Z",
-          priority: "low",
-        },
-      ]
-      setNotifications(mockNotifications)
+      const response = await adminAPI.getNotifications()
+      setNotifications(response.data)
     } catch (error) {
       console.error("Error fetching notifications:", error)
+      alert("Failed to load notifications. Please try again.")
     } finally {
       setLoading(false)
     }
@@ -68,8 +28,7 @@ const Notifications = () => {
 
   const markAsRead = async (notificationId) => {
     try {
-      // TODO: Connect to backend API
-      // await adminAPI.markNotificationAsRead(notificationId);
+      await adminAPI.markNotificationAsRead(notificationId)
       setNotifications((prev) =>
         prev.map((notification) =>
           notification._id === notificationId ? { ...notification, read: true } : notification,
@@ -77,26 +36,27 @@ const Notifications = () => {
       )
     } catch (error) {
       console.error("Error marking notification as read:", error)
+      alert("Failed to mark notification as read.")
     }
   }
 
   const markAllAsRead = async () => {
     try {
-      // TODO: Connect to backend API
-      // await adminAPI.markAllNotificationsAsRead();
+      await adminAPI.markAllNotificationsAsRead()
       setNotifications((prev) => prev.map((notification) => ({ ...notification, read: true })))
     } catch (error) {
       console.error("Error marking all notifications as read:", error)
+      alert("Failed to mark all notifications as read.")
     }
   }
 
   const deleteNotification = async (notificationId) => {
     try {
-      // TODO: Connect to backend API
-      // await adminAPI.deleteNotification(notificationId);
+      await adminAPI.deleteNotification(notificationId)
       setNotifications((prev) => prev.filter((notification) => notification._id !== notificationId))
     } catch (error) {
       console.error("Error deleting notification:", error)
+      alert("Failed to delete notification.")
     }
   }
 

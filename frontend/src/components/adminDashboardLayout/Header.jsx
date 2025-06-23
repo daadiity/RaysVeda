@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { Bell, Search, User, Menu, LogOut } from "lucide-react"
 import { useNavigate } from "react-router-dom"
+import { adminAPI } from "../../services/api" // Import adminAPI
 
 const Header = ({ setSidebarOpen }) => {
   const navigate = useNavigate()
@@ -17,15 +18,8 @@ const Header = ({ setSidebarOpen }) => {
 
   const fetchNotifications = async () => {
     try {
-      // TODO: Connect to backend notifications API
-      // const response = await adminAPI.getNotifications();
-      // setNotifications(response.data);
-
-      // Placeholder data - replace with actual API call
-      setNotifications([
-        { id: 1, message: "New booking received", read: false },
-        { id: 2, message: "User registration pending", read: false },
-      ])
+      const response = await adminAPI.getNotifications({ limit: 5 })
+      setNotifications(response.data)
     } catch (error) {
       console.error("Error fetching notifications:", error)
     }
@@ -33,18 +27,15 @@ const Header = ({ setSidebarOpen }) => {
 
   const fetchAdminProfile = async () => {
     try {
-      // TODO: Connect to backend admin profile API
-      // const response = await adminAPI.getProfile();
-      // setAdminProfile(response.data);
-
-      // Placeholder data - replace with actual API call
-      setAdminProfile({
-        name: "Admin User",
-        email: "admin@raysveda.com",
-        avatar: null,
-      })
+      const response = await adminAPI.getProfile()
+      setAdminProfile(response.data)
     } catch (error) {
       console.error("Error fetching admin profile:", error)
+      // Fallback to localStorage data
+      const adminUser = localStorage.getItem("adminUser")
+      if (adminUser) {
+        setAdminProfile(JSON.parse(adminUser))
+      }
     }
   }
 
@@ -60,8 +51,7 @@ const Header = ({ setSidebarOpen }) => {
 
   const handleLogout = async () => {
     try {
-      // TODO: Connect to backend logout API
-      // await adminAPI.logout();
+      await adminAPI.logout()
 
       // Clear local storage
       localStorage.removeItem("adminToken")
@@ -71,6 +61,10 @@ const Header = ({ setSidebarOpen }) => {
       navigate("/admin/login")
     } catch (error) {
       console.error("Error during logout:", error)
+      // Even if logout fails on backend, clear local storage
+      localStorage.removeItem("adminToken")
+      localStorage.removeItem("adminUser")
+      navigate("/admin/login")
     }
   }
 

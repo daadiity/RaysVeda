@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { Search, Plus, Edit, Trash2, Eye, Star } from "lucide-react"
+import adminAPI from "../../services/api" // ✅ Make sure this file is correctly configured
 
 const Poojas = () => {
   const [poojas, setPoojas] = useState([])
@@ -12,112 +13,68 @@ const Poojas = () => {
 
   useEffect(() => {
     fetchPoojas()
-  }, [])
+  }, [currentPage, searchTerm])
 
   const fetchPoojas = async () => {
     try {
       setLoading(true)
-      // TODO: Connect to backend API
-      // const response = await adminAPI.getPoojas();
-      // setPoojas(response.data);
-
-      // Mock data - replace with actual API call
-      const mockPoojas = [
-        {
-          _id: "1",
-          name: "Ganesh Puja",
-          description: "Traditional Ganesh worship ceremony",
-          price: 2500,
-          duration: "2 hours",
-          category: "Festival",
-          isActive: true,
-          rating: 4.8,
-          totalBookings: 145,
-          image: "/placeholder.svg?height=100&width=100",
-        },
-        {
-          _id: "2",
-          name: "Lakshmi Puja",
-          description: "Goddess Lakshmi worship for prosperity",
-          price: 3200,
-          duration: "3 hours",
-          category: "Festival",
-          isActive: true,
-          rating: 4.9,
-          totalBookings: 138,
-          image: "/placeholder.svg?height=100&width=100",
-        },
-        {
-          _id: "3",
-          name: "Saraswati Puja",
-          description: "Goddess Saraswati worship for knowledge",
-          price: 1800,
-          duration: "1.5 hours",
-          category: "Educational",
-          isActive: true,
-          rating: 4.7,
-          totalBookings: 132,
-          image: "/placeholder.svg?height=100&width=100",
-        },
-      ]
-      setPoojas(mockPoojas)
+      const params = {
+        page: currentPage,
+        limit: poojasPerPage,
+        search: searchTerm,
+      }
+      const response = await adminAPI.getPoojas(params)
+      setPoojas(response.data.poojas || []) // Adjust according to your API response shape
     } catch (error) {
       console.error("Error fetching poojas:", error)
+      alert("Failed to load poojas. Please try again.")
     } finally {
       setLoading(false)
     }
   }
 
   const handleAddPooja = () => {
-    // TODO: Implement add pooja functionality
-    // Open modal or navigate to add pooja form
-    console.log("Add pooja - implement form/modal")
-    // Example: navigate('/admin/poojas/add');
+    alert("Add pooja functionality - implement form/modal with adminAPI.createPooja()")
   }
 
   const handleEditPooja = (poojaId) => {
-    // TODO: Connect to backend API
-    // Navigate to edit pooja page or open modal
-    console.log("Edit pooja:", poojaId)
-    // Example: navigate(`/admin/poojas/edit/${poojaId}`);
+    alert(`Edit pooja functionality - use adminAPI.updatePooja(${poojaId}, data)`)
   }
 
   const handleDeletePooja = async (poojaId) => {
     if (window.confirm("Are you sure you want to delete this pooja?")) {
       try {
-        // TODO: Connect to backend API
-        // await adminAPI.deletePooja(poojaId);
-        // fetchPoojas(); // Refresh the list
-        console.log("Delete pooja:", poojaId)
+        await adminAPI.deletePooja(poojaId)
+        fetchPoojas()
+        alert("Pooja deleted successfully")
       } catch (error) {
         console.error("Error deleting pooja:", error)
+        alert("Failed to delete pooja. Please try again.")
       }
     }
   }
 
   const handleToggleStatus = async (poojaId, currentStatus) => {
     try {
-      // TODO: Connect to backend API
-      // await adminAPI.updatePoojaStatus(poojaId, !currentStatus);
-      // fetchPoojas(); // Refresh the list
-      console.log("Toggle pooja status:", poojaId, !currentStatus)
+      await adminAPI.updatePoojaStatus(poojaId, !currentStatus)
+      fetchPoojas()
+      alert("Pooja status updated successfully")
     } catch (error) {
       console.error("Error updating pooja status:", error)
+      alert("Failed to update pooja status. Please try again.")
     }
   }
 
   const handleViewPooja = (poojaId) => {
-    // TODO: Navigate to pooja details page
-    console.log("View pooja details:", poojaId)
+    alert(`View pooja details - use adminAPI.getPoojaById(${poojaId})`)
   }
 
   const filteredPoojas = poojas.filter(
     (pooja) =>
       pooja.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      pooja.category.toLowerCase().includes(searchTerm.toLowerCase()),
+      pooja.category.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
-  // Pagination
   const indexOfLastPooja = currentPage * poojasPerPage
   const indexOfFirstPooja = indexOfLastPooja - poojasPerPage
   const currentPoojas = filteredPoojas.slice(indexOfFirstPooja, indexOfLastPooja)

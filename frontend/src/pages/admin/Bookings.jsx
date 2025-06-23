@@ -1,7 +1,9 @@
+
 "use client"
 
 import { useState, useEffect } from "react"
 import { Search, Filter, Calendar, Clock, Eye, Edit } from "lucide-react"
+import { adminAPI } from "../../services/api" // Adjust path as needed
 
 const Bookings = () => {
   const [bookings, setBookings] = useState([])
@@ -9,47 +11,27 @@ const Bookings = () => {
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
   const [currentPage, setCurrentPage] = useState(1)
-  const [bookingsPerPage] = useState(10)
+  const [bookingsPerPage] = useState(10)  
 
   useEffect(() => {
     fetchBookings()
-  }, [])
+  }, [currentPage, bookingsPerPage, searchTerm, statusFilter])
 
   const fetchBookings = async () => {
     try {
       setLoading(true)
-      // TODO: Connect to backend API
-      // const response = await adminAPI.getBookings();
-      // setBookings(response.data);
+      const params = {
+        page: currentPage,
+        limit: bookingsPerPage,
+        search: searchTerm,
+        status: statusFilter !== "all" ? statusFilter : undefined,
+      }
 
-      // Mock data - replace with actual API call
-      const mockBookings = [
-        {
-          _id: "1",
-          user: { name: "Rajesh Kumar", email: "rajesh@example.com" },
-          poojaType: "Ganesh Puja",
-          date: "2024-01-15",
-          time: "10:00 AM",
-          status: "confirmed",
-          amount: 2500,
-          address: "Mumbai, Maharashtra",
-          createdAt: "2024-01-10",
-        },
-        {
-          _id: "2",
-          user: { name: "Priya Sharma", email: "priya@example.com" },
-          poojaType: "Lakshmi Puja",
-          date: "2024-01-16",
-          time: "6:00 PM",
-          status: "pending",
-          amount: 3200,
-          address: "Delhi, India",
-          createdAt: "2024-01-11",
-        },
-      ]
-      setBookings(mockBookings)
+      const response = await adminAPI.get("/bookings", { params })
+      setBookings(response.data.bookings || [])
     } catch (error) {
       console.error("Error fetching bookings:", error)
+      alert("Failed to load bookings. Please try again.")
     } finally {
       setLoading(false)
     }
@@ -57,18 +39,18 @@ const Bookings = () => {
 
   const handleStatusUpdate = async (bookingId, newStatus) => {
     try {
-      // TODO: Connect to backend API
-      // await adminAPI.updateBookingStatus(bookingId, newStatus);
-      // fetchBookings(); // Refresh the list
-      console.log("Update booking status:", bookingId, newStatus)
+      await adminAPI.patch(`/bookings/${bookingId}/status`, { status: newStatus })
+      fetchBookings()
+      alert("Booking status updated successfully")
     } catch (error) {
       console.error("Error updating booking status:", error)
+      alert("Failed to update booking status. Please try again.")
     }
   }
 
   const handleViewBooking = (bookingId) => {
-    // TODO: Navigate to booking details page
     console.log("View booking details:", bookingId)
+    alert(`View booking details - use adminAPI.getBookingById(${bookingId})`)
   }
 
   const getStatusColor = (status) => {
@@ -96,7 +78,6 @@ const Bookings = () => {
     return matchesSearch && matchesStatus
   })
 
-  // Pagination
   const indexOfLastBooking = currentPage * bookingsPerPage
   const indexOfFirstBooking = indexOfLastBooking - bookingsPerPage
   const currentBookings = filteredBookings.slice(indexOfFirstBooking, indexOfLastBooking)
