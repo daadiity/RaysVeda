@@ -1,77 +1,144 @@
-import React, { useState } from "react";
-import axios from "axios";
-import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext";
+"use client"
 
-export default function LoginForm() {
-  const [form, setForm] = useState({ phone: "", password: "" });
-  const [message, setMessage] = useState("");
-  const navigate = useNavigate();
-  const { login } = useAuth(); // Get the login function from AuthContext
+import { useState } from "react"
+import { useNavigate } from "react-router-dom"
+import { Eye, EyeOff, BookOpen } from "lucide-react"
+import { adminAPI } from "../../services/api"
 
-  const handleChange = e => setForm({ ...form, [e.target.name]: e.target.value });
+const LoginForm = () => {
+  const navigate = useNavigate()
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  })
+  const [showPassword, setShowPassword] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState("")
 
-  const handleSubmit = async e => {
-    e.preventDefault();
-    setMessage(""); // Clear any previous messages
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    })
+    // Clear error when user starts typing
+    if (error) setError("")
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    setLoading(true)
+    setError("")
+
     try {
-      const res = await axios.post("/api/auth/login", form);
-      // The backend should now send { user: ..., token: ... }
-      const { user, token } = res.data; // Destructure both user and token
+      const response = await adminAPI.login(formData)
 
-      login(user, token); // Pass both user data AND the token to the login function
-      navigate("/dashboard"); // Redirect to dashboard on successful login
-    } catch (err) {
-      console.error("Login error:", err.response?.data || err.message);
-      setMessage(err.response?.data?.message || "Invalid credentials.");
+      if (response.success) {
+        // Store token and user data
+        localStorage.setItem("adminToken", response.data.token)
+        localStorage.setItem("adminUser", JSON.stringify(response.data.admin))
+
+        // Redirect to dashboard
+        navigate("/admin")
+      }
+    } catch (error) {
+      console.error("Login error:", error)
+      setError(error.message || "Login failed. Please check your credentials.")
+    } finally {
+      setLoading(false)
     }
-  };
+  }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-100 to-orange-300">
-      <div className="bg-white shadow-lg rounded-lg p-8 w-full max-w-md">
-        <h2 className="text-2xl font-bold mb-6 text-center text-primary-700">Sign in to your account</h2>
-        <form onSubmit={handleSubmit} className="space-y-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-50 to-orange-100">
+      <div className="max-w-md w-full space-y-8 p-8 bg-white rounded-xl shadow-lg">
+        {/* Header */}
+        <div className="text-center">
+          <div className="flex justify-center items-center mb-4">
+            <BookOpen className="h-12 w-12 text-orange-500" />
+          </div>
+          <h2 className="text-3xl font-bold text-gray-900">RaysVeda Admin</h2>
+          <p className="mt-2 text-sm text-gray-600">Sign in to your admin account</p>
+        </div>
+
+        {/* Error Message */}
+        {error && <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">{error}</div>}
+
+        {/* Login Form */}
+        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+          <div className="space-y-4">
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                Email Address
+              </label>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                required
+                value={formData.email}
+                onChange={handleChange}
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500"
+                placeholder="Enter your email"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                Password
+              </label>
+              <div className="mt-1 relative">
+                <input
+                  id="password"
+                  name="password"
+                  type={showPassword ? "text" : "password"}
+                  required
+                  value={formData.password}
+                  onChange={handleChange}
+                  className="block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500 pr-10"
+                  placeholder="Enter your password"
+                />
+                <button
+                  type="button"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-4 w-4 text-gray-400" />
+                  ) : (
+                    <Eye className="h-4 w-4 text-gray-400" />
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+
           <div>
-            <label className="block text-gray-700 mb-1">Phone</label>
-            <input
-              name="phone"
-              value={form.phone}
-              onChange={handleChange}
-              required
-              placeholder="Enter your phone"
-              className="input w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-400"
-            />
+            <button
+              type="submit"
+              disabled={loading}
+              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-orange-500 hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loading ? (
+                <div className="flex items-center">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                  Signing in...
+                </div>
+              ) : (
+                "Sign in"
+              )}
+            </button>
           </div>
-          <div>
-            <label className="block text-gray-700 mb-1">Password</label>
-            <input
-              name="password"
-              type="password"
-              value={form.password}
-              onChange={handleChange}
-              required
-              placeholder="Enter your password"
-              className="input w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-400"
-            />
+
+          {/* Demo Credentials */}
+          <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+            <p className="text-sm text-gray-600 font-medium mb-2">Demo Credentials:</p>
+            <p className="text-xs text-gray-500">Email: admin@raysveda.com</p>
+            <p className="text-xs text-gray-500">Password: admin123</p>
           </div>
-          <button
-            type="submit"
-            className="w-full bg-primary-600 hover:bg-primary-700 text-white font-semibold py-2 rounded transition"
-          >
-            Login
-          </button>
-          <div className="text-center text-sm mt-2">
-            Don't have an account?{" "}
-            <Link to="/signup" className="text-primary-600 hover:underline">
-              Sign up
-            </Link>
-          </div>
-          {message && (
-            <div className="text-center text-red-500 mt-2">{message}</div>
-          )}
         </form>
       </div>
     </div>
-  );
+  )
 }
+
+export default LoginForm

@@ -1,13 +1,14 @@
 "use client"
 import { useNavigate, useLocation } from "react-router-dom"
 import { BarChart3, Calendar, Users, BookOpen, TrendingUp, Settings, Bell, FileText, X, HelpCircle } from "lucide-react"
+import { adminAPI } from "../../services/api" // Assuming adminAPI is in this path
 
 const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
   const navigate = useNavigate()
   const location = useLocation()
 
   const navigationItems = [
-    { name: "Dashboard", icon: BarChart3, path: "/admin/dashboard" },
+    { name: "Dashboard", icon: BarChart3, path: "/admin" },
     { name: "Users", icon: Users, path: "/admin/users" },
     { name: "Bookings", icon: Calendar, path: "/admin/bookings" },
     { name: "Poojas", icon: BookOpen, path: "/admin/poojas" },
@@ -22,13 +23,20 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
     setSidebarOpen(false) // Close sidebar on mobile after navigation
   }
 
-  const handleGetSupport = () => {
-    // TODO: Connect to backend support system
-    // Example API call:
-    // POST /api/admin/support-request
-    // Body: { message: "Need help with admin panel", priority: "medium" }
-    console.log("Support request - Connect to backend support system")
-    alert("Support feature - Connect to your backend support system")
+  const handleGetSupport = async () => {
+    try {
+      const supportData = {
+        message: "Need help with admin panel",
+        priority: "medium",
+        type: "general",
+      }
+
+      await adminAPI.createSupportRequest(supportData)
+      alert("Support request submitted successfully!")
+    } catch (error) {
+      console.error("Error creating support request:", error)
+      alert("Failed to submit support request. Please try again.")
+    }
   }
 
   return (

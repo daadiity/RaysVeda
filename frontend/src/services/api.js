@@ -2,7 +2,7 @@ import axios from "axios"
 
 // Create axios instance with base configuration
 const api = axios.create({
-  baseURL: process.env.REACT_APP_API_URL || "http://localhost:5000/api",
+  baseURL: "http://localhost:5000/api", // process.env.REACT_APP_API_URL -- uncomment for production
   timeout: 10000,
 })
 
@@ -22,7 +22,7 @@ api.interceptors.request.use(
 
 // Add response interceptor to handle errors
 api.interceptors.response.use(
-  (response) => response,
+  (response) => response.data, // Return only the data part
   (error) => {
     if (error.response?.status === 401) {
       // Token expired or invalid
@@ -30,7 +30,7 @@ api.interceptors.response.use(
       localStorage.removeItem("adminUser")
       window.location.href = "/admin/login"
     }
-    return Promise.reject(error)
+    return Promise.reject(error.response?.data || error)
   },
 )
 
@@ -69,7 +69,7 @@ export const adminAPI = {
   createPooja: (data) => api.post("/admin/poojas", data),
   updatePooja: (id, data) => api.put(`/admin/poojas/${id}`, data),
   deletePooja: (id) => api.delete(`/admin/poojas/${id}`),
-  updatePoojaStatus: (id, status) => api.patch(`/admin/poojas/${id}/status`, { status }),
+  updatePoojaStatus: (id, isActive) => api.patch(`/admin/poojas/${id}/status`, { isActive }),
 
   // Reports
   generateReport: (type, dateRange, params = {}) =>
@@ -109,18 +109,3 @@ export const adminAPI = {
 }
 
 export default api
-
-/* 
-BACKEND INTEGRATION INSTRUCTIONS:
-
-1. Set up your Express.js server with the following routes:
-
-// Authentication Routes
-POST /api/admin/login - Admin login
-POST /api/admin/logout - Admin logout
-GET /api/admin/profile - Get admin profile
-PUT /api/admin/profile - Update admin profile
-
-// Dashboard Routes
-GET /api/admin/dashboard/stats - Get dashboard statistics
-GET /api/admin/dashboar

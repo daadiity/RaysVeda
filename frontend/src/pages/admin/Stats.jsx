@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import DashboardCharts from "../../components/charts/DashboardCharts"
+import { adminAPI } from "../../services/api" // Import adminAPI
 
 const Stats = () => {
   const [loading, setLoading] = useState(true)
@@ -20,72 +21,25 @@ const Stats = () => {
   const fetchStatsData = async () => {
     try {
       setLoading(true)
-      // TODO: Connect to backend API
-      // const response = await adminAPI.getDetailedStats();
-      // setChartData(response.data.charts);
-      // setStatsOverview(response.data.overview);
 
-      // Mock data - replace with actual API call
-      const mockChartData = {
-        monthlyBookings: [
-          { month: "Jan", bookings: 65 },
-          { month: "Feb", bookings: 78 },
-          { month: "Mar", bookings: 90 },
-          { month: "Apr", bookings: 81 },
-          { month: "May", bookings: 95 },
-          { month: "Jun", bookings: 110 },
-          { month: "Jul", bookings: 125 },
-          { month: "Aug", bookings: 140 },
-          { month: "Sep", bookings: 135 },
-          { month: "Oct", bookings: 150 },
-          { month: "Nov", bookings: 165 },
-          { month: "Dec", bookings: 180 },
-        ],
-        monthlyRevenue: [
-          { month: "Jan", revenue: 45000 },
-          { month: "Feb", revenue: 52000 },
-          { month: "Mar", revenue: 48000 },
-          { month: "Apr", revenue: 61000 },
-          { month: "May", revenue: 55000 },
-          { month: "Jun", revenue: 67000 },
-          { month: "Jul", revenue: 72000 },
-          { month: "Aug", revenue: 85000 },
-          { month: "Sep", revenue: 78000 },
-          { month: "Oct", revenue: 92000 },
-          { month: "Nov", revenue: 88000 },
-          { month: "Dec", revenue: 105000 },
-        ],
-        popularPoojas: [
-          { name: "Ganesh Puja", count: 145 },
-          { name: "Lakshmi Puja", count: 138 },
-          { name: "Saraswati Puja", count: 132 },
-          { name: "Durga Puja", count: 128 },
-          { name: "Shiva Puja", count: 125 },
-          { name: "Hanuman Puja", count: 98 },
-          { name: "Krishna Puja", count: 87 },
-          { name: "Vishnu Puja", count: 76 },
-        ],
-        bookingStatus: [
-          { name: "Confirmed", value: 245 },
-          { name: "Pending", value: 125 },
-          { name: "Completed", value: 320 },
-          { name: "Cancelled", value: 45 },
-        ],
-      }
+      // Use the detailed stats endpoint or dashboard stats
+      const [statsResponse, chartsResponse] = await Promise.all([adminAPI.getDashboardStats(), adminAPI.getChartData()])
 
+      // Transform the data to match the component format
       const mockStatsOverview = {
-        totalRevenue: 850000,
-        totalBookings: 1234,
-        averageBookingValue: 3500,
-        customerRetentionRate: 78,
-        topPerformingMonth: "December",
-        growthRate: 15.5,
+        totalRevenue: statsResponse.data.totalRevenue,
+        totalBookings: statsResponse.data.totalBookings,
+        averageBookingValue: statsResponse.data.averageBookingValue,
+        customerRetentionRate: 78, // Calculate this from user data
+        topPerformingMonth: "December", // Calculate from monthly data
+        growthRate: 15.5, // Calculate from historical data
       }
 
-      setChartData(mockChartData)
+      setChartData(chartsResponse.data)
       setStatsOverview(mockStatsOverview)
     } catch (error) {
       console.error("Error fetching stats data:", error)
+      alert("Failed to load statistics. Please try again.")
     } finally {
       setLoading(false)
     }
@@ -187,7 +141,7 @@ const Stats = () => {
                   <div className="text-right">
                     <div className="text-sm font-medium text-gray-900">₹{month.revenue.toLocaleString()}</div>
                     <div className="text-xs text-gray-500">
-                      {chartData.monthlyBookings.find((b) => b.month === month.month)?.bookings} bookings
+                      {chartData.monthlyBookings.find((b) => b.month === month.month)?.bookings}
                     </div>
                   </div>
                 </div>

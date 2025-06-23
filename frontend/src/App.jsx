@@ -26,14 +26,16 @@ import SignupPage from './pages/SignupPage';
 import LoginPage from './pages/LoginPage';
 import UserDashboard from './pages/UserDashboard';
 import BookingHistory from "./pages/BookingHistory";
-import ProtectedRoute from './components/auth/ProtectedRoute';
 
-import AdminLogin from "./pages/AdminLogin";
+
+// import AdminLogin from "./pages/AdminLogin";
 // import AdminDashboard from "./components/AdminDashboard"
 import "./index.css"
 
 
 import AdminLayout from "./components/adminDashboardLayout/AdminLayout";
+import LoginForm from "./components/auth/LoginForm";
+import ProtectedRoute from "./components/auth/ProtectedRoute";
 import Dashboard from "./pages/admin/Dashboard";
 import Users from "./pages/admin/Users";
 import Bookings from "./pages/admin/Bookings";
@@ -83,6 +85,7 @@ function App() {
           <Route path="/services/pran-pratishtha" element={<PranPratishtha />} />
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/admin/login" element={<LoginForm />} />
           <Route path="/dashboard" element={
             <ProtectedRoute>
               <UserDashboard />
@@ -94,7 +97,9 @@ function App() {
             </ProtectedRoute>
           } />
 
-          {/* Admin Routes */}
+          
+
+          {/* Admin Routes
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/admin" element={<AdminLayout />}>
             <Route path="dashboard" element={<Dashboard />} />
@@ -105,7 +110,29 @@ function App() {
             <Route path="reports" element={<Reports />} />
             <Route path="settings" element={<Settings />} />
             <Route path="notifications" element={<Notifications />} />
+          </Route> */}
+
+          {/* Admin Routes */}
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute>
+                <AdminLayout />
+              </ProtectedRoute>
+            }
+          >
+            <Route index element={<Dashboard />} />
+            <Route path="users" element={<Users />} />
+            <Route path="bookings" element={<Bookings />} />
+            <Route path="stats" element={<Stats />} />
+            <Route path="poojas" element={<Poojas />} />
+            <Route path="reports" element={<Reports />} />
+            <Route path="settings" element={<Settings />} />
+            <Route path="notifications" element={<Notifications />} />
           </Route>
+
+
+
         </Routes>
       </main>
 

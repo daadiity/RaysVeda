@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { Save, User, Bell, Shield, Database } from "lucide-react"
+import { adminAPI } from "../../services/api"
 
 const Settings = () => {
   const [loading, setLoading] = useState(false)
@@ -46,52 +47,51 @@ const Settings = () => {
 
   const fetchSettings = async () => {
     try {
-      // TODO: Connect to backend API
-      // const response = await adminAPI.getSettings();
-      // setSettings(response.data);
+      const response = await adminAPI.getSettings()
 
-      // Mock data - replace with actual API call
-      const mockSettings = {
+      // Transform backend settings to match component format
+      const transformedSettings = {
         profile: {
-          name: "Admin User",
-          email: "admin@raysveda.com",
-          phone: "+91 9876543210",
+          name: "", // Get from admin profile
+          email: "",
+          phone: "",
           avatar: null,
         },
-        notifications: {
+        notifications: response.data.notifications || {
           emailNotifications: true,
           smsNotifications: false,
           pushNotifications: true,
           bookingAlerts: true,
           paymentAlerts: true,
         },
-        security: {
+        security: response.data.security || {
           twoFactorAuth: false,
           sessionTimeout: 30,
           passwordExpiry: 90,
         },
-        system: {
+        system: response.data.system || {
           maintenanceMode: false,
           debugMode: false,
           backupFrequency: "daily",
           maxFileSize: 10,
         },
       }
-      setSettings(mockSettings)
+
+      setSettings(transformedSettings)
     } catch (error) {
       console.error("Error fetching settings:", error)
+      alert("Failed to load settings. Please try again.")
     }
   }
 
   const handleSave = async (section) => {
     try {
       setLoading(true)
-      // TODO: Connect to backend API
-      // await adminAPI.updateSettings(section, settings[section]);
-      console.log(`Save ${section} settings:`, settings[section])
+      await adminAPI.updateSettings(section, settings[section])
       alert(`${section} settings saved successfully!`)
     } catch (error) {
       console.error("Error saving settings:", error)
+      alert(`Failed to save ${section} settings. Please try again.`)
     } finally {
       setLoading(false)
     }

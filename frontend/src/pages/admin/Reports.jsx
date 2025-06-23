@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { Download, TrendingUp } from "lucide-react"
+import { adminAPI } from "../../services/api"
 
 const Reports = () => {
   const [loading, setLoading] = useState(false)
@@ -28,27 +29,12 @@ const Reports = () => {
   const generateReport = async () => {
     try {
       setLoading(true)
-      // TODO: Connect to backend API
-      // const response = await adminAPI.generateReport(reportType, dateRange);
-      // setReportData(response.data);
 
-      // Mock data - replace with actual API call
-      const mockReportData = {
-        summary: {
-          totalRevenue: 125000,
-          totalBookings: 450,
-          averageBookingValue: 2778,
-          growthRate: 12.5,
-        },
-        details: [
-          { date: "2024-01-01", value: 5000, bookings: 15 },
-          { date: "2024-01-02", value: 7500, bookings: 22 },
-          { date: "2024-01-03", value: 6200, bookings: 18 },
-        ],
-      }
-      setReportData(mockReportData)
+      const response = await adminAPI.generateReport(reportType, dateRange)
+      setReportData(response.data)
     } catch (error) {
       console.error("Error generating report:", error)
+      alert("Failed to generate report. Please try again.")
     } finally {
       setLoading(false)
     }
@@ -56,13 +42,20 @@ const Reports = () => {
 
   const downloadReport = async (format) => {
     try {
-      // TODO: Connect to backend API
-      // const response = await adminAPI.downloadReport(reportType, dateRange, format);
-      // Create download link and trigger download
-      console.log(`Download ${format} report for ${reportType} - ${dateRange}`)
-      alert(`${format.toUpperCase()} report download will be implemented with backend API`)
+      const response = await adminAPI.downloadReport(reportType, dateRange, format)
+
+      // Handle blob download
+      const url = window.URL.createObjectURL(new Blob([response]))
+      const link = document.createElement("a")
+      link.href = url
+      link.setAttribute("download", `${reportType}-report-${dateRange}.${format}`)
+      document.body.appendChild(link)
+      link.click()
+      link.remove()
+      window.URL.revokeObjectURL(url)
     } catch (error) {
       console.error("Error downloading report:", error)
+      alert("Failed to download report. Please try again.")
     }
   }
 
