@@ -10,7 +10,10 @@ import AddUserModal from "../../components/dashboard/AddUserModal";
 const Users = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState("");
+  // const [searchTerm, setSearchTerm] = useState("");
+  const [inputValue, setInputValue] = useState(""); // What user types
+  const [searchTerm, setSearchTerm] = useState(""); // What is searched on Enter
+
   const [currentPage, setCurrentPage] = useState(1);
   const [usersPerPage] = useState(10);
   const [selectedUser, setSelectedUser] = useState(null);
@@ -22,7 +25,7 @@ const Users = () => {
 
   useEffect(() => {
     fetchUsers();
-  }, [currentPage, searchTerm]);
+  }, [searchTerm, currentPage]);
 
   const fetchUsers = async () => {
     try {
@@ -83,6 +86,13 @@ const Users = () => {
       user.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      setSearchTerm(inputValue);
+      setCurrentPage(1); // Optional: Reset to first page
+    }
+  };
+
   const indexOfLastUser = currentPage * usersPerPage;
   const indexOfFirstUser = indexOfLastUser - usersPerPage;
   const currentUsers = filteredUsers.slice(indexOfFirstUser, indexOfLastUser);
@@ -113,8 +123,14 @@ const Users = () => {
             <input
               type="text"
               placeholder="Search users..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  setSearchTerm(inputValue); // Send to backend
+                  setCurrentPage(1); // Reset to first page
+                }
+              }}
               className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent w-full"
             />
           </div>
