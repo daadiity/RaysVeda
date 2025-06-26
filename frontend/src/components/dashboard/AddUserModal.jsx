@@ -1,8 +1,8 @@
-// components/dashboard/AddUserModal.jsx
-import { useState } from "react";
 import { X } from "lucide-react";
+import { useState } from "react";
+import PropTypes from "prop-types";
 
-const AddUserModal = ({ isOpen, onClose, onCreate }) => {
+export default function AddUserModal({ isOpen, onClose, onCreate }) {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -11,8 +11,7 @@ const AddUserModal = ({ isOpen, onClose, onCreate }) => {
   });
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = (e) => {
@@ -23,59 +22,92 @@ const AddUserModal = ({ isOpen, onClose, onCreate }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
-      <div className="bg-white rounded-lg shadow-lg w-full max-w-md p-6">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-semibold">Add New User</h2>
-          <button onClick={onClose}>
-            <X className="w-5 h-5 text-gray-500 hover:text-gray-800" />
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60">
+      <div className="bg-white rounded-2xl shadow-lg w-full max-w-md p-6 relative">
+        {/* Header */}
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-xl font-semibold text-gray-800">Add New User</h2>
+          <button
+            onClick={onClose}
+            className="text-gray-400 hover:text-gray-600 transition"
+          >
+            <X className="h-5 w-5" />
           </button>
         </div>
+
+        {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
-          <input
-            name="name"
-            placeholder="Name"
-            value={formData.name}
-            onChange={handleChange}
-            required
-            className="w-full px-4 py-2 border rounded-md"
-          />
-          <input
-            name="email"
-            type="email"
-            placeholder="Email"
-            value={formData.email}
-            onChange={handleChange}
-            required
-            className="w-full px-4 py-2 border rounded-md"
-          />
-          <input
-            name="phone"
-            placeholder="Phone"
-            value={formData.phone}
-            onChange={handleChange}
-            required
-            className="w-full px-4 py-2 border rounded-md"
-          />
-          <select
-            name="status"
-            value={formData.status}
-            onChange={handleChange}
-            className="w-full px-4 py-2 border rounded-md"
-          >
-            <option value="active">Active</option>
-            <option value="inactive">Inactive</option>
-          </select>
-          <button
-            type="submit"
-            className="w-full bg-orange-500 text-white py-2 rounded-md hover:bg-orange-600 transition"
-          >
-            Create User
-          </button>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Name
+            </label>
+            <input
+              name="name"
+              type="text"
+              value={formData.name}
+              onChange={handleChange}
+              required
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Email
+            </label>
+            <input
+              name="email"
+              type="email"
+              value={formData.email}
+              onChange={handleChange}
+              required
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Phone
+            </label>
+            <input
+              name="phone"
+              type="text"
+              value={formData.phone}
+              onChange={handleChange}
+              required
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Status
+            </label>
+            <select
+              name="status"
+              value={formData.status}
+              onChange={handleChange}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+            >
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+            </select>
+          </div>
+
+          {/* Submit Button */}
+          <div className="pt-2">
+            <button
+              type="submit"
+              className="w-full bg-orange-500 hover:bg-orange-600 text-white font-medium py-2 px-4 rounded-lg transition"
+            >
+              Create User
+            </button>
+          </div>
         </form>
       </div>
     </div>
   );
-};
+}
 
-export default AddUserModal;
+AddUserModal.propTypes = {
+  isOpen: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
+  onCreate: PropTypes.func.isRequired,
+};

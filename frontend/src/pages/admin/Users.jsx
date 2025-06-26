@@ -5,6 +5,7 @@ import { Search, Plus, Edit, Trash2, Eye } from "lucide-react";
 import { adminAPI } from "../../services/api"; // Adjust the path based on your project structure
 import UserDetailsModal from "../../components/dashboard/UserDetailsModal"; // adjust path if needed
 import EditUserModal from "../../components/dashboard/EditUserModal"; // adjust path if needed
+import AddUserModal from "../../components/dashboard/AddUserModal";
 
 const Users = () => {
   const [users, setUsers] = useState([]);
@@ -15,6 +16,8 @@ const Users = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
+  const [addModalOpen, setAddModalOpen] = useState(false);
+
   // const [editUserData, setEditUserData] = useState(null);
 
   useEffect(() => {
@@ -41,9 +44,7 @@ const Users = () => {
   };
 
   const handleAddUser = () => {
-    alert(
-      "Add user functionality - implement form/modal with adminAPI.createUser()"
-    );
+    setAddModalOpen(true);
   };
 
   const handleEditUser = (user) => {
@@ -269,6 +270,24 @@ const Users = () => {
             } catch (err) {
               console.error(err);
               alert("Failed to update user");
+            }
+          }}
+        />
+      )}
+
+      {addModalOpen && (
+        <AddUserModal
+          isOpen={addModalOpen}
+          onClose={() => setAddModalOpen(false)}
+          onCreate={async (newUserData) => {
+            try {
+              await adminAPI.createUser(newUserData);
+              fetchUsers();
+              alert("User added successfully");
+              setAddModalOpen(false);
+            } catch (err) {
+              console.error(err);
+              alert("Failed to add user");
             }
           }}
         />
