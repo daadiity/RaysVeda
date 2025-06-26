@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Search, Plus, Edit, Trash2, Eye } from "lucide-react";
 import { adminAPI } from "../../services/api"; // Adjust the path based on your project structure
 import UserDetailsModal from "../../components/dashboard/UserDetailsModal"; // adjust path if needed
+import EditUserModal from "../../components/dashboard/EditUserModal"; // adjust path if needed
 
 const Users = () => {
   const [users, setUsers] = useState([]);
@@ -13,6 +14,8 @@ const Users = () => {
   const [usersPerPage] = useState(10);
   const [selectedUser, setSelectedUser] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  // const [editUserData, setEditUserData] = useState(null);
 
   useEffect(() => {
     fetchUsers();
@@ -43,8 +46,9 @@ const Users = () => {
     );
   };
 
-  const handleEditUser = (userId) => {
-    alert(`Edit user functionality - use adminAPI.updateUser(${userId}, data)`);
+  const handleEditUser = (user) => {
+    setSelectedUser(user);
+    setEditModalOpen(true);
   };
 
   const handleDeleteUser = async (userId) => {
@@ -247,6 +251,25 @@ const Users = () => {
           onClose={() => {
             setShowModal(false);
             setSelectedUser(null);
+          }}
+        />
+      )}
+
+      {editModalOpen && (
+        <EditUserModal
+          user={selectedUser}
+          isOpen={editModalOpen}
+          onClose={() => setEditModalOpen(false)}
+          onUpdate={async (updatedData) => {
+            try {
+              await adminAPI.updateUser(selectedUser._id, updatedData);
+              fetchUsers();
+              alert("User updated successfully");
+              setEditModalOpen(false);
+            } catch (err) {
+              console.error(err);
+              alert("Failed to update user");
+            }
           }}
         />
       )}
