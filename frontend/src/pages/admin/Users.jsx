@@ -1,134 +1,102 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Search, Plus, Edit, Trash2, Eye } from "lucide-react"
+import { useState, useEffect } from "react";
+import { Search, Plus, Edit, Trash2, Eye } from "lucide-react";
+import { adminAPI } from "../../services/api"; // Adjust the path based on your project structure
+import UserDetailsModal from "../../components/dashboard/UserDetailsModal"; // adjust path if needed
 
 const Users = () => {
-  const [users, setUsers] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [searchTerm, setSearchTerm] = useState("")
-  const [currentPage, setCurrentPage] = useState(1)
-  const [usersPerPage] = useState(10)
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [usersPerPage] = useState(10);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
-    fetchUsers()
-  }, [])
+    fetchUsers();
+  }, [currentPage, searchTerm]);
 
   const fetchUsers = async () => {
     try {
-      setLoading(true)
+      setLoading(true);
       const params = {
         page: currentPage,
         limit: usersPerPage,
         search: searchTerm,
-      }
+      };
 
-      // TODO: Connect to backend API
-      // const response = await adminAPI.getUsers(params);
-      // setUsers(response.data);
-
-      // Update pagination if backend provides it
-      // if (response.pagination) {
-      //   // You can use this for more accurate pagination
-      //   console.log('Pagination info:', response.pagination);
-      // }
-
-      // Mock data - replace with actual API call
-      const mockUsers = [
-        {
-          _id: "1",
-          name: "Rajesh Kumar",
-          email: "rajesh@example.com",
-          phone: "+91 9876543210",
-          status: "active",
-          joinDate: "2024-01-15",
-          totalBookings: 5,
-        },
-        {
-          _id: "2",
-          name: "Priya Sharma",
-          email: "priya@example.com",
-          phone: "+91 9876543211",
-          status: "active",
-          joinDate: "2024-01-10",
-          totalBookings: 3,
-        },
-      ]
-      setUsers(mockUsers)
+      const response = await adminAPI.getUsers(params);
+      setUsers(response.data.users || response.data); // adapt based on actual response
     } catch (error) {
-      console.error("Error fetching users:", error)
-      alert("Failed to load users. Please try again.")
+      console.error("Error fetching users:", error);
+      alert("Failed to load users. Please try again.");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleAddUser = () => {
-    // TODO: Implement add user modal/form
-    // For now, navigate to a form or open a modal
-    console.log("Add user - implement form/modal")
-    alert("Add user functionality - implement form/modal with adminAPI.createUser()")
-  }
+    alert(
+      "Add user functionality - implement form/modal with adminAPI.createUser()"
+    );
+  };
 
   const handleEditUser = (userId) => {
-    // TODO: Implement edit user functionality
-    console.log("Edit user:", userId)
-    alert(`Edit user functionality - use adminAPI.updateUser(${userId}, data)`)
-  }
+    alert(`Edit user functionality - use adminAPI.updateUser(${userId}, data)`);
+  };
 
   const handleDeleteUser = async (userId) => {
     if (window.confirm("Are you sure you want to delete this user?")) {
       try {
-        // TODO: Connect to backend API
-        // await adminAPI.deleteUser(userId);
-        // fetchUsers(); // Refresh the list
-        // Mock adminAPI
-        const adminAPI = {
-          deleteUser: async (id) => {
-            console.log(`Deleting user with id: ${id}`)
-            return Promise.resolve() // Simulate success
-          },
-        }
-        await adminAPI.deleteUser(userId)
-        fetchUsers() // Refresh the list
-        alert("User deleted successfully")
+        await adminAPI.deleteUser(userId);
+        fetchUsers();
+        alert("User deleted successfully");
       } catch (error) {
-        console.error("Error deleting user:", error)
-        alert("Failed to delete user. Please try again.")
+        console.error("Error deleting user:", error);
+        alert("Failed to delete user. Please try again.");
       }
     }
-  }
+  };
 
-  const handleViewUser = (userId) => {
-    // TODO: Navigate to user details page or open modal
-    console.log("View user details:", userId)
-    alert(`View user details - use adminAPI.getUserById(${userId})`)
-  }
-
+  const handleViewUser = async (userId) => {
+    try {
+      const response = await adminAPI.getUserById(userId);
+      console.log("User API Response:", response);
+      const user = response.data; // ✅ This is where your actual user object is
+      setSelectedUser(user);
+      setShowModal(true);
+    } catch (error) {
+      console.error("Failed to fetch user details:", error);
+      alert("Failed to fetch user details. Please try again.");
+    }
+  };
   const filteredUsers = users.filter(
     (user) =>
       user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchTerm.toLowerCase()),
-  )
+      user.email.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
-  // Pagination
-  const indexOfLastUser = currentPage * usersPerPage
-  const indexOfFirstUser = indexOfLastUser - usersPerPage
-  const currentUsers = filteredUsers.slice(indexOfFirstUser, indexOfLastUser)
-  const totalPages = Math.ceil(filteredUsers.length / usersPerPage)
+  const indexOfLastUser = currentPage * usersPerPage;
+  const indexOfFirstUser = indexOfLastUser - usersPerPage;
+  const currentUsers = filteredUsers.slice(indexOfFirstUser, indexOfLastUser);
+  const totalPages = Math.ceil(filteredUsers.length / usersPerPage);
 
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-64">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
       </div>
-    )
+    );
   }
 
   return (
     <div>
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">Users Management</h1>
+        <h1 className="text-2xl font-bold text-gray-900 mb-2">
+          Users Management
+        </h1>
         <p className="text-gray-600">Manage all registered users</p>
       </div>
 
@@ -161,7 +129,9 @@ const Users = () => {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  User
+                </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Contact
                 </th>
@@ -184,15 +154,21 @@ const Users = () => {
                 <tr key={user._id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div>
-                      <div className="text-sm font-medium text-gray-900">{user.name}</div>
+                      <div className="text-sm font-medium text-gray-900">
+                        {user.name}
+                      </div>
                       <div className="text-sm text-gray-500">{user.email}</div>
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{user.phone}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    {user.phone}
+                  </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span
                       className={`px-2 py-1 text-xs rounded-full ${
-                        user.status === "active" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
+                        user.status === "active"
+                          ? "bg-green-100 text-green-800"
+                          : "bg-red-100 text-red-800"
                       }`}
                     >
                       {user.status}
@@ -201,10 +177,15 @@ const Users = () => {
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     {new Date(user.joinDate).toLocaleDateString()}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{user.totalBookings}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    {user.totalBookings}
+                  </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex space-x-2">
-                      <button onClick={() => handleViewUser(user._id)} className="text-blue-600 hover:text-blue-900">
+                      <button
+                        onClick={() => handleViewUser(user._id)}
+                        className="text-blue-600 hover:text-blue-900"
+                      >
                         <Eye className="h-4 w-4" />
                       </button>
                       <button
@@ -213,7 +194,10 @@ const Users = () => {
                       >
                         <Edit className="h-4 w-4" />
                       </button>
-                      <button onClick={() => handleDeleteUser(user._id)} className="text-red-600 hover:text-red-900">
+                      <button
+                        onClick={() => handleDeleteUser(user._id)}
+                        className="text-red-600 hover:text-red-900"
+                      >
                         <Trash2 className="h-4 w-4" />
                       </button>
                     </div>
@@ -229,19 +213,24 @@ const Users = () => {
           <div className="bg-white px-4 py-3 border-t border-gray-200 sm:px-6">
             <div className="flex justify-between items-center">
               <div className="text-sm text-gray-700">
-                Showing {indexOfFirstUser + 1} to {Math.min(indexOfLastUser, filteredUsers.length)} of{" "}
+                Showing {indexOfFirstUser + 1} to{" "}
+                {Math.min(indexOfLastUser, filteredUsers.length)} of{" "}
                 {filteredUsers.length} results
               </div>
               <div className="flex space-x-2">
                 <button
-                  onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.max(prev - 1, 1))
+                  }
                   disabled={currentPage === 1}
                   className="px-3 py-1 border border-gray-300 rounded-md text-sm disabled:opacity-50"
                 >
                   Previous
                 </button>
                 <button
-                  onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                  }
                   disabled={currentPage === totalPages}
                   className="px-3 py-1 border border-gray-300 rounded-md text-sm disabled:opacity-50"
                 >
@@ -252,10 +241,17 @@ const Users = () => {
           </div>
         )}
       </div>
+      {showModal && (
+        <UserDetailsModal
+          user={selectedUser}
+          onClose={() => {
+            setShowModal(false);
+            setSelectedUser(null);
+          }}
+        />
+      )}
     </div>
-  )
-}
+  );
+};
 
-export default Users
-// This code defines a Users management page for an admin dashboard.
-// It includes features like searching, adding, editing, deleting, and viewing user details.
+export default Users;
