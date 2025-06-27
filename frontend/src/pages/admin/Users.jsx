@@ -210,7 +210,7 @@ const Users = () => {
                         <Eye className="h-4 w-4" />
                       </button>
                       <button
-                        onClick={() => handleEditUser(user._id)}
+                        onClick={() => handleEditUser(user)}
                         className="text-orange-600 hover:text-orange-900"
                       >
                         <Edit className="h-4 w-4" />

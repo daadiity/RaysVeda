@@ -22,7 +22,7 @@ export default function AddUserModal({ isOpen, onClose, onCreate }) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
       <div className="bg-white rounded-2xl shadow-lg w-full max-w-md p-6 relative">
         {/* Header */}
         <div className="flex justify-between items-center mb-6">

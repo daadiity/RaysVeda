@@ -1,85 +1,90 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Bell, Search, User, Menu, LogOut } from "lucide-react"
-import { useNavigate } from "react-router-dom"
-import { adminAPI } from "../../services/api" // Import adminAPI
+import { useState, useEffect } from "react";
+import { Bell, Search, User, Menu, LogOut } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { adminAPI } from "../../services/api"; // Import adminAPI
+import SearchModal from "../dashboard/SearchModal"; // Import SearchModal component
 
 const Header = ({ setSidebarOpen }) => {
-  const navigate = useNavigate()
-  const [notifications, setNotifications] = useState([])
-  const [adminProfile, setAdminProfile] = useState(null)
-  const [showProfileMenu, setShowProfileMenu] = useState(false)
+  const navigate = useNavigate();
+  const [notifications, setNotifications] = useState([]);
+  const [adminProfile, setAdminProfile] = useState(null);
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [showSearchModal, setShowSearchModal] = useState(false);
 
   useEffect(() => {
-    fetchNotifications()
-    fetchAdminProfile()
-  }, [])
+    fetchNotifications();
+    fetchAdminProfile();
+  }, []);
 
   const fetchNotifications = async () => {
     try {
-      const response = await adminAPI.getNotifications({ limit: 5 })
-      setNotifications(response.data)
+      const response = await adminAPI.getNotifications({ limit: 5 });
+      setNotifications(response.data);
     } catch (error) {
-      console.error("Error fetching notifications:", error)
+      console.error("Error fetching notifications:", error);
     }
-  }
+  };
 
   const fetchAdminProfile = async () => {
     try {
-      const response = await adminAPI.getProfile()
-      setAdminProfile(response.data)
+      const response = await adminAPI.getProfile();
+      setAdminProfile(response.data);
     } catch (error) {
-      console.error("Error fetching admin profile:", error)
+      console.error("Error fetching admin profile:", error);
       // Fallback to localStorage data
-      const adminUser = localStorage.getItem("adminUser")
+      const adminUser = localStorage.getItem("adminUser");
       if (adminUser) {
-        setAdminProfile(JSON.parse(adminUser))
+        setAdminProfile(JSON.parse(adminUser));
       }
     }
-  }
+  };
 
   const handleSearch = () => {
-    // TODO: Implement search functionality
-    // Navigate to search results page or open search modal
-    console.log("Search functionality - implement search across users, bookings, etc.")
-  }
+    setShowSearchModal(true);
+  };
 
   const handleNotifications = () => {
-    navigate("/admin/notifications")
-  }
+    navigate("/admin/notifications");
+  };
 
   const handleLogout = async () => {
     try {
-      await adminAPI.logout()
+      await adminAPI.logout();
 
       // Clear local storage
-      localStorage.removeItem("adminToken")
-      localStorage.removeItem("adminUser")
+      localStorage.removeItem("adminToken");
+      localStorage.removeItem("adminUser");
 
       // Redirect to login page
-      navigate("/admin/login")
+      navigate("/admin/login");
     } catch (error) {
-      console.error("Error during logout:", error)
+      console.error("Error during logout:", error);
       // Even if logout fails on backend, clear local storage
-      localStorage.removeItem("adminToken")
-      localStorage.removeItem("adminUser")
-      navigate("/admin/login")
+      localStorage.removeItem("adminToken");
+      localStorage.removeItem("adminUser");
+      navigate("/admin/login");
     }
-  }
+  };
 
-  const unreadCount = notifications.filter((n) => !n.read).length
+  const unreadCount = notifications.filter((n) => !n.read).length;
 
   return (
     <header className="bg-white shadow-sm border-b">
       <div className="flex items-center justify-between px-6 py-4">
         <div className="flex items-center">
-          <button onClick={() => setSidebarOpen(true)} className="lg:hidden text-gray-600 hover:text-orange-500 mr-4">
+          <button
+            onClick={() => setSidebarOpen(true)}
+            className="lg:hidden text-gray-600 hover:text-orange-500 mr-4"
+          >
             <Menu className="h-6 w-6" />
           </button>
           <div>
             <h1 className="text-2xl font-semibold text-gray-900">Dashboard</h1>
-            <p className="text-sm text-gray-500">Welcome back! Here's what's happening today.</p>
+            <p className="text-sm text-gray-500">
+              Welcome back! Here's what's happening today.
+            </p>
           </div>
         </div>
 
@@ -96,7 +101,9 @@ const Header = ({ setSidebarOpen }) => {
             className="text-gray-600 hover:text-orange-500 p-2 rounded-lg hover:bg-orange-50 relative"
           >
             <Bell className="h-5 w-5" />
-            {unreadCount > 0 && <span className="absolute top-1 right-1 h-2 w-2 bg-orange-500 rounded-full"></span>}
+            {unreadCount > 0 && (
+              <span className="absolute top-1 right-1 h-2 w-2 bg-orange-500 rounded-full"></span>
+            )}
           </button>
 
           <div className="relative">
@@ -105,7 +112,9 @@ const Header = ({ setSidebarOpen }) => {
               className="text-gray-600 hover:text-orange-500 p-2 rounded-lg hover:bg-orange-50 flex items-center space-x-2"
             >
               <User className="h-5 w-5" />
-              {adminProfile && <span className="text-sm font-medium">{adminProfile.name}</span>}
+              {adminProfile && (
+                <span className="text-sm font-medium">{adminProfile.name}</span>
+              )}
             </button>
 
             {showProfileMenu && (
@@ -128,8 +137,12 @@ const Header = ({ setSidebarOpen }) => {
           </div>
         </div>
       </div>
+      {/* 🔍 Search Modal */}
+      {showSearchModal && (
+        <SearchModal onClose={() => setShowSearchModal(false)} />
+      )}
     </header>
-  )
-}
+  );
+};
 
-export default Header
+export default Header;
