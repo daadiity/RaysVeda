@@ -30,9 +30,9 @@ const Stats = () => {
         totalRevenue: statsResponse.data.totalRevenue,
         totalBookings: statsResponse.data.totalBookings,
         averageBookingValue: statsResponse.data.averageBookingValue,
-        customerRetentionRate: 78, // Calculate this from user data
-        topPerformingMonth: "December", // Calculate from monthly data
-        growthRate: 15.5, // Calculate from historical data
+        customerRetentionRate: 78, // need to calculate this from user data
+        topPerformingMonth: "December", // need to calculate from monthly data
+        growthRate: 15.5, // need to calculate from historical data
       }
 
       setChartData(chartsResponse.data)

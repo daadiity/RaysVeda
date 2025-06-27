@@ -32,7 +32,7 @@ const Dashboard = () => {
       // Fetch real data from backend
       const [statsResponse, bookingsResponse, chartsResponse] = await Promise.all([
         adminAPI.getDashboardStats(),
-        adminAPI.getRecentBookings(5),
+        adminAPI.getRecentBookings(3),
         adminAPI.getChartData(),
       ])
 

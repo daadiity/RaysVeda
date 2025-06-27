@@ -1,40 +1,43 @@
-const express = require("express")
-const jwt = require("jsonwebtoken")
-const Admin = require("../models/Admin")
-const auth = require("../middleware/auth")
-const upload = require("../middleware/upload")
+const express = require("express");
+const jwt = require("jsonwebtoken");
+const Admin = require("../models/Admin");
+const auth = require("../middleware/auth");
+const upload = require("../middleware/upload"); // Assuming you have a middleware for file uploads
+const User = require("../models/User");
+const Booking = require("../models/Booking");
+const Pooja = require("../models/Pooja");
 
-const router = express.Router()
+const router = express.Router();
 
 // Admin login
 router.post("/login", async (req, res) => {
   try {
-    const { email, password } = req.body
+    const { email, password } = req.body;
 
     // Validate input
     if (!email || !password) {
       return res.status(400).json({
         success: false,
         message: "Email and password are required",
-      })
+      });
     }
 
     // Find admin
-    const admin = await Admin.findOne({ email })
+    const admin = await Admin.findOne({ email });
     if (!admin) {
       return res.status(401).json({
         success: false,
         message: "Invalid credentials",
-      })
+      });
     }
 
     // Check password
-    const isMatch = await admin.comparePassword(password)
+    const isMatch = await admin.comparePassword(password);
     if (!isMatch) {
       return res.status(401).json({
         success: false,
         message: "Invalid credentials",
-      })
+      });
     }
 
     // Check if admin is active
@@ -42,17 +45,21 @@ router.post("/login", async (req, res) => {
       return res.status(401).json({
         success: false,
         message: "Account is inactive",
-      })
+      });
     }
 
     // Update last login
-    admin.lastLogin = new Date()
-    await admin.save()
+    admin.lastLogin = new Date();
+    await admin.save();
 
     // Generate JWT token
-    const token = jwt.sign({ id: admin._id, email: admin.email }, process.env.JWT_SECRET || "your-secret-key", {
-      expiresIn: "24h",
-    })
+    const token = jwt.sign(
+      { id: admin._id, email: admin.email },
+      process.env.JWT_SECRET || "your-secret-key",
+      {
+        expiresIn: "24h",
+      }
+    );
 
     res.json({
       success: true,
@@ -61,15 +68,15 @@ router.post("/login", async (req, res) => {
         admin,
         token,
       },
-    })
+    });
   } catch (error) {
     res.status(500).json({
       success: false,
       message: "Server error",
       error: error.message,
-    })
+    });
   }
-})
+});
 
 // Admin logout
 router.post("/logout", auth, async (req, res) => {
@@ -78,15 +85,15 @@ router.post("/logout", auth, async (req, res) => {
     res.json({
       success: true,
       message: "Logout successful",
-    })
+    });
   } catch (error) {
     res.status(500).json({
       success: false,
       message: "Server error",
       error: error.message,
-    })
+    });
   }
-})
+});
 
 // Get admin profile
 router.get("/profile", auth, async (req, res) => {
@@ -94,42 +101,42 @@ router.get("/profile", auth, async (req, res) => {
     res.json({
       success: true,
       data: req.admin,
-    })
+    });
   } catch (error) {
     res.status(500).json({
       success: false,
       message: "Server error",
       error: error.message,
-    })
+    });
   }
-})
+});
 
 // Update admin profile
 router.put("/profile", auth, async (req, res) => {
   try {
-    const { name, email, phone } = req.body
+    const { name, email, phone } = req.body;
 
-    const admin = await Admin.findById(req.admin._id)
+    const admin = await Admin.findById(req.admin._id);
 
-    if (name) admin.name = name
-    if (email) admin.email = email
-    if (phone) admin.phone = phone
+    if (name) admin.name = name;
+    if (email) admin.email = email;
+    if (phone) admin.phone = phone;
 
-    await admin.save()
+    await admin.save();
 
     res.json({
       success: true,
       message: "Profile updated successfully",
       data: admin,
-    })
+    });
   } catch (error) {
     res.status(500).json({
       success: false,
       message: "Server error",
       error: error.message,
-    })
+    });
   }
-})
+});
 
 // File upload
 router.post("/upload", auth, upload.single("file"), (req, res) => {
@@ -138,10 +145,12 @@ router.post("/upload", auth, upload.single("file"), (req, res) => {
       return res.status(400).json({
         success: false,
         message: "No file uploaded",
-      })
+      });
     }
 
-    const fileUrl = `/uploads/${req.body.type || "general"}/${req.file.filename}`
+    const fileUrl = `/uploads/${req.body.type || "general"}/${
+      req.file.filename
+    }`;
 
     res.json({
       success: true,
@@ -152,26 +161,26 @@ router.post("/upload", auth, upload.single("file"), (req, res) => {
         size: req.file.size,
         url: fileUrl,
       },
-    })
+    });
   } catch (error) {
     res.status(500).json({
       success: false,
       message: "Upload failed",
       error: error.message,
-    })
+    });
   }
-})
+});
 
 // Create default admin (run once)
 router.post("/create-default", async (req, res) => {
   try {
-    const existingAdmin = await Admin.findOne({ email: "admin@raysveda.com" })
+    const existingAdmin = await Admin.findOne({ email: "admin@raysveda.com" });
 
     if (existingAdmin) {
       return res.status(400).json({
         success: false,
         message: "Default admin already exists",
-      })
+      });
     }
 
     const admin = new Admin({
@@ -179,9 +188,9 @@ router.post("/create-default", async (req, res) => {
       email: "admin@raysveda.com",
       password: "admin123",
       role: "super_admin",
-    })
+    });
 
-    await admin.save()
+    await admin.save();
 
     res.json({
       success: true,
@@ -190,14 +199,57 @@ router.post("/create-default", async (req, res) => {
         email: "admin@raysveda.com",
         password: "admin123",
       },
-    })
+    });
   } catch (error) {
     res.status(500).json({
       success: false,
       message: "Server error",
       error: error.message,
-    })
+    });
   }
-})
+});
 
-module.exports = router
+// Search Users
+router.get("/search/users", async (req, res) => {
+  try {
+    const query = req.query.query || "";
+    const regex = new RegExp(query, "i"); // case-insensitive match
+
+    const users = await User.find({
+      $or: [{ name: regex }, { email: regex }, { phone: regex }],
+    }).limit(10);
+
+    res.json(users);
+  } catch (err) {
+    console.error("Error searching users:", err);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// Search Bookings
+router.get("/search/bookings", async (req, res) => {
+  try {
+    const query = req.query.query || "";
+    const regex = new RegExp(query, "i");
+
+    const bookings = await Booking.find()
+      .populate("user", "name email")
+      .populate("pooja", "name")
+      .limit(20); // keep performance in mind
+
+    // Filter manually based on user name or pooja name
+    const filtered = bookings.filter((booking) => {
+      const userMatch =
+        booking.user?.name?.match(regex) || booking.user?.email?.match(regex);
+      const poojaMatch = booking.pooja?.name?.match(regex);
+      return userMatch || poojaMatch;
+    });
+
+    res.json(filtered);
+  } catch (err) {
+    console.error("Error searching bookings:", err);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+module.exports = router;
