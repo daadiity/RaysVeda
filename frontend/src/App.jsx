@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
-
+import VastuPage from "./pages/VastuPage";
 import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
 import WhatsAppButton from './components/common/WhatsAppButton';
@@ -75,6 +75,7 @@ function App() {
           <Route path="/services" element={<ServicesPage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/contact" element={<ContactPage />} />
+
           <Route path="/services/kundli" element={<KundliIntroPage />} />
           <Route path="/services/kundli/form" element={<KundliFormPage />} />
           <Route path="/services/kundli/result" element={<KundliResultPage />} />
@@ -85,6 +86,7 @@ function App() {
           <Route path="/services/pran-pratishtha" element={<PranPratishtha />} />
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/services/vastu" element={<VastuPage />} />
           <Route path="/admin/login" element={<LoginForm />} />
           <Route path="/dashboard" element={
             <ProtectedRoute>
