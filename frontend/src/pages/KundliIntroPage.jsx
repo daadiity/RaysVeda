@@ -1,174 +1,145 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
 
-const landingBg =
-  `url("https://i.pinimg.com/736x/a8/0d/4f/a80d4ff0eb2c859e043b3abb3028b2bc.jpg"),
-   linear-gradient(120deg, #fff7e6 0%, #ffe5c2 100%),
-   url("https://raysveda.com/images/kundli-bg.webp")`;
-const landingCard = 'rgba(255,255,255,0.96)';
-const orange = '#f26522';
-const orangeDark = '#d35400';
-const borderRadius = '1.5rem';
-const fontFamily = "'Poppins', 'Merriweather', serif";
-const headingFont = "'Merriweather', serif";
-const subText = '#5a4632';
+const orangeGradient = 'linear-gradient(to right, #ff7e00, #ffc107)';
+const headingFont = "'Poppins', sans-serif";
+const bodyFont = "'Poppins', sans-serif";
 
-const KundliIntroPage = () => {
-  const navigate = useNavigate();
+const kundliImg = "https://abblogging.com/wp-content/uploads/2021/08/kundli-matching-1536x1024.jpg";
 
-  return (
-    <div
-      style={{
-        minHeight: '100vh',
-        backgroundImage: landingBg,
-        backgroundRepeat: 'no-repeat, no-repeat, no-repeat',
-        backgroundSize: 'contain, cover, cover',
-        backgroundPosition: 'center, center, center',
+const KundliIntroPage = () => (
+  <div style={{ minHeight: '100vh', background: '#fff7ea', fontFamily: bodyFont }}>
+    {/* Header with Gradient */}
+    <div style={{
+      background: orangeGradient,
+      padding: '4.5rem 0',
+      borderBottomLeftRadius: '120px 40px',
+      borderBottomRightRadius: '120px 40px'
+    }}>
+      <div style={{
+        maxWidth: 1100,
+        margin: '0 auto',
+        padding: '0 2rem',
         display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        fontFamily,
-        position: 'relative',
-      }}
-    >
-      {/* Decorative top bar */}
-      <div
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          width: '100vw',
-          height: 90,
-          background: 'linear-gradient(90deg, #fff7e6 60%, #ffe5c2 100%)',
-          borderBottom: `2px solid ${orange}`,
-          zIndex: 10,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontFamily,
-          fontWeight: 700,
-          fontSize: '2.1rem',
-          color: orangeDark,
-          letterSpacing: '1px',
-          boxShadow: '0 2px 12px #f2652212',
-        }}
-      >
-        <span style={{ fontFamily: headingFont, fontWeight: 800 }}>
-          Free Janam Kundli by RaysVeda
-        </span>
-      </div>
-
-      {/* Main Card */}
-      <div
-        style={{
-          background: landingCard,
-          borderRadius,
-          boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.10)',
-          padding: '2.8rem 2.2rem 2.2rem 2.2rem',
-          maxWidth: 800,
-          width: '100%',
-          textAlign: 'center',
-          border: `2.5px solid ${orange}`,
-          position: 'relative',
-          zIndex: 2,
-          marginTop: 100,
-          marginBottom: 30,
-        }}
-      >
-        <h1
-          style={{
+        flexWrap: 'wrap',
+        gap: '2rem',
+        justifyContent: 'space-between',
+        alignItems: 'center'
+      }}>
+        {/* Text Content */}
+        <div style={{ flex: 1, minWidth: 320 }}>
+          <h1 style={{
             fontFamily: headingFont,
-            fontWeight: 800,
-            color: orange,
-            fontSize: '2.7rem',
-            marginBottom: '0.7rem',
-            letterSpacing: '0.5px',
-            textShadow: '0 2px 8px #f2652215',
-          }}
-        >
-          Free Janam Kundli (Birth Chart)
-        </h1>
-        <div
-          style={{
-            fontSize: '1.18rem',
-            color: subText,
-            marginBottom: '1.5rem',
-            lineHeight: 1.7,
-            fontFamily,
-            fontWeight: 500,
-            textAlign: 'center',
-            maxWidth: 700,
-            margin: '0 auto',
-          }}
-        >
-          <span style={{ color: orangeDark, fontWeight: 700 }}>
-            Unlock the secrets of your destiny with your personalized Janam Kundli.
-          </span>
-          <br />
-          <span>
-            Kundli (Janam Kundli or Birth Chart) is the foundation of Vedic astrology. It is a celestial map created on the basis of your birth details—date, time, and place. Your Kundli reveals the positions of planets, stars, and other astrological aspects at the time of your birth, which influence your personality, strengths, weaknesses, career, relationships, and future events.
-          </span>
-          <br /><br />
-          <span>
-            <b>Why get your Kundli?</b> <br />
-            <ul style={{
-              textAlign: 'left',
-              margin: '1rem auto 0 auto',
-              maxWidth: 600,
-              color: '#6b4b1a',
-              fontSize: '1.08rem',
-              lineHeight: 1.7,
-              fontFamily,
-              fontWeight: 500,
-              paddingLeft: 24,
-            }}>
-              <li>Understand your strengths, weaknesses, and life path</li>
-              <li>Get insights into career, marriage, health, and finances</li>
-              <li>Know your planetary doshas and remedies</li>
-              <li>Plan important events with auspicious timing (muhurat)</li>
-              <li>Receive predictions and guidance for a better future</li>
-            </ul>
-          </span>
-          <span>
-            <b>RaysVeda’s Free Kundli</b> gives you a detailed birth chart, planetary positions, Lagna, Navamsa, and predictions in Hindi & English. Start your astrological journey now!
-          </span>
-        </div>
-        <button
-          className="btn btn-lg"
-          style={{
-            background: orange,
+            fontSize: '2.5rem',
             color: '#fff',
-            fontWeight: 700,
-            fontSize: '1.25rem',
-            borderRadius: '8px',
-            padding: '0.75rem 2.5rem',
-            boxShadow: '0 2px 8px #f2652255',
-            border: 'none',
-            letterSpacing: '0.5px',
-            transition: 'background 0.2s',
-            fontFamily,
-          }}
-          onClick={() => navigate('/services/kundli/form')}
-        >
-          Generate Your Free Kundli
-        </button>
-        <div style={{
-          marginTop: '2.2rem',
-          color: orangeDark,
-          fontSize: '1.03rem',
-          fontFamily,
-          fontWeight: 600,
-          opacity: 0.85,
-        }}>
-          Powered by RaysVeda
+            fontWeight: 700
+          }}>
+            Free Janam Kundli (Birth Chart)
+          </h1>
+          <p style={{
+            color: '#fffbe7',
+            fontSize: '1.1rem',
+            marginBottom: '1.5rem'
+          }}>
+            Your birth was no accident — the universe aligned its energies to script your journey. Discover what the cosmos holds for you.
+          </p>
+          <p style={{
+            color: '#fff',
+            fontSize: '1rem',
+            marginBottom: '2rem'
+          }}>
+            Discover your destiny through the wisdom of Vedic astrology. Your Kundli is a cosmic map revealing the secrets of your life path.
+          </p>
+          <button
+            onClick={() => window.location.href = '/services/kundli/form'}
+            style={{
+              background: '#fff',
+              color: '#f26522',
+              padding: '0.6rem 1.8rem',
+              fontWeight: 600,
+              border: '2px solid #f26522',
+              borderRadius: 8,
+              cursor: 'pointer'
+            }}
+          >
+            Generate Your Kundli
+          </button>
+        </div>
+        {/* Image */}
+        <div style={{ flex: 1, textAlign: 'center' }}>
+          <img
+            src={kundliImg}
+            alt="Kundli"
+            style={{ maxWidth: '100%', height: 300, borderRadius: 12 }}
+          />
         </div>
       </div>
-      <link
-        href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Merriweather:wght@400;700&display=swap"
-        rel="stylesheet"
-      />
     </div>
-  );
-};
+
+    {/* Blogs Section */}
+    <div style={{ padding: '3rem 2rem', textAlign: 'center' }}>
+      <h2 style={{ fontSize: '1.75rem', color: '#f26522', marginBottom: '1.2rem' }}>
+        Explore the Wisdom of the Stars
+      </h2>
+      <p style={{ maxWidth: 800, margin: '0 auto', fontSize: '1rem', color: '#333' }}>
+        Dive deeper into the world of astrology with handpicked blogs and articles that explain the science behind your Janam Kundli.
+      </p>
+
+      <div style={{
+        display: 'flex',
+        flexWrap: 'wrap',
+        gap: '1.8rem',
+        justifyContent: 'center',
+        marginTop: '2rem'
+      }}>
+        {[
+          {
+            title: 'What is a Janam Kundli?',
+            link: 'https://www.astrosage.com/kundli/',
+          },
+          {
+            title: 'Importance of Birth Time in Astrology',
+            link: 'https://www.astroyogi.com/articles/importance-of-time-in-kundli.aspx',
+          },
+          {
+            title: 'How Vedic Astrology Can Help You',
+            link: 'https://www.astrology.com/us/home.aspx',
+          },
+          {
+            title: 'Reading Your Kundli Chart',
+            link: 'https://www.ganeshaspeaks.com/astrology/kundli/',
+          },
+        ].map((blog, i) => (
+          <a key={i}
+             href={blog.link}
+             target="_blank"
+             rel="noopener noreferrer"
+             style={{
+               textDecoration: 'none',
+               background: '#fff',
+               borderRadius: '10px',
+               boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
+               padding: '1.5rem',
+               width: 260,
+               transition: 'transform 0.2s',
+               color: '#f26522',
+               fontWeight: 600,
+               fontSize: '1rem'
+             }}
+             onMouseOver={(e) => e.currentTarget.style.transform = 'translateY(-5px)'}
+             onMouseOut={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+          >
+            {blog.title}
+          </a>
+        ))}
+      </div>
+    </div>
+
+    {/* Fonts */}
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </div>
+);
 
 export default KundliIntroPage;

@@ -12,6 +12,10 @@ import ScrollToTop from './components/common/ScrollToTop'
 import KundliIntroPage from './pages/KundliIntroPage'
 import KundliFormPage from './pages/KundliFormPage'
 import KundliResultPage from './pages/KundliResultPage'
+
+import HawanPage from './pages/HawanPage'
+import BlogPage from './pages/BlogPage' // <-- Add this import
+
 import Vedas from './pages/Vedas'
 import SacredMantras from './pages/SacredMantras'
 import Meditation from './pages/Meditation';
@@ -24,6 +28,7 @@ import BookingHistory from "./pages/BookingHistory";
 import CharitableProgramPage from './pages/CharitableProgramPage';
 import CommunityServicesPage from './pages/CommunityServicesPage';
 import DonatePage from './pages/DonatePage';
+
 
 function App() {
   const [scrolled, setScrolled] = useState(false)
@@ -52,6 +57,10 @@ function App() {
           <Route path="/services/kundli" element={<KundliIntroPage />} />
           <Route path="/services/kundli/form" element={<KundliFormPage />} />
           <Route path="/services/kundli/result" element={<KundliResultPage />} />
+
+          <Route path="/services/hawan" element={<HawanPage />} />
+          <Route path="/blog" element={<BlogPage />} /> {/* <-- Blog route */}
+
           <Route path="/vidya/vedas" element={<Vedas />} />
           <Route path="/vidya/mantras" element={<SacredMantras />} />
           <Route path="/vidya/meditation" element={<Meditation />} />
