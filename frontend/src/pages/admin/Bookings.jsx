@@ -19,6 +19,7 @@ const Bookings = () => {
   const [statusFilter, setStatusFilter] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
   const [bookingsPerPage] = useState(10);
+  const [inputValue, setInputValue] = useState(""); // what user types
 
   useEffect(() => {
     fetchBookings();
@@ -27,16 +28,20 @@ const Bookings = () => {
   const fetchBookings = async () => {
     try {
       setLoading(true);
-      const params = {
-        page: currentPage,
-        limit: bookingsPerPage,
-        search: searchTerm,
-        status: statusFilter !== "all" ? statusFilter : undefined,
-      };
 
-      const response = await adminAPI.getBookings(params);
-      console.log("Bookings API response:", response);
-      setBookings(response.data || []);
+      let response;
+      if (searchTerm.trim() !== "") {
+        // Fetch from search route
+        response = await adminAPI.searchBookings({ query: searchTerm });
+        setBookings(response.data.bookings || []);
+      } else {
+        // Default booking list (if no search)
+        response = await adminAPI.getBookings({
+          page: currentPage,
+          limit: bookingsPerPage,
+        });
+        setBookings(response.data || []);
+      }
     } catch (error) {
       console.error("Error fetching bookings:", error);
       alert("Failed to load bookings. Please try again.");
@@ -139,10 +144,13 @@ const Bookings = () => {
             <input
               type="text"
               placeholder="Search bookings..."
-              value={searchTerm}
-              onChange={(e) => {
-                setSearchTerm(e.target.value);
-                setCurrentPage(1);
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  setSearchTerm(inputValue); // searchTerm is already in your state
+                  setCurrentPage(1);
+                }
               }}
               className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent w-full"
             />
