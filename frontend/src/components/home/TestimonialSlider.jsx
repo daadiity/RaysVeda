@@ -3,7 +3,28 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { FaQuoteLeft, FaChevronLeft, FaChevronRight } from 'react-icons/fa'
 
 const testimonials = [
-  {\n    id: 1,\n    name: "Priya Sharma",\n    role: "Devotee",\n    content: "I was seeking spiritual guidance during a difficult time, and the Lakshmi Puja performed by RaysVeda brought peace and prosperity into my life. The priest was knowledgeable and the experience was truly divine.",\n    image: "https://images.pexels.com/photos/1065084/pexels-photo-1065084.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"\n  },\n  {\n    id: 2,\n    name: "Rahul Patel",\n    role: "Regular Client",\n    content: "The online Kundli reading service was incredibly accurate and provided deep insights into my life path. The remedies suggested have been tremendously helpful in overcoming obstacles. Highly recommended!",\n    image: "https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"\n  },\n  {\n    id: 3,\n    name: "Ananya Verma",\n    role: "Spiritual Seeker",\n    content: "I participated in a Hawan ceremony organized by RaysVeda, and the energy was transformative. The ritual was conducted with precision and devotion.",\n    image: "https://images.pexels.com/photos/8108063/pexels-photo-8108063.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"\n  }\n]
+  {
+    id: 1,
+    name: "Priya Sharma",
+    role: "Devotee",
+    content: "I was seeking spiritual guidance during a difficult time, and the Lakshmi Puja performed by RaysVeda brought peace and prosperity into my life. The priest was knowledgeable and the experience was truly divine.",
+    image: "https://images.pexels.com/photos/1065084/pexels-photo-1065084.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
+  },
+  {
+    id: 2,
+    name: "Rahul Patel",
+    role: "Regular Client",
+    content: "The online Kundli reading service was incredibly accurate and provided deep insights into my life path. The remedies suggested have been tremendously helpful in overcoming obstacles. Highly recommended!",
+    image: "https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
+  },
+  {
+    id: 3,
+    name: "Ananya Verma",
+    role: "Spiritual Seeker",
+    content: "I participated in a Hawan ceremony organized by RaysVeda, and the energy was transformative. The ritual was conducted with precision and devotion.",
+    image: "https://images.pexels.com/photos/8108063/pexels-photo-8108063.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
+  }
+];
 
 const TestimonialSlider = () => {
   const [currentIndex, setCurrentIndex] = useState(0)
