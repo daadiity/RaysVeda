@@ -4,4 +4,3 @@ const geminiController = require('../controllers/geminiController');
 
 router.post('/gemini-interpret', geminiController.generateKundli);
 module.exports = router;
-
