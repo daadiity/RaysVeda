@@ -21,6 +21,9 @@ export default function UserDashboard() {
   const [error, setError] = useState("");
   const { user } = useAuth();
 
+  // Configure axios defaults
+  axios.defaults.baseURL = 'http://localhost:5000';
+
   if (user === undefined) {
     return (
       <div className="flex justify-center items-center min-h-[40vh]">
@@ -35,13 +38,23 @@ export default function UserDashboard() {
   useEffect(() => {
     if (user && user._id) {
       setLoading(true);
+      
+      // Get token for authenticated request
+      const token = localStorage.getItem('token');
+      
       axios
-        .get(`/api/bookings/user/${user._id}`)
+        .get(`/api/bookings/user/${user._id}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        })
         .then((res) => {
+          console.log('Dashboard bookings response:', res.data);
           setBookings(res.data.bookings);
           setLoading(false);
         })
         .catch((err) => {
+          console.error('Dashboard fetch error:', err);
           setError("Failed to fetch bookings. Please try again later.");
           setLoading(false);
         });
@@ -52,10 +65,10 @@ export default function UserDashboard() {
     }
   }, [user]);
 
-  // Summary stats
+  // Summary stats - FIX: Change "Success" to "paid"
   const total = bookings.length;
-  const completed = bookings.filter((b) => b.paymentStatus === "Success").length;
-  const pending = bookings.filter((b) => b.paymentStatus !== "Success").length;
+  const completed = bookings.filter((b) => b.paymentStatus === "paid").length;
+  const pending = bookings.filter((b) => b.paymentStatus === "pending").length;
 
   if (loading && user !== null)
     return (
@@ -80,7 +93,7 @@ export default function UserDashboard() {
       <h2 className="text-2xl md:text-3xl font-bold mb-2 text-gray-800">
         Welcome, <span className="text-primary-600">{user?.name || "User"}</span>!
       </h2>
-      <p className="mb-6 text-gray-600">Here’s your puja booking summary and history.</p>
+      <p className="mb-6 text-gray-600">Here's your puja booking summary and history.</p>
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
@@ -113,7 +126,7 @@ export default function UserDashboard() {
           <FaHourglassHalf className="text-5xl text-yellow-400 mb-4" />
           <div className="text-lg font-semibold mb-2">No bookings found.</div>
           <Link
-            to="/puja/booking"
+            to="/puja"
             className="inline-flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white px-5 py-2 rounded shadow mt-4 transition"
           >
             <FaPlusCircle /> Book a Puja Now
@@ -126,18 +139,18 @@ export default function UserDashboard() {
               key={b._id}
               className="bg-white shadow rounded-lg p-5 flex flex-col gap-2 border-l-4 border-green-400"
               style={{
-                borderColor: b.paymentStatus === "Success" ? "#22c55e" : "#facc15",
+                borderColor: b.paymentStatus === "paid" ? "#22c55e" : "#facc15",
               }}
             >
               <div className="flex items-center justify-between mb-2">
                 <span className="text-lg font-bold text-gray-800">{b.poojaType}</span>
                 <span
                   className={`inline-flex items-center gap-1 px-2 py-1 rounded text-xs font-semibold
-                    ${b.paymentStatus === "Success"
+                    ${b.paymentStatus === "paid"
                       ? "bg-green-100 text-green-700"
                       : "bg-yellow-100 text-yellow-700"}`}
                 >
-                  {b.paymentStatus === "Success" ? (
+                  {b.paymentStatus === "paid" ? (
                     <>
                       <FaCheckCircle className="text-green-500" /> Paid
                     </>
@@ -157,14 +170,13 @@ export default function UserDashboard() {
               </div>
               <div className="flex items-center gap-2 text-gray-600 text-sm">
                 <FaRupeeSign className="text-green-600" />
-                <span>{b.amount ? b.amount : "—"}</span>
+                <span>₹{b.amount ? b.amount : "—"}</span>
               </div>
               {b.address && (
                 <div className="text-xs text-gray-400 mt-2">
                   <span className="font-semibold">Address:</span> {b.address}
                 </div>
               )}
-              {/* Removed the View Booking History link */}
             </div>
           ))}
         </div>

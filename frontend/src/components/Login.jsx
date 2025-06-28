@@ -1,19 +1,50 @@
-import React, { useState } from "react";
-import axios from "axios";
-import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext";
+import React, { useState } from 'react';
+import axios from 'axios';
+import { useAuth } from '../context/AuthContext';
 
-export default function LoginForm() {
-  const [form, setForm] = useState({ emailOrPhone: "", password: "" });
-  const [message, setMessage] = useState("");
+const Login = ({ onClose, onSwitchToSignup }) => {
+  const [formData, setFormData] = useState({
+    emailOrPhone: '',
+    password: ''
+  });
+  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [inputType, setInputType] = useState('');
-  const navigate = useNavigate();
   const { login } = useAuth();
+
+  // Configure axios defaults
+  axios.defaults.baseURL = 'http://localhost:5000';
+
+  // Phone number normalization function
+  const normalizePhoneNumber = (phone) => {
+    // Remove all non-digit characters
+    let cleanPhone = phone.replace(/\D/g, '');
+    
+    // Handle different Indian phone number formats
+    if (cleanPhone.length === 10) {
+      // If 10 digits, assume it's without country code
+      return cleanPhone;
+    } else if (cleanPhone.length === 11 && cleanPhone.startsWith('0')) {
+      // If 11 digits starting with 0, remove the leading 0
+      return cleanPhone.substring(1);
+    } else if (cleanPhone.length === 12 && cleanPhone.startsWith('91')) {
+      // If 12 digits starting with 91, remove country code
+      return cleanPhone.substring(2);
+    } else if (cleanPhone.length === 13 && cleanPhone.startsWith('910')) {
+      // If 13 digits starting with 910, remove country code and leading 0
+      return cleanPhone.substring(3);
+    }
+    
+    // Return original clean phone if no standard format matches
+    return cleanPhone;
+  };
 
   const handleChange = (e) => {
     const value = e.target.value;
-    setForm({ ...form, [e.target.name]: value });
+    setFormData({
+      ...formData,
+      [e.target.name]: value
+    });
 
     // Detect input type for better UX
     if (e.target.name === 'emailOrPhone') {
@@ -26,74 +57,76 @@ export default function LoginForm() {
       }
     }
 
-    // Clear message when user starts typing
-    if (message) setMessage("");
+    if (error) setError('');
   };
 
-  // Helper functions
   const isEmail = (input) => input.includes('@');
+  
   const isPhone = (input) => {
-    const cleanInput = input.replace(/\D/g, '');
-    return cleanInput.length >= 10 && /^\d+$/.test(cleanInput);
+    const cleanInput = normalizePhoneNumber(input);
+    return cleanInput.length === 10 && /^\d+$/.test(cleanInput);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setMessage("");
-    setLoading(true);
-
-    // Validation
-    if (!form.emailOrPhone || !form.password) {
-      setMessage('Please provide email/phone and password');
-      setLoading(false);
+    
+    if (!formData.emailOrPhone || !formData.password) {
+      setError('Please provide email/phone and password');
       return;
     }
 
-    const inputValue = form.emailOrPhone.trim();
+    const inputValue = formData.emailOrPhone.trim();
     
     if (!isEmail(inputValue) && !isPhone(inputValue)) {
-      setMessage('Please provide a valid email address or phone number');
-      setLoading(false);
+      setError('Please provide a valid email address or 10-digit phone number');
       return;
     }
 
+    setLoading(true);
+    setError('');
+
     try {
-      // Prepare request data based on input type
-      const requestData = { password: form.password };
+      const requestData = { password: formData.password };
 
       if (isEmail(inputValue)) {
         requestData.email = inputValue.toLowerCase();
         console.log('Attempting login with email:', requestData.email);
       } else {
-        requestData.phone = inputValue.replace(/\D/g, ''); // Clean phone number
-        console.log('Attempting login with phone:', requestData.phone);
+        // Normalize phone number before sending
+        const normalizedPhone = normalizePhoneNumber(inputValue);
+        requestData.phone = normalizedPhone;
+        console.log('Attempting login with normalized phone:', normalizedPhone, 'from input:', inputValue);
       }
 
-      const res = await axios.post("/api/auth/login", requestData);
-      
-      if (res.data.success) {
-        const { user, token } = res.data;
-        
-        // Store token in localStorage
-        localStorage.setItem('token', token);
-        localStorage.setItem('user', JSON.stringify(user));
-        
-        login(user); // Update auth context
-        navigate("/dashboard"); // Redirect to dashboard
+      const response = await axios.post('/api/auth/login', requestData, {
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      if (response.data.success) {
+        localStorage.setItem('token', response.data.token);
+        localStorage.setItem('user', JSON.stringify(response.data.user));
+        login(response.data.user);
+        onClose();
       } else {
-        setMessage(res.data.message || "Login failed");
+        setError(response.data.message || 'Login failed');
       }
     } catch (err) {
-      console.error("Login error:", err.response?.data || err.message);
-      setMessage(err.response?.data?.message || "Invalid credentials.");
+      console.error('Login error:', err);
+      if (err.response) {
+        setError(err.response.data.message || 'Invalid credentials. Please check your phone/email and password.');
+      } else if (err.request) {
+        setError('Network error. Please check your connection.');
+      } else {
+        setError('An unexpected error occurred');
+      }
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-100 via-orange-50 to-amber-50">
-      <div className="max-w-md w-full mx-4">
+    <div className="min-h-screen bg-gradient-to-br from-orange-100 via-orange-50 to-amber-50 flex items-center justify-center p-4">
+      <div className="max-w-md w-full">
         {/* Header */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-orange-600 to-red-600 rounded-full mb-4">
@@ -109,16 +142,12 @@ export default function LoginForm() {
             <h2 className="text-2xl font-bold text-gray-800 mb-2">Sign in to your account</h2>
           </div>
 
-          {message && (
-            <div className={`border px-4 py-3 rounded-lg mb-6 flex items-center ${
-              message.includes('Invalid') || message.includes('Error') || message.includes('provide')
-                ? 'bg-red-50 border-red-200 text-red-700'
-                : 'bg-green-50 border-green-200 text-green-700'
-            }`}>
+          {error && (
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6 flex items-center">
               <svg className="w-5 h-5 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
               </svg>
-              <span className="text-sm">{message}</span>
+              <span className="text-sm">{error}</span>
             </div>
           )}
 
@@ -131,8 +160,8 @@ export default function LoginForm() {
               <div className="relative">
                 <input
                   type="text"
-                  name="emailOrPhone" // CHANGED FROM "phone" to "emailOrPhone"
-                  value={form.emailOrPhone}
+                  name="emailOrPhone"
+                  value={formData.emailOrPhone}
                   onChange={handleChange}
                   className="w-full px-4 py-3 pl-12 pr-20 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-300"
                   placeholder="email@example.com or 9876543210"
@@ -143,7 +172,7 @@ export default function LoginForm() {
                 <div className="absolute left-4 top-1/2 transform -translate-y-1/2">
                   {inputType === 'email' ? (
                     <svg className="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 12a4 4 0 10-8 0 4 4 0 018 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
                     </svg>
                   ) : inputType === 'phone' ? (
                     <svg className="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -174,7 +203,7 @@ export default function LoginForm() {
                 <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
                 </svg>
-                Use either your email address or phone number
+                Phone with or without 0 (e.g., 9876543210 or 09876543210)
               </div>
             </div>
 
@@ -187,7 +216,7 @@ export default function LoginForm() {
                 <input
                   type="password"
                   name="password"
-                  value={form.password}
+                  value={formData.password}
                   onChange={handleChange}
                   className="w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-300"
                   placeholder="Enter your password"
@@ -228,12 +257,13 @@ export default function LoginForm() {
             {/* Sign Up Link */}
             <div className="text-center pt-4 border-t border-gray-200">
               <span className="text-gray-600 text-sm">Don't have an account? </span>
-              <Link 
-                to="/signup" 
+              <button
+                type="button"
+                onClick={onSwitchToSignup}
                 className="text-orange-600 hover:text-orange-700 font-semibold text-sm transition-colors hover:underline"
               >
                 Sign up
-              </Link>
+              </button>
             </div>
           </form>
         </div>
@@ -245,4 +275,6 @@ export default function LoginForm() {
       </div>
     </div>
   );
-}
+};
+
+export default Login;
