@@ -1,0 +1,225 @@
+# Root .gitignore for RaysVeda project
+
+# =======================
+# ENVIRONMENT & SECRETS
+# =======================
+# Never commit sensitive data
+*.env
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+.env.staging
+
+# Backend environment files
+backend/.env
+backend/.env.*
+
+# Frontend environment files  
+frontend/.env
+frontend/.env.*
+
+# =======================
+# NODE.JS & NPM
+# =======================
+# Dependencies
+node_modules/
+*/node_modules/
+frontend/node_modules/
+backend/node_modules/
+
+# Package lock files (choose one strategy)
+package-lock.json
+*/package-lock.json
+yarn.lock
+*/yarn.lock
+
+# NPM logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+*.lcov
+
+# nyc test coverage
+.nyc_output
+
+# =======================
+# FRONTEND (VITE/REACT)
+# =======================
+# Build outputs
+frontend/dist/
+frontend/build/
+frontend/.vite/
+
+# Vite cache
+frontend/node_modules/.vite/
+
+# ESLint cache
+frontend/.eslintcache
+
+# Editor directories and files
+frontend/.vscode/
+frontend/.idea/
+frontend/*.swp
+frontend/*.swo
+
+# OS generated files
+frontend/.DS_Store
+frontend/Thumbs.db
+
+# =======================
+# BACKEND (EXPRESS/NODE)
+# =======================
+# Build outputs
+backend/dist/
+backend/build/
+
+# Logs
+backend/logs/
+backend/*.log
+
+# Uploads (if you have file uploads)
+backend/uploads/
+backend/public/uploads/
+
+# =======================
+# DATABASE
+# =======================
+# Local database files
+*.db
+*.sqlite
+*.sqlite3
+
+# MongoDB dumps
+*.bson
+dump/
+
+# =======================
+# DEVELOPMENT TOOLS
+# =======================
+# Editor/IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Temporary files
+*.tmp
+*.temp
+temp/
+tmp/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# =======================
+# DEPLOYMENT & CI/CD
+# =======================
+# Deployment files
+.vercel
+.netlify/
+
+# Docker
+.dockerignore
+Dockerfile
+docker-compose.yml
+docker-compose.*.yml
+
+# =======================
+# LOGS & DEBUG
+# =======================
+# Application logs
+logs/
+*.log
+log/
+
+# Debug files
+.pnp.*
+.yarn/
+
+# =======================
+# TESTING
+# =======================
+# Test coverage
+coverage/
+.coverage/
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# =======================
+# SECURITY & CERTIFICATES
+# =======================
+# SSL certificates
+*.pem
+*.key
+*.crt
+*.csr
+
+# SSH keys
+id_rsa
+id_rsa.pub
+*.ppk
+
+# =======================
+# BACKUP & ARCHIVE FILES
+# =======================
+*.bak
+*.backup
+*.old
+*.orig
+*.rej
+*.zip
+*.tar.gz
+*.rar
+
+# =======================
+# RAZORPAY & PAYMENT
+# =======================
+# Never commit payment gateway keys/secrets
+razorpay_*
+payment_*.json
+
+# =======================
+# PROJECT SPECIFIC
+# =======================
+# Your specific build/output directories
+dist/
+build/
+
+# Cache directories
+.cache/
+*.cache
+
+# Temporary uploads or user generated content
+uploads/
+images/user_uploads/
+
+# Documentation builds
+docs/_build/
+
+# =======================
+# FUTURE ADDITIONS
+# =======================
+# Add any project-specific patterns here
+# Example:
+# backend/config/production.js
+# frontend/src/config/api.prod.js
