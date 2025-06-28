@@ -1,10 +1,8 @@
-import { useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
-import { motion, useInView } from 'framer-motion'
-import ServiceCard from '../components/home/ServiceCard'
-import PujaCard from '../components/home/PujaCard'
-import { useAuth } from '../context/AuthContext'
-import BookPoojaForm from '../components/BookPoojaForm'
+import React, { useRef, useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { motion, useInView, useAnimation } from 'framer-motion';
+import { useAuth } from '../context/AuthContext';
+import BookPoojaForm from '../components/BookPoojaForm';
 
 const fadeIn = {
   hidden: { opacity: 0, y: 20 },
@@ -15,256 +13,702 @@ const fadeIn = {
   }
 }
 
+const staggerContainer = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.2,
+      delayChildren: 0.1
+    }
+  }
+}
+
+const scaleUp = {
+  hidden: { scale: 0.8, opacity: 0 },
+  visible: {
+    scale: 1,
+    opacity: 1,
+    transition: { duration: 0.5 }
+  }
+}
+
 const HomePage = () => {
-  const aboutRef = useRef(null)
+  const heroRef = useRef(null)
+  const featuresRef = useRef(null)
   const servicesRef = useRef(null)
-  const pujaRef = useRef(null)
-  const [showBooking, setShowBooking] = useState(false)
-  const [showLoginMsg, setShowLoginMsg] = useState(false)
+  const pujasRef = useRef(null)
+  const testimonialsRef = useRef(null)
+  const navigate = useNavigate()
+
+  const heroInView = useInView(heroRef, { once: true })
+  const featuresInView = useInView(featuresRef, { once: true, margin: "-100px" })
+  const servicesInView = useInView(servicesRef, { once: true, margin: "-100px" })
+  const pujasInView = useInView(pujasRef, { once: true, margin: "-100px" })
+  const testimonialsInView = useInView(testimonialsRef, { once: true, margin: "-100px" })
+
   const { user } = useAuth()
 
-  const aboutInView = useInView(aboutRef, { once: true, margin: "-100px" })
-  const servicesInView = useInView(servicesRef, { once: true, margin: "-100px" })
-  const pujaInView = useInView(pujaRef, { once: true, margin: "-100px" })
+  // Add these state variables for booking functionality
+  const [showBooking, setShowBooking] = useState(false)
+  const [selectedPuja, setSelectedPuja] = useState(null)
+  const [showLoginMsg, setShowLoginMsg] = useState(false)
+  const [currentTestimonial, setCurrentTestimonial] = useState(0)
 
+  // Enhanced services data with images
   const services = [
     {
       id: 1,
-      title: "Pran Pratishtha",
-      description: "Sacred ceremony to invoke divine energy into statues and images, bringing them to life.",
-      image: "https://images.pexels.com/photos/7919635/pexels-photo-7919635.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-      link: "/services/pran-pratishtha"
+      title: "Puja Services",
+      description: "Sacred rituals and ceremonies for various occasions and spiritual needs.",
+      image: "https://i.pinimg.com/736x/47/fa/21/47fa2113b986016e9e4427b48415edda.jpg",
+      icon: "🕉️",
+      link: "/puja",
+      features: ["Traditional Rituals", "Expert Priests", "Customized Ceremonies"]
     },
     {
       id: 2,
-      title: "Puja",
-      description: "Traditional worship ritual to honor deities, seeking blessings and divine grace.",
-      image: "https://t4.ftcdn.net/jpg/12/33/33/13/240_F_1233331310_4Qx5hQxoAKNDSAVUz7xNog81BTb4Yv5W.jpg",
-      link: "/services/puja"
+      title: "Astrology",
+      description: "Personalized astrological consultations and guidance for life decisions.",
+      image: "https://i.pinimg.com/736x/e7/b0/55/e7b05536587efbcfb2dc52fe7147d4c7.jpg",
+      icon: "🔮",
+      link: "/astrology",
+      features: ["Birth Chart Analysis", "Future Predictions", "Remedial Solutions"]
     },
     {
       id: 3,
-      title: "Hawan",
-      description: "Ancient Vedic fire ritual for purification, offerings, and invoking divine blessings.",
-      image: "https://www.angirarajasthan.in/cdn/shop/articles/banner.jpg?v=1725092073",
-      link: "/services/hawan"
+      title: "Meditation",
+      description: "Guided meditation sessions for inner peace and spiritual growth.",
+      image: "https://i.pinimg.com/736x/e7/d6/e7/e7d6e7d0fead9db0b91a16a86e2a35b1.jpg",
+      icon: "🧘‍♂️",
+      link: "/meditation",
+      features: ["Guided Sessions", "Breathing Techniques", "Mindfulness Training"]
     },
     {
       id: 4,
-      title: "Kundli",
-      description: "Vedic astrology chart analysis to understand planetary influences and life predictions.",
-      image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSl4KAaNMhL3H1BGTJbDXVCDw1E_ZIGg2UVbg&s",
-      link: "/services/kundli"
-    },
-    {
-      id: 5,
-      title: "Numerology",
-      description: "Uncover insights into your personality, destiny, and life path through the power of numbers.",
-      image:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRoY2LtP4XwWW5girdLUuxajspdx0j0FfaYZg&s",
-      link: "/services/numerology"
-    },
-    {
-      id: 6,
-      title: "Vastu",
-      description: "Harmonize your living and working spaces with ancient architectural principles for prosperity and well-being.",
-      image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTE9-X11LFgzYr1rByGQwk8XCr3Q5iEzXaE_A&s",
-      link: "/services/vastu"
-    },
+      title: "Community",
+      description: "Join our spiritual community for support and shared experiences.",
+      image: "https://i.pinimg.com/736x/0c/ee/65/0cee65871ca0195397d91131ad9c3e7e.jpg",
+      icon: "👥",
+      link: "/community",
+      features: ["Spiritual Groups", "Events & Workshops", "Online Forums"]
+    }
   ]
 
-  const pujas = [
+  // Enhanced testimonials with images
+  const testimonials = [
     {
       id: 1,
-      title: "Shri Narayan Puja",
-      description: "This Pooja calms down your mind, sharpens your focus in life, helps in the overcoming of financial issues, delivers good fortune, avoids evil and helps to gain happiness!",
-      image: "https://i.pinimg.com/736x/47/a2/37/47a23755394a44cd1b8e543472160e13.jpg",
-      price: "₹1,501",
-      link: "/puja/shri-narayan"
+      name: "Rajesh Kumar",
+      location: "Delhi, India",
+      image: "https://i.pinimg.com/736x/e5/5d/d7/e55dd7dea6905491b6dcd4ce40ceaec1.jpg",
+      text: "RaysVeda has transformed my spiritual journey. The personalized guidance and authentic rituals have brought peace and clarity to my life.",
+      rating: 5,
+      service: "Puja Services"
     },
     {
       id: 2,
-      title: "Shri Ganpati Puja",
-      description: "Represents sweetness & auspicious beginnings & offers blessings for achieving goals, aspirations as well as remove obstacles & bring good fortune!",
-      image: "https://i.pinimg.com/736x/2e/6d/6f/2e6d6f7119a936f6caabce62b5018d4b.jpg",
-      price: "₹1,801",
-      link: "/puja/shri-ganpati"
+      name: "Priya Sharma",
+      location: "Mumbai, India",
+      image: "https://i.pinimg.com/736x/1d/07/b3/1d07b3449037083feae0ebc40a8bfe1e.jpg",
+      text: "The convenience of booking online combined with traditional practices makes RaysVeda unique. Highly recommended!",
+      rating: 5,
+      service: "Online Booking"
     },
     {
       id: 3,
-      title: "Shri Shiv Puja",
-      description: "For blessings of Lord Shiva for spiritual growth, inner peace, and removal of obstacles, ensuring prosperity and well-being.",
-      image: "https://i.pinimg.com/736x/c6/da/a2/c6daa23adb2fce39cc1c7c9d45e745b1.jpg",
-      price: "₹2,101",
-      link: "/puja/shri-shiv"
+      name: "Ankit Patel",
+      location: "Ahmedabad, India",
+      image: "https://i.pinimg.com/736x/3c/4d/5e/3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f.jpg",
+      text: "The astrology consultation was incredibly accurate and insightful. It helped me make important life decisions with confidence.",
+      rating: 5,
+      service: "Astrology"
+    },
+    {
+      id: 4,
+      name: "Meera Gupta",
+      location: "Bangalore, India",
+      image: "https://i.pinimg.com/736x/47/01/77/470177c3c1d29dd0e95d9079bac12a19.jpg",
+      text: "The meditation sessions have brought incredible peace to my daily life. The instructors are knowledgeable and caring.",
+      rating: 5,
+      service: "Meditation"
     }
   ]
 
-  // Handler for Book a Puja Now button (used in both hero and CTA)
+  // Enhanced pujas data with better images
+  const featuredPujas = [
+    {
+      id: 1,
+      title: "Shri Ganpati Puja",
+      description: "Remove obstacles and bring good fortune to your life with this powerful ritual.",
+      image: "https://i.pinimg.com/736x/2e/6d/6f/2e6d6f7119a936f6caabce62b5018d4b.jpg",
+      price: "₹1,101",
+      amount: 1101,
+      duration: "2-3 Hours",
+      benefits: ["Removes Obstacles", "Brings Good Fortune", "Success in New Ventures"],
+      link: "/puja/shri-ganpati"
+    },
+    {
+      id: 2,
+      title: "Maa Lakshmi Puja",
+      description: "Invite prosperity, wealth, and abundance into your home with divine blessings.",
+      image: "https://i.pinimg.com/736x/50/b0/dc/50b0dc13deb8d141838f77c216549560.jpg",
+      price: "₹2,101",
+      amount: 2101,
+      duration: "3-4 Hours",
+      benefits: ["Attracts Wealth", "Business Success", "Financial Stability"],
+      link: "/puja/maa-lakshmi"
+    },
+    {
+      id: 3,
+      title: "Shri Narayan Puja",
+      description: "Seek protection, peace, and spiritual growth through this sacred ritual.",
+      image: "https://i.pinimg.com/736x/47/a2/37/47a23755394a44cd1b8e543472160e13.jpg",
+      price: "₹1,501",
+      amount: 1501,
+      duration: "2-3 Hours",
+      benefits: ["Divine Protection", "Inner Peace", "Spiritual Growth"],
+      link: "/puja/shri-narayan"
+    }
+  ]
+
+  // Auto-rotate testimonials
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTestimonial((prev) => (prev + 1) % testimonials.length)
+    }, 5000) // Change every 5 seconds
+
+    return () => clearInterval(interval)
+  }, [testimonials.length])
+
+  // Handler functions
   const handleBookPujaClick = () => {
-    if (user && user._id) {
-      setShowBooking(true)
-    } else {
+    if (!user) {
       setShowLoginMsg(true)
       setTimeout(() => setShowLoginMsg(false), 3000)
+      return
     }
+    setSelectedPuja(null)
+    setShowBooking(true)
+  }
+
+  const handlePujaBookNow = (puja) => {
+    if (!user) {
+      setShowLoginMsg(true)
+      setTimeout(() => setShowLoginMsg(false), 3000)
+      return
+    }
+    // If user is logged in, redirect to puja page or open booking form
+    // You can either navigate to puja page or open a booking modal
+    navigate('/pujas') // or implement booking logic here
   }
 
   return (
     <>
-      {/* Hero Section */}
-      <section className="relative h-screen flex items-center justify-center text-white text-center">
-        <div 
-          className="absolute inset-0 bg-cover bg-center" 
-          style={{ backgroundImage: `url('https://res.cloudinary.com/dufvitqpb/image/upload/v1748418174/generated-image_7_z71loi.png')` }}
-        >
-          <div className="absolute inset-0 bg-black opacity-50"></div>
+      {/* Enhanced Hero Section with Parallax Effect */}
+      <section ref={heroRef} className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-600 via-orange-500 to-amber-500 text-white overflow-hidden">
+        {/* Animated Background Elements */}
+        <div className="absolute inset-0">
+          <div className="absolute top-20 left-10 w-32 h-32 bg-white/10 rounded-full animate-pulse"></div>
+          <div className="absolute top-40 right-20 w-24 h-24 bg-white/10 rounded-full animate-bounce delay-1000"></div>
+          <div className="absolute bottom-32 left-1/4 w-20 h-20 bg-white/10 rounded-full animate-pulse delay-500"></div>
+          <div className="absolute bottom-20 right-1/3 w-28 h-28 bg-white/10 rounded-full animate-bounce delay-1500"></div>
         </div>
-        <div className="relative z-10 px-4">
-          <motion.h1 
-            className="text-4xl md:text-6xl font-serif font-bold mb-4"
-            initial={{ opacity: 0, y: -50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-          >
-            Your Journey to Inner Peace
-          </motion.h1>
-          <motion.p 
-            className="text-lg md:text-xl max-w-2xl mx-auto mb-8"
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-          >
-            Experience authentic Vedic rituals and spiritual guidance from the comfort of your home
-          </motion.p>
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-          >
-            <button className="btn-primary" onClick={handleBookPujaClick}>
-              Book a Puja Now
-            </button>
-            {showLoginMsg && (
-              <div className="mt-4 bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded inline-block">
-                Please log in or sign up to book a puja.
-              </div>
-            )}
-          </motion.div>
+        
+        <div className="absolute inset-0 bg-black/20"></div>
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="max-w-4xl mx-auto text-center">
+            <motion.div
+              initial={{ scale: 0.5, opacity: 0 }}
+              animate={heroInView ? { scale: 1, opacity: 1 } : {}}
+              transition={{ duration: 0.8 }}
+              className="mb-6"
+            >
+              <span className="text-6xl mb-4 block">🕉️</span>
+            </motion.div>
+            
+            <motion.h1
+              initial={{ opacity: 0, y: 30 }}
+              animate={heroInView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="text-4xl md:text-6xl font-serif font-bold mb-6 leading-tight"
+            >
+              Welcome to{' '}
+              <span className="bg-gradient-to-r from-yellow-200 to-orange-200 bg-clip-text text-transparent">
+                RaysVeda
+              </span>
+            </motion.h1>
+            
+            <motion.p
+              initial={{ opacity: 0, y: 30 }}
+              animate={heroInView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.8, delay: 0.4 }}
+              className="text-xl md:text-2xl mb-8 font-light"
+            >
+              Your journey to spiritual enlightenment begins here
+            </motion.p>
+            
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={heroInView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.8, delay: 0.6 }}
+              className="flex flex-col sm:flex-row gap-4 justify-center"
+            >
+              <motion.button
+                whileHover={{ scale: 1.05, boxShadow: "0 10px 25px rgba(0,0,0,0.2)" }}
+                whileTap={{ scale: 0.95 }}
+                className="bg-white text-orange-600 px-8 py-4 rounded-full text-lg font-semibold hover:bg-orange-50 transition-all duration-300 shadow-lg"
+                onClick={handleBookPujaClick}
+              >
+                🎯 Book a Puja Now
+              </motion.button>
+              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                <Link 
+                  to="/about" 
+                  className="border-2 border-white text-white px-8 py-4 rounded-full text-lg font-semibold hover:bg-white hover:text-orange-600 transition-all duration-300 inline-block"
+                >
+                  ✨ Learn More
+                </Link>
+              </motion.div>
+            </motion.div>
+          </div>
+        </div>
+        
+        {/* Animated Wave */}
+        <div className="absolute bottom-0 left-0 right-0">
+          <svg className="w-full h-24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 120" fill="#FFF7ED">
+            <motion.path
+              initial={{ pathLength: 0 }}
+              animate={{ pathLength: 1 }}
+              transition={{ duration: 2, delay: 1 }}
+              fillOpacity="1" 
+              d="M0,64L80,69.3C160,75,320,85,480,80C640,75,800,53,960,48C1120,43,1280,53,1360,58.7L1440,64L1440,120L1360,120C1280,120,1120,120,960,120C800,120,640,120,480,120C320,120,160,120,80,120L0,120Z"
+            />
+          </svg>
         </div>
       </section>
 
-      {/* About Section */}
-      <section className="py-16 md:py-24 bg-orange-50" ref={aboutRef}>
+      {/* Enhanced Features Section */}
+      <section ref={featuresRef} className="py-20 bg-orange-50">
         <div className="container mx-auto px-4">
           <motion.div
-            variants={fadeIn}
+            variants={staggerContainer}
             initial="hidden"
-            animate={aboutInView ? "visible" : "hidden"}
+            animate={featuresInView ? "visible" : "hidden"}
           >
-            <h2 className="section-heading">About RaysVeda</h2>
-            <p className="section-subheading">
-              Our mission is to bring ancient Vedic wisdom to the modern world, fostering spiritual growth and well-being.
-            </p>
-            <div className="flex flex-col md:flex-row items-center gap-8">
-              <div className="md:w-1/2">
-                <img 
-                  src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTrWnv5izXi1T-EGQLFHW2MyQ39J-aXc08jyg&s" 
-                  alt="Vedic knowledge" 
-                  className="rounded-lg shadow-lg w-full h-auto"
-                />
-              </div>
-              <div className="md:w-1/2 text-gray-700 leading-relaxed">
-                <p className="mb-4">
-                  RaysVeda is a trusted platform dedicated to preserving and promoting authentic Vedic traditions. We connect individuals with experienced pandits and spiritual guides who conduct personalized pujas, rituals, and consultations online.
-                </p>
-                <p className="mb-4">
-                  Our services are designed to help you navigate life's challenges, find inner peace, and attract positive energy, all from the comfort and convenience of your home. We believe in the transformative power of ancient wisdom to enrich modern lives.
-                </p>
-                <Link to="/about" className="text-primary-600 hover:text-primary-800 font-medium inline-flex items-center">
-                  Learn more about us
-                  <svg className="w-4 h-4 ml-1" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
-                  </svg>
-                </Link>
-              </div>
+            <motion.div variants={fadeIn} className="text-center mb-16">
+              <span className="text-4xl mb-4 block">⭐</span>
+              <h2 className="text-4xl md:text-5xl font-serif font-bold text-gray-800 mb-4">
+                Why Choose RaysVeda?
+              </h2>
+              <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+                Experience the perfect blend of ancient wisdom and modern convenience
+              </p>
+            </motion.div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {[
+                {
+                  icon: "🔱",
+                  title: "Authentic Rituals",
+                  description: "Traditional ceremonies performed by experienced priests following ancient Vedic traditions.",
+                  color: "from-orange-400 to-red-500"
+                },
+                {
+                  icon: "⏰",
+                  title: "Convenient Scheduling",
+                  description: "Book your spiritual sessions at your preferred time and date with easy online scheduling.",
+                  color: "from-orange-400 to-amber-500"
+                },
+                {
+                  icon: "💝",
+                  title: "Personalized Experience",
+                  description: "Customized spiritual guidance and rituals tailored to your specific needs and beliefs.",
+                  color: "from-amber-400 to-orange-500"
+                }
+              ].map((feature, index) => (
+                <motion.div
+                  key={index}
+                  variants={scaleUp}
+                  whileHover={{ y: -10 }}
+                  className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 text-center group"
+                >
+                  <div className={`w-20 h-20 bg-gradient-to-r ${feature.color} rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300`}>
+                    <span className="text-3xl">{feature.icon}</span>
+                  </div>
+                  <h3 className="text-2xl font-semibold mb-4 text-gray-800">{feature.title}</h3>
+                  <p className="text-gray-600 leading-relaxed">{feature.description}</p>
+                </motion.div>
+              ))}
             </div>
           </motion.div>
         </div>
       </section>
 
-      {/* Services Section */}
-      <section className="py-16 md:py-24 bg-white" ref={servicesRef}>
+      {/* Enhanced Services Section with Images */}
+      <section ref={servicesRef} className="py-20 bg-white">
         <div className="container mx-auto px-4">
           <motion.div
-            variants={fadeIn}
+            variants={staggerContainer}
             initial="hidden"
             animate={servicesInView ? "visible" : "hidden"}
           >
-            <h2 className="section-heading">Our Services</h2>
-            <p className="section-subheading">
-              A wide range of spiritual services tailored to your needs
-            </p>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {services.map((service) => (
-                <ServiceCard key={service.id} service={service} />
+            <motion.div variants={fadeIn} className="text-center mb-16">
+              <span className="text-4xl mb-4 block">🛕</span>
+              <h2 className="text-4xl md:text-5xl font-serif font-bold text-gray-800 mb-4">
+                Our Services
+              </h2>
+              <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+                Comprehensive spiritual services to guide you on your sacred journey
+              </p>
+            </motion.div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+              {services.map((service, index) => (
+                <motion.div
+                  key={service.id}
+                  variants={scaleUp}
+                  whileHover={{ y: -5, scale: 1.02 }}
+                  className="group"
+                >
+                  <Link to={service.link} className="block">
+                    <div className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 h-full">
+                      {/* Service Image */}
+                      <div className="relative h-48 overflow-hidden">
+                        <img 
+                          src={service.image} 
+                          alt={service.title}
+                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+                        <div className="absolute top-4 right-4 w-12 h-12 bg-white/90 rounded-full flex items-center justify-center">
+                          <span className="text-2xl">{service.icon}</span>
+                        </div>
+                      </div>
+                      
+                      {/* Service Content */}
+                      <div className="p-6">
+                        <h3 className="text-xl font-semibold mb-3 text-gray-800 group-hover:text-orange-600 transition-colors">
+                          {service.title}
+                        </h3>
+                        <p className="text-gray-600 mb-4 text-sm">{service.description}</p>
+                        
+                        {/* Service Features */}
+                        <ul className="space-y-1 mb-4">
+                          {service.features.map((feature, idx) => (
+                            <li key={idx} className="text-xs text-gray-500 flex items-center">
+                              <span className="w-1.5 h-1.5 bg-orange-400 rounded-full mr-2"></span>
+                              {feature}
+                            </li>
+                          ))}
+                        </ul>
+                        
+                        <div className="flex items-center justify-between">
+                          <span className="text-orange-600 font-semibold text-sm">Explore Now</span>
+                          <svg className="w-4 h-4 text-orange-600 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                          </svg>
+                        </div>
+                      </div>
+                    </div>
+                  </Link>
+                </motion.div>
               ))}
-            </div>
-            <div className="text-center mt-12">
-              <Link to="/services" className="btn-primary">
-                Explore All Services
-              </Link>
             </div>
           </motion.div>
         </div>
       </section>
 
-      {/* Puja Section */}
-      <section className="py-16 md:py-24 bg-orange-50" ref={pujaRef}>
+      {/* Enhanced Explore Pujas Section */}
+      <section ref={pujasRef} className="py-20 bg-gradient-to-br from-orange-50 to-amber-50 relative">
         <div className="container mx-auto px-4">
           <motion.div
-            variants={fadeIn}
+            variants={staggerContainer}
             initial="hidden"
-            animate={pujaInView ? "visible" : "hidden"}
+            animate={pujasInView ? "visible" : "hidden"}
           >
-            <h2 className="section-heading">Explore Puja</h2>
-            <p className="section-subheading">
-              Discover various types of pujas for different purposes and deities
-            </p>
+            <motion.div variants={fadeIn} className="text-center mb-16">
+              <span className="text-4xl mb-4 block">🪔</span>
+              <h2 className="text-4xl md:text-5xl font-serif font-bold text-gray-800 mb-4">
+                Explore Our Pujas
+              </h2>
+              <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+                Discover our most popular sacred rituals and ceremonies, each designed to bring specific blessings into your life
+              </p>
+            </motion.div>
+            
+            {/* SINGLE LOGIN MESSAGE - CENTERED MODAL STYLE */}
+            {showLoginMsg && (
+              <>
+                {/* Overlay */}
+                <div 
+                  className="fixed inset-0 bg-black/50 z-40"
+                  onClick={() => setShowLoginMsg(false)}
+                />
+                
+                {/* Modal */}
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white border-2 border-red-400 text-red-700 px-8 py-6 rounded-2xl shadow-2xl z-50 max-w-md w-full mx-4"
+                >
+                  <div className="text-center">
+                    <div className="text-4xl mb-4">🔐</div>
+                    <h3 className="text-lg font-semibold mb-2 text-gray-800">Login Required</h3>
+                    <p className="text-sm mb-6 text-gray-600">Please log in or sign up to book a puja.</p>
+                    <div className="flex gap-3 justify-center">
+                      <button 
+                        onClick={() => setShowLoginMsg(false)}
+                        className="bg-gray-600 text-white px-6 py-2 rounded-full text-sm hover:bg-gray-700 transition-colors"
+                      >
+                        Close
+                      </button>
+                      <button 
+                        onClick={() => {
+                          setShowLoginMsg(false)
+                          navigate('/login')
+                        }}
+                        className="bg-orange-600 text-white px-6 py-2 rounded-full text-sm hover:bg-orange-700 transition-colors"
+                      >
+                        Login Now
+                      </button>
+                    </div>
+                  </div>
+                </motion.div>
+              </>
+            )}
+            
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {pujas.map((puja) => (
-                <PujaCard key={puja.id} puja={puja} />
+              {featuredPujas.map((puja, index) => (
+                <motion.div 
+                  key={puja.id}
+                  variants={scaleUp}
+                  whileHover={{ y: -10 }}
+                  className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 group"
+                >
+                  <div className="relative h-48 overflow-hidden">
+                    <img 
+                      src={puja.image} 
+                      alt={puja.title}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                  </div>
+                  
+                  <div className="p-6">
+                    <h3 className="text-xl font-serif font-semibold text-gray-800 mb-2">
+                      {puja.title}
+                    </h3>
+                    <p className="text-gray-600 mb-4 text-sm leading-relaxed">
+                      {puja.description}
+                    </p>
+                    
+                    <div className="flex justify-between items-center">
+                      <span className="text-orange-600 font-medium">
+                        Starting from {puja.price}
+                      </span>
+                      <button 
+                        onClick={() => handlePujaBookNow(puja)}
+                        className="bg-gradient-to-r from-orange-600 to-red-600 text-white py-2 px-4 rounded-full font-semibold hover:from-orange-700 hover:to-red-700 transition-all duration-300 shadow-lg hover:shadow-xl text-sm"
+                      >
+                        Book Now
+                      </button>
+                    </div>
+                  </div>
+                </motion.div>
               ))}
             </div>
-            <div className="text-center mt-12">
-              <button className="btn-primary" onClick={handleBookPujaClick}>
-                Book a Puja Now
-              </button>
+            
+            <motion.div variants={fadeIn} className="text-center mt-12">
+              <Link 
+                to="/puja" 
+                className="inline-flex items-center bg-white text-orange-600 px-8 py-4 rounded-full text-lg font-semibold hover:bg-orange-50 transition-all duration-300 shadow-lg hover:shadow-xl"
+              >
+                🔍 View All Pujas
+                <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </Link>
+            </motion.div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Enhanced Interactive Testimonials Section */}
+      <section ref={testimonialsRef} className="py-20 bg-white">
+        <div className="container mx-auto px-4">
+          <motion.div
+            variants={staggerContainer}
+            initial="hidden"
+            animate={testimonialsInView ? "visible" : "hidden"}
+          >
+            <motion.div variants={fadeIn} className="text-center mb-16">
+              <span className="text-4xl mb-4 block">💬</span>
+              <h2 className="text-4xl md:text-5xl font-serif font-bold text-gray-800 mb-4">
+                What Our Community Says
+              </h2>
+              <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+                Hear from thousands of satisfied devotees who have experienced divine blessings through RaysVeda
+              </p>
+            </motion.div>
+            
+            {/* Featured Testimonial */}
+            <motion.div
+              key={currentTestimonial}
+              initial={{ opacity: 0, x: 50 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -50 }}
+              className="max-w-4xl mx-auto mb-12"
+            >
+              <div className="bg-gradient-to-r from-orange-50 to-amber-50 rounded-3xl p-8 md:p-12 shadow-xl">
+                <div className="flex flex-col md:flex-row items-center gap-8">
+                  <div className="relative">
+                    <img 
+                      src={testimonials[currentTestimonial].image} 
+                      alt={testimonials[currentTestimonial].name}
+                      className="w-24 h-24 md:w-32 md:h-32 rounded-full object-cover shadow-lg"
+                    />
+                    <div className="absolute -bottom-2 -right-2 bg-orange-600 text-white rounded-full w-8 h-8 flex items-center justify-center">
+                      <span className="text-xs">✓</span>
+                    </div>
+                  </div>
+                  
+                  <div className="flex-1 text-center md:text-left">
+                    <div className="flex justify-center md:justify-start mb-4">
+                      {[...Array(testimonials[currentTestimonial].rating)].map((_, idx) => (
+                        <span key={idx} className="text-yellow-400 text-xl">⭐</span>
+                      ))}
+                    </div>
+                    
+                    <blockquote className="text-lg md:text-xl text-gray-700 mb-4 italic leading-relaxed">
+                      "{testimonials[currentTestimonial].text}"
+                    </blockquote>
+                    
+                    <div>
+                      <h4 className="font-semibold text-gray-800 text-lg">
+                        {testimonials[currentTestimonial].name}
+                      </h4>
+                      <p className="text-gray-600">{testimonials[currentTestimonial].location}</p>
+                      <p className="text-orange-600 text-sm font-medium mt-1">
+                        {testimonials[currentTestimonial].service}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+            
+            {/* Testimonial Navigation */}
+            <div className="flex justify-center space-x-2 mb-8">
+              {testimonials.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setCurrentTestimonial(index)}
+                  className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                    index === currentTestimonial ? 'bg-orange-600 scale-125' : 'bg-gray-300 hover:bg-gray-400'
+                  }`}
+                />
+              ))}
+            </div>
+            
+            {/* All Testimonials Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {testimonials.slice(0, 3).map((testimonial, index) => (
+                <motion.div
+                  key={testimonial.id}
+                  variants={scaleUp}
+                  whileHover={{ y: -5 }}
+                  className="bg-white border border-gray-100 rounded-2xl p-6 shadow-md hover:shadow-lg transition-all duration-300"
+                >
+                  <div className="flex items-center mb-4">
+                    <img 
+                      src={testimonial.image} 
+                      alt={testimonial.name}
+                      className="w-12 h-12 rounded-full object-cover mr-4"
+                    />
+                    <div>
+                      <h4 className="font-semibold text-gray-800">{testimonial.name}</h4>
+                      <p className="text-sm text-gray-500">{testimonial.location}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex mb-3">
+                    {[...Array(testimonial.rating)].map((_, idx) => (
+                      <span key={idx} className="text-yellow-400">⭐</span>
+                    ))}
+                  </div>
+                  
+                  <p className="text-gray-600 text-sm leading-relaxed">
+                    {testimonial.text}
+                  </p>
+                  
+                  <div className="mt-3 pt-3 border-t border-gray-100">
+                    <span className="text-xs text-orange-600 font-medium">
+                      {testimonial.service}
+                    </span>
+                  </div>
+                </motion.div>
+              ))}
             </div>
           </motion.div>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-16 md:py-24 bg-gradient-to-r from-primary-600 to-accent-500 text-white">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl md:text-4xl font-serif font-semibold mb-6">
-            Begin Your Spiritual Journey Today
-          </h2>
-          <p className="text-xl max-w-3xl mx-auto mb-8">
-            Experience the divine blessings and inner peace through our authentic spiritual services
-          </p>
-          <button className="btn bg-white text-primary-700 hover:bg-gray-100" onClick={handleBookPujaClick}>
-            Book a Puja
-          </button>
-          {showLoginMsg && (
-            <div className="mt-4 bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded inline-block">
-              Please log in or sign up to book a puja.
+      {/* Enhanced CTA Section - CHANGED TO MATCH THEME */}
+      <section className="py-20 bg-gradient-to-br from-orange-100 via-orange-50 to-amber-50 text-gray-800 relative overflow-hidden">
+        {/* Background Pattern */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-0 left-0 w-full h-full" style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23f97316' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+          }} />
+        </div>
+        
+        <div className="container mx-auto px-4 text-center relative z-10">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+          >
+            <span className="text-5xl mb-6 block">🙏</span>
+            <h2 className="text-3xl md:text-5xl font-serif font-bold mb-6 text-gray-800">
+              Ready to Begin Your Spiritual Journey?
+            </h2>
+            <p className="text-xl max-w-3xl mx-auto mb-8 text-gray-600">
+              Join thousands of devotees who have found peace, prosperity, and divine blessings through RaysVeda
+            </p>
+            
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="bg-gradient-to-r from-orange-600 to-red-600 text-white px-8 py-4 rounded-full text-lg font-bold hover:from-orange-700 hover:to-red-700 transition-all duration-300 shadow-lg hover:shadow-xl"
+                onClick={handleBookPujaClick}
+              >
+                🎯 Book a Puja Today
+              </motion.button>
+              
+              <div className="flex items-center text-gray-600">
+                <span className="text-sm">Or call us at</span>
+                <a href="tel:+919161110130" className="ml-2 text-orange-600 font-semibold hover:text-orange-700 transition-colors">
+                  📞 +91-9161-110-130
+                </a>
+              </div>
             </div>
-          )}
+            
+            
+          </motion.div>
         </div>
       </section>
 
-      {showBooking && <BookPoojaForm onClose={() => setShowBooking(false)} />}
+      {/* Booking Form Modal */}
+      {showBooking && (
+        <BookPoojaForm 
+          selectedPuja={selectedPuja} 
+          onClose={() => setShowBooking(false)} 
+        />
+      )}
     </>
   )
 }

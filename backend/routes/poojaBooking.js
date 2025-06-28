@@ -1,14 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const Razorpay = require('razorpay');
-const nodemailer = require('nodemailer');
 const PoojaBooking = require('../models/PoojaBooking');
-const { protect } = require('../middleware/authMiddleware'); // Import your authentication middleware
+const { protect } = require('../middleware/authMiddleware');
 
-// --- DIAGNOSTIC LOGS ---
 console.log('PoojaBooking module loaded (from poojaBooking.js).');
 console.log('Type of PoojaBooking (from poojaBooking.js):', typeof PoojaBooking);
-// --- END DIAGNOSTIC LOGS ---
 
 // Initialize Razorpay instance
 const razorpay = new Razorpay({
@@ -17,68 +14,81 @@ const razorpay = new Razorpay({
 });
 
 // Booking endpoint - PROTECTED ROUTE
-router.post('/book-pooja', protect, async (req, res) => { // Apply the 'protect' middleware
+router.post('/book-pooja', protect, async (req, res) => {
   console.log("Request body:", req.body);
+  console.log("User from middleware:", req.user);
 
-  // Destructure booking details from req.body.
-  // The 'user' field will come from 'req.user' set by the 'protect' middleware.
-  const { name, gotra, address, phone, poojaType, email, date, time } = req.body;
+  const { name, gotra, address, phone, poojaType, email, date, time, amount } = req.body;
 
-  // --- DIAGNOSTIC LOG AT POINT OF USE ---
   console.log('Attempting to create new PoojaBooking instance...');
-  // Log the user ID obtained from the authentication middleware
-  console.log('User ID from authenticated request (req.user._id):', req.user ? req.user._id : 'User not authenticated or ID missing');
-  // --- END DIAGNOSTIC LOG ---
+  console.log('User ID from authenticated request:', req.user ? req.user._id : 'User not authenticated');
 
-  // Save booking data to MongoDB
   try {
-    // Ensure that req.user and req.user._id are available from the middleware
     if (!req.user || !req.user._id) {
-      // This case should ideally be caught by the 'protect' middleware itself,
-      // but it's a good defensive check.
-      return res.status(401).json({ success: false, message: 'Unauthorized: User ID not found in request. Please log in.' });
+      return res.status(401).json({ 
+        success: false, 
+        message: 'Unauthorized: User ID not found in request. Please log in.' 
+      });
+    }
+
+    // Validate required fields
+    if (!name || !phone || !poojaType || !email || !date || !time) {
+      return res.status(400).json({
+        success: false,
+        message: 'Missing required fields: name, phone, poojaType, email, date, time'
+      });
+    }
+
+    // Validate amount
+    const bookingAmount = amount || 500;
+    if (bookingAmount < 100) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid amount'
+      });
     }
 
     const booking = new PoojaBooking({
-      user: req.user._id, // Assign the authenticated user's ID
+      user: req.user._id,
       name,
-      gotra,
+      gotra: gotra || '',
       address,
       phone,
       poojaType,
       email,
       date,
       time,
-      amount: req.body.amount, 
+      amount: bookingAmount,
       paymentStatus: 'pending'
     });
 
     await booking.save();
     console.log('PoojaBooking saved successfully:', booking._id);
 
-    // Create Razorpay order
+    // Create Razorpay order with dynamic amount
     const options = {
-      amount: 50000, // amount in paise (₹500). Adjust as needed.
+      amount: bookingAmount * 100, // Convert to paise
       currency: "INR",
       receipt: `receipt_order_${booking._id}`,
       payment_capture: 1,
       notes: {
         bookingId: booking._id.toString(),
         name,
-        gotra,
+        gotra: gotra || '',
         address,
         phone,
         poojaType,
-        email
+        email,
+        date,
+        time
       }
     };
+
     const order = await razorpay.orders.create(options);
     console.log('Razorpay order created:', order.id);
 
-
-    console.log('Sending Razorpay key to frontend:', process.env.RAZORPAY_KEY_ID);
-
-    res.status(201).json({ // Use 201 Created for successful resource creation
+    res.status(201).json({
+      success: true,
       orderId: order.id,
       amount: options.amount,
       currency: options.currency,
@@ -86,94 +96,83 @@ router.post('/book-pooja', protect, async (req, res) => { // Apply the 'protect'
       key: process.env.RAZORPAY_KEY_ID,
       message: 'Pooja booking initiated successfully, awaiting payment.'
     });
+
   } catch (error) {
     console.error('Error in /book-pooja route:', error);
-    // Log the full error object for detailed debugging, especially validation errors
-    console.error(error);
     
-    // Check if it's a Mongoose validation error
     if (error.name === 'ValidationError') {
-        return res.status(400).json({ success: false, message: 'Validation failed', errors: error.errors });
+      const validationErrors = Object.values(error.errors).map(err => err.message);
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Validation failed', 
+        errors: validationErrors 
+      });
     }
     
-    res.status(500).json({ success: false, message: 'Internal Server Error: Booking failed', error: error.message });
+    res.status(500).json({ 
+      success: false, 
+      message: 'Internal Server Error: Booking failed', 
+      error: error.message 
+    });
   }
 });
 
-
-// Webhook for Razorpay payment success
-router.post('/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
-  // IMPORTANT: You should verify the webhook signature here for security
-  // Refer to Razorpay documentation for signature verification:
-  // https://razorpay.com/docs/payments/server-integration/nodejs/webhook-signature-verification/
-  console.log('Received Razorpay webhook.');
-
-  let event;
+// Payment verification endpoint
+router.post('/verify-payment', protect, async (req, res) => {
   try {
-      event = req.body && JSON.parse(req.body.toString());
-  } catch (parseError) {
-      console.error('Error parsing webhook payload:', parseError);
-      return res.status(400).send('Invalid JSON payload');
-  }
-  
-  if (event && event.event === 'payment.captured') {
-    const payment = event.payload.payment.entity;
-    const bookingId = payment.notes && payment.notes.bookingId;
-    console.log(`Payment captured for booking ID: ${bookingId}, Payment ID: ${payment.id}`);
+    const { razorpay_order_id, razorpay_payment_id, razorpay_signature, bookingId } = req.body;
 
-    try {
-      // Update booking as paid
-      const updatedBooking = await PoojaBooking.findByIdAndUpdate(
-        bookingId,
-        { paymentStatus: 'paid' }, // Set to 'paid'
-        { new: true } // Return the updated document
-      );
+    // Update booking status to paid
+    const booking = await PoojaBooking.findByIdAndUpdate(
+      bookingId,
+      { 
+        paymentStatus: 'paid',
+        razorpayOrderId: razorpay_order_id,
+        razorpayPaymentId: razorpay_payment_id
+      },
+      { new: true }
+    );
 
-      if (!updatedBooking) {
-        console.warn(`Booking with ID ${bookingId} not found for webhook update.`);
-        return res.status(404).send('Booking not found');
-      }
-      console.log('Booking status updated to paid for:', updatedBooking._id);
-
-      // Send confirmation email
-      let transporter = nodemailer.createTransport({
-        service: 'gmail',
-        auth: {
-          user: process.env.EMAIL_USER,
-          pass: process.env.EMAIL_PASS
-        }
+    if (!booking) {
+      return res.status(404).json({
+        success: false,
+        message: 'Booking not found'
       });
-
-      await transporter.sendMail({
-        from: `"RaysVeda" <${process.env.EMAIL_USER}>`, // Use environment variable for sender email
-        to: updatedBooking.email,
-        subject: 'Pooja Booking Confirmation & Payment Success',
-        html: `
-          <h2>Thank you for booking your Pooja with RaysVeda!</h2>
-          <p>Your payment was successful and your booking is confirmed.</p>
-          <p><b>Booking ID:</b> ${updatedBooking._id}</p>
-          <p><b>Pooja Type:</b> ${updatedBooking.poojaType}</p>
-          <p><b>Booked For:</b> ${updatedBooking.name}</p>
-          <p><b>Contact Email:</b> ${updatedBooking.email}</p>
-          <p><b>Contact Phone:</b> ${updatedBooking.phone}</p>
-          <p><b>Address:</b> ${updatedBooking.address}</p>
-          <p><b>Gotra:</b> ${updatedBooking.gotra || 'Not provided'}</p>
-          <p>We look forward to serving you!</p>
-          <br>
-          <p>Best Regards,</p>
-          <p>The RaysVeda Team</p>
-        `
-      });
-      console.log('Confirmation email sent to:', updatedBooking.email);
-
-    } catch (error) {
-      console.error('Error processing webhook or sending email:', error);
-      return res.status(500).send('Internal Server Error');
     }
-  } else {
-    console.log('Webhook event not a payment.captured event or payload is malformed.');
+
+    res.json({
+      success: true,
+      message: 'Payment verified successfully',
+      booking
+    });
+
+  } catch (error) {
+    console.error('Payment verification error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Payment verification failed'
+    });
   }
-  res.status(200).send('OK'); // Always respond with 200 OK to Razorpay
+});
+
+// Get user bookings
+router.get('/bookings', protect, async (req, res) => {
+  try {
+    const bookings = await PoojaBooking.find({ user: req.user._id })
+      .sort({ createdAt: -1 });
+
+    res.json({
+      success: true,
+      bookings
+    });
+
+  } catch (error) {
+    console.error('Get bookings error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch bookings'
+    });
+  }
 });
 
 module.exports = router;
