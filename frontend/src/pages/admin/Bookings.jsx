@@ -11,6 +11,8 @@ import {
   Trash2,
 } from "lucide-react";
 import { adminAPI } from "../../services/api";
+import ViewBookingModal from "../../components/dashboard/ViewBookingModal";
+import EditBookingModal from "../../components/dashboard/EditBookingModal";
 
 const Bookings = () => {
   const [bookings, setBookings] = useState([]);
@@ -19,7 +21,10 @@ const Bookings = () => {
   const [statusFilter, setStatusFilter] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
   const [bookingsPerPage] = useState(10);
-  const [inputValue, setInputValue] = useState(""); // what user types
+  const [inputValue, setInputValue] = useState("");
+  const [selectedBooking, setSelectedBooking] = useState(null);
+  const [viewModalOpen, setViewModalOpen] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
 
   useEffect(() => {
     fetchBookings();
@@ -28,14 +33,11 @@ const Bookings = () => {
   const fetchBookings = async () => {
     try {
       setLoading(true);
-
       let response;
       if (searchTerm.trim() !== "") {
-        // Fetch from search route
         response = await adminAPI.searchBookings({ query: searchTerm });
         setBookings(response.data.bookings || []);
       } else {
-        // Default booking list (if no search)
         response = await adminAPI.getBookings({
           page: currentPage,
           limit: bookingsPerPage,
@@ -64,11 +66,34 @@ const Bookings = () => {
   const handleViewBooking = async (bookingId) => {
     try {
       const booking = await adminAPI.getBookingById(bookingId);
-      console.log("Booking details:", booking);
-      alert(JSON.stringify(booking, null, 2)); // Replace with modal display if needed
+      setSelectedBooking(booking);
+      setViewModalOpen(true);
     } catch (err) {
       console.error("Failed to fetch booking details", err);
       alert("Failed to fetch booking details.");
+    }
+  };
+
+  const handleEditBooking = async (bookingId) => {
+    try {
+      const booking = await adminAPI.getBookingById(bookingId);
+      setSelectedBooking(booking);
+      setEditModalOpen(true);
+    } catch (err) {
+      console.error("Failed to fetch booking for editing", err);
+      alert("Failed to fetch booking.");
+    }
+  };
+
+  const handleSaveBookingEdit = async (bookingId, updatedData) => {
+    try {
+      await adminAPI.updateBooking(bookingId, updatedData);
+      setEditModalOpen(false);
+      fetchBookings();
+      alert("Booking updated successfully");
+    } catch (err) {
+      console.error("Failed to update booking", err);
+      alert("Failed to update booking.");
     }
   };
 
@@ -148,7 +173,7 @@ const Bookings = () => {
               onChange={(e) => setInputValue(e.target.value)}
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
-                  setSearchTerm(inputValue); // searchTerm is already in your state
+                  setSearchTerm(inputValue);
                   setCurrentPage(1);
                 }
               }}
@@ -267,9 +292,7 @@ const Bookings = () => {
                         <Eye className="h-4 w-4" />
                       </button>
                       <button
-                        onClick={() =>
-                          console.log("Edit booking:", booking._id)
-                        }
+                        onClick={() => handleEditBooking(booking._id)}
                         className="text-orange-600 hover:text-orange-900"
                       >
                         <Edit className="h-4 w-4" />
@@ -321,6 +344,18 @@ const Bookings = () => {
           </div>
         )}
       </div>
+
+      <ViewBookingModal
+        open={viewModalOpen}
+        onClose={() => setViewModalOpen(false)}
+        booking={selectedBooking}
+      />
+      <EditBookingModal
+        open={editModalOpen}
+        onClose={() => setEditModalOpen(false)}
+        booking={selectedBooking}
+        onSave={handleSaveBookingEdit}
+      />
     </div>
   );
 };
