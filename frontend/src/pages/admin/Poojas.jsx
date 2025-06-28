@@ -10,11 +10,19 @@ const Poojas = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [poojasPerPage] = useState(10);
-  const [addModalOpen, setAddModalOpen] = useState(false)
+  const [addModalOpen, setAddModalOpen] = useState(false);
+  const [totalCount, setTotalCount] = useState(0);
 
   useEffect(() => {
     fetchPoojas();
   }, [currentPage, searchTerm]);
+
+  useEffect(() => {
+    console.log(
+      "Pooja images:",
+      poojas.map((p) => p.image)
+    ); // 👈 Add this
+  }, [poojas]);
 
   const fetchPoojas = async () => {
     try {
@@ -25,7 +33,12 @@ const Poojas = () => {
         search: searchTerm,
       };
       const response = await adminAPI.getPoojas(params);
-      setPoojas(response.data.poojas || []); // Adjust according to your API response shape
+
+      console.log("Poojas API Response:", response.data);
+
+      // ✅ FIX HERE
+      setPoojas(response.data?.poojas || response.data || []);
+      setTotalCount(response.data?.total || 0);
     } catch (error) {
       console.error("Error fetching poojas:", error);
       alert("Failed to load poojas. Please try again.");
@@ -72,19 +85,7 @@ const Poojas = () => {
     alert(`View pooja details - use adminAPI.getPoojaById(${poojaId})`);
   };
 
-  const filteredPoojas = poojas.filter(
-    (pooja) =>
-      pooja.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      pooja.category.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  const indexOfLastPooja = currentPage * poojasPerPage;
-  const indexOfFirstPooja = indexOfLastPooja - poojasPerPage;
-  const currentPoojas = filteredPoojas.slice(
-    indexOfFirstPooja,
-    indexOfLastPooja
-  );
-  const totalPages = Math.ceil(filteredPoojas.length / poojasPerPage);
+  const totalPages = Math.ceil(totalCount / poojasPerPage);
 
   if (loading) {
     return (
@@ -111,8 +112,13 @@ const Poojas = () => {
             <input
               type="text"
               placeholder="Search poojas..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              defaultValue={searchTerm}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  setSearchTerm(e.target.value);
+                  setCurrentPage(1); // Optional: Reset to first page
+                }
+              }}
               className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent w-full"
             />
           </div>
@@ -128,14 +134,14 @@ const Poojas = () => {
 
       {/* Poojas Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {currentPoojas.map((pooja) => (
+        {poojas.map((pooja) => (
           <div
             key={pooja._id}
             className="bg-white rounded-lg border shadow-sm overflow-hidden hover:shadow-md transition-shadow"
           >
             <div className="aspect-w-16 aspect-h-9">
               <img
-                src={pooja.image || "/placeholder.svg"}
+                src={pooja.images?.[0] || "/placeholder.svg"}
                 alt={pooja.name}
                 className="w-full h-48 object-cover"
               />

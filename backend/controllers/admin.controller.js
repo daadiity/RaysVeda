@@ -35,12 +35,32 @@ const adminLogin = async (req, res) => {
 
 const getAllUsers = async (req, res) => {
   try {
-    const users = await User.find().sort({ createdAt: -1 });
-    res.json(users);
+    const { page = 1, limit = 10, search = "" } = req.query;
+
+    const query = search
+      ? {
+          $or: [
+            { name: { $regex: search, $options: "i" } },
+            { email: { $regex: search, $options: "i" } },
+          ],
+        }
+      : {};
+
+    const skip = (page - 1) * limit;
+
+    const [users, totalCount] = await Promise.all([
+      User.find(query).skip(skip).limit(Number(limit)).sort({ createdAt: -1 }),
+      User.countDocuments(query),
+    ]);
+
+    res.json({ users, totalCount });
   } catch (err) {
-    res.status(500).json({ message: 'Server error' });
+    console.error("Error in getAllUsers:", err);
+    res.status(500).json({ message: "Server error" });
   }
 };
+
+
 
 const deleteUser = async (req, res) => {
   try {
@@ -101,11 +121,39 @@ const getDashboardStats = async (req, res) => {
   }
 };
 
+const getAllPoojas = async (req, res) => {
+  try {
+    const { page = 1, limit = 10, search = "" } = req.query;
+
+    const query = search
+      ? {
+          $or: [
+            { name: { $regex: search, $options: "i" } },
+            { category: { $regex: search, $options: "i" } },
+          ],
+        }
+      : {};
+
+    const poojas = await Pooja.find(query)
+      .skip((page - 1) * limit)
+      .limit(parseInt(limit))
+      .sort({ createdAt: -1 });
+
+    const total = await Pooja.countDocuments(query);
+
+    res.json({ poojas, total });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server Error" });
+  }
+};
+
 module.exports = {
   adminLogin,
   getAllUsers,
   deleteUser,
   getAllBookings,
   deleteBooking,
-  getDashboardStats
+  getDashboardStats,
+  getAllPoojas
 };

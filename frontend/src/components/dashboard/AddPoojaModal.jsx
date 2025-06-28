@@ -19,17 +19,27 @@ export default function AddPoojaModal({ isOpen, onClose, onCreate }) {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    await onCreate(formData);
-    setFormData({
-      name: "",
-      category: "",
-      description: "",
-      price: "",
-      duration: "",
-      image: "",
-    });
+  e.preventDefault();
+
+  // Convert `image` string into `images` array
+  const payload = {
+    ...formData,
+    images: formData.image ? [formData.image] : [], // ✅ new field expected by backend
   };
+  delete payload.image; // Remove old image string
+
+  await onCreate(payload); // Send updated payload to parent
+
+  setFormData({
+    name: "",
+    category: "",
+    description: "",
+    price: "",
+    duration: "",
+    image: "",
+  });
+};
+
 
   return (
     <Dialog

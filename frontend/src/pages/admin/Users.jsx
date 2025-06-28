@@ -10,9 +10,9 @@ import AddUserModal from "../../components/dashboard/AddUserModal";
 const Users = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
-  // const [searchTerm, setSearchTerm] = useState("");
   const [inputValue, setInputValue] = useState(""); // What user types
   const [searchTerm, setSearchTerm] = useState(""); // What is searched on Enter
+  const [totalCount, setTotalCount] = useState(0);
 
   const [currentPage, setCurrentPage] = useState(1);
   const [usersPerPage] = useState(10);
@@ -20,8 +20,6 @@ const Users = () => {
   const [showModal, setShowModal] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [addModalOpen, setAddModalOpen] = useState(false);
-
-  // const [editUserData, setEditUserData] = useState(null);
 
   useEffect(() => {
     fetchUsers();
@@ -37,7 +35,14 @@ const Users = () => {
       };
 
       const response = await adminAPI.getUsers(params);
-      setUsers(response.data.users || response.data); // adapt based on actual response
+
+      // ✅ DIRECTLY use response (not response.data)
+      console.log("User API response:", response);
+
+      const { users, totalCount } = response;
+
+      setUsers(users || []);
+      // Optionally store totalCount in state if you want pagination
     } catch (error) {
       console.error("Error fetching users:", error);
       alert("Failed to load users. Please try again.");
@@ -80,11 +85,6 @@ const Users = () => {
       alert("Failed to fetch user details. Please try again.");
     }
   };
-  const filteredUsers = users.filter(
-    (user) =>
-      user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchTerm.toLowerCase())
-  );
 
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {
@@ -95,8 +95,8 @@ const Users = () => {
 
   const indexOfLastUser = currentPage * usersPerPage;
   const indexOfFirstUser = indexOfLastUser - usersPerPage;
-  const currentUsers = filteredUsers.slice(indexOfFirstUser, indexOfLastUser);
-  const totalPages = Math.ceil(filteredUsers.length / usersPerPage);
+  const totalPages = Math.ceil(totalCount / usersPerPage);
+  const currentUsers = users; // Already paginated by backend
 
   if (loading) {
     return (
@@ -196,7 +196,7 @@ const Users = () => {
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {new Date(user.joinDate).toLocaleDateString()}
+                    {new Date(user.createdAt).toLocaleDateString()}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     {user.totalBookings}
@@ -234,10 +234,11 @@ const Users = () => {
           <div className="bg-white px-4 py-3 border-t border-gray-200 sm:px-6">
             <div className="flex justify-between items-center">
               <div className="text-sm text-gray-700">
-                Showing {indexOfFirstUser + 1} to{" "}
-                {Math.min(indexOfLastUser, filteredUsers.length)} of{" "}
-                {filteredUsers.length} results
+                Showing {(currentPage - 1) * usersPerPage + 1} to{" "}
+                {Math.min(currentPage * usersPerPage, totalCount)} of{" "}
+                {totalCount} results
               </div>
+
               <div className="flex space-x-2">
                 <button
                   onClick={() =>

@@ -6,6 +6,7 @@ const upload = require("../middleware/upload"); // Assuming you have a middlewar
 const User = require("../models/User");
 const Booking = require("../models/Booking");
 const Pooja = require("../models/Pooja");
+const adminController = require("../controllers/admin.controller");
 
 const router = express.Router();
 
@@ -209,6 +210,38 @@ router.post("/create-default", async (req, res) => {
   }
 });
 
+// Get all users (with optional search and pagination)
+router.get("/users", async (req, res) => {
+  try {
+    const { page = 1, limit = 10, search = "" } = req.query;
+
+    const query = search
+      ? {
+          $or: [
+            { name: { $regex: search, $options: "i" } },
+            { email: { $regex: search, $options: "i" } },
+            { phone: { $regex: search, $options: "i" } },
+          ],
+        }
+      : {};
+
+    const skip = (page - 1) * limit;
+
+    const [users, totalCount] = await Promise.all([
+      User.find(query)
+        .sort({ createdAt: -1 })
+        .skip(Number(skip))
+        .limit(Number(limit)),
+      User.countDocuments(query),
+    ]);
+
+    res.json({ users, totalCount });
+  } catch (error) {
+    console.error("Error fetching users:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 // Search Users
 router.get("/search/users", async (req, res) => {
   try {
@@ -234,10 +267,8 @@ router.get("/search/bookings", async (req, res) => {
 
     const bookings = await Booking.find()
       .populate("user", "name email")
-      .populate("pooja", "name")
-      .limit(20); // keep performance in mind
+      .populate("pooja", "name");
 
-    // Filter manually based on user name or pooja name
     const filtered = bookings.filter((booking) => {
       const userMatch =
         booking.user?.name?.match(regex) || booking.user?.email?.match(regex);
@@ -245,11 +276,16 @@ router.get("/search/bookings", async (req, res) => {
       return userMatch || poojaMatch;
     });
 
-    res.json(filtered);
+    res.json({ bookings: filtered });
   } catch (err) {
     console.error("Error searching bookings:", err);
     res.status(500).json({ error: "Internal server error" });
   }
 });
+
+router.get("/poojas", adminController.getAllPoojas);
+
+
+
 
 module.exports = router;
