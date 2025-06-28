@@ -28,7 +28,9 @@ function App() {
   }, [])
 
   return (
+
     <div className="min-vh-100 bg-light d-flex flex-column">
+   
       <Header scrolled={scrolled} />
       <main className="flex-grow-1">
         <Routes>
