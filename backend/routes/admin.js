@@ -285,7 +285,8 @@ router.get("/search/bookings", async (req, res) => {
 
 router.get("/poojas", adminController.getAllPoojas);
 
-
-
+// Reports
+router.get("/reports/:type", auth, adminController.generateReport);
+router.get("/reports/:type/download", auth, adminController.downloadReport);
 
 module.exports = router;
