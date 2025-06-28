@@ -1,109 +1,195 @@
-import React, { useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import KundliForm from '../components/KundliForm';
-
-const formBg =
-  `url("https://i.pinimg.com/736x/01/91/35/019135a42563e7ae23c9f1a574735e38.jpg")`;
-const landingCard = 'rgba(255,255,255,0.96)';
-const orange = '#f26522';
-const orangeDark = '#d35400';
-const borderRadius = '1.5rem';
-const fontFamily = "'Poppins', 'Merriweather', serif";
-const headingFont = "'Merriweather', serif";
 
 const KundliFormPage = () => {
   const navigate = useNavigate();
+  const [form, setForm] = useState({
+    name: '',
+    dob: '',
+    tob: '',
+    gender: '',
+    place: '',
+    latitude: '',
+    longitude: '',
+  });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  // Scroll to top when this page loads
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
 
-  const handleFormSubmit = (formData) => {
-    sessionStorage.setItem('kundliForm', JSON.stringify(formData));
-    navigate('/services/kundli/result');
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+
+    const formToSave = {
+      ...form,
+      latitude: Number(form.latitude),
+      longitude: Number(form.longitude),
+    };
+
+    try {
+      const response = await fetch('/api/gemini-interpret', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formToSave),
+      });
+      const result = await response.json();
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to generate kundli');
+      }
+      sessionStorage.setItem('kundliResult', JSON.stringify(result));
+      navigate('/services/kundli/result');
+    } catch (err) {
+      setError(err.message || 'Failed to generate kundli');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div
-      style={{
-        minHeight: '100vh',
-        backgroundImage: formBg,
-        backgroundRepeat: 'no-repeat',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        fontFamily,
-        position: 'relative',
-      }}
-    >
-      {/* Decorative top bar */}
-      <div
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          width: '100vw',
-          height: 90,
-          background: 'linear-gradient(90deg, #fff7e6 60%, #ffe5c2 100%)',
-          borderBottom: `2px solid ${orange}`,
-          zIndex: 10,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontFamily,
-          fontWeight: 700,
-          fontSize: '2.1rem',
-          color: orangeDark,
-          letterSpacing: '1px',
-          boxShadow: '0 2px 12px #f2652212',
-        }}
-      >
-        <span style={{ fontFamily: headingFont, fontWeight: 800 }}>
-          Free Janam Kundli by RaysVeda
-        </span>
-      </div>
+    <div style={{ minHeight: '100vh', background: 'linear-gradient(to right, #ff8008, #ffc837)', padding: '2rem' }}>
+      {/* Header */}
+      <h1 style={{ textAlign: 'center', color: '#ffffff', fontSize: '2rem', fontWeight: 'bold', marginBottom: '0.5rem' }}>
+        Discover Your Destiny with Precision
+      </h1>
+      <p style={{ textAlign: 'center', color: '#fff', fontSize: '1rem', marginBottom: '2rem' }}>
+        Enter your birth details to generate an accurate and personalized Kundli. Unlock the cosmic secrets written in your stars.
+      </p>
 
-      {/* Main Card */}
-      <div
+      {/* Form */}
+      <form
+        onSubmit={handleSubmit}
         style={{
-          background: landingCard,
-          borderRadius,
-          boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.10)',
-          padding: '2.8rem 2.2rem 2.2rem 2.2rem',
-          maxWidth: 800,
-          width: '100%',
-          textAlign: 'center',
-          border: `2.5px solid ${orange}`,
-          position: 'relative',
-          zIndex: 2,
-          marginTop: 100,
-          marginBottom: 30,
+          maxWidth: '600px',
+          margin: '0 auto',
+          background: '#fff',
+          borderRadius: '20px',
+          padding: '2rem',
+          boxShadow: '0 8px 16px rgba(0,0,0,0.1)',
         }}
       >
-        <h1
+        {/* Full Name */}
+        <label style={labelStyle}>Full Name</label>
+        <input style={inputStyle} name="name" placeholder="e.g., abcdef" value={form.name} onChange={handleChange} required />
+
+        {/* DOB and TOB in row */}
+        <div style={rowStyle}>
+          <div style={halfColStyle}>
+            <label style={labelStyle}>Date of Birth</label>
+            <input style={inputStyle} name="dob" type="date" placeholder="e.g., 09-11-2002" value={form.dob} onChange={handleChange} required />
+          </div>
+          <div style={halfColStyle}>
+            <label style={labelStyle}>Time of Birth</label>
+            <input style={inputStyle} name="tob" type="time" placeholder="e.g., 09:30" value={form.tob} onChange={handleChange} required />
+          </div>
+        </div>
+
+        {/* Gender and Place of Birth */}
+        <div style={rowStyle}>
+          <div style={halfColStyle}>
+            <label style={labelStyle}>Gender</label>
+            <select style={inputStyle} name="gender" value={form.gender} onChange={handleChange} required>
+              <option value="">Select Gender</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div style={halfColStyle}>
+            <label style={labelStyle}>Place of Birth</label>
+            <input style={inputStyle} name="place" placeholder="e.g., Patna" value={form.place} onChange={handleChange} required />
+          </div>
+        </div>
+
+        {/* Latitude and Longitude */}
+        <div style={rowStyle}>
+          <div style={halfColStyle}>
+            <label style={labelStyle}>Latitude</label>
+            <input
+              style={inputStyle}
+              name="latitude"
+              type="number"
+              step="any"
+              placeholder="e.g., 28.6139"
+              value={form.latitude}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div style={halfColStyle}>
+            <label style={labelStyle}>Longitude</label>
+            <input
+              style={inputStyle}
+              name="longitude"
+              type="number"
+              step="any"
+              placeholder="e.g., 77.2090"
+              value={form.longitude}
+              onChange={handleChange}
+              required
+            />
+          </div>
+        </div>
+
+        {/* Error */}
+        {error && (
+          <div style={{ color: '#fff', background: '#f44336', padding: '1rem', marginTop: '1rem', borderRadius: '10px' }}>
+            {error}
+          </div>
+        )}
+
+        {/* Submit Button */}
+        <button
+          type="submit"
+          disabled={loading}
           style={{
-            fontFamily: headingFont,
-            fontWeight: 800,
-            color: orange,
-            fontSize: '2.7rem',
-            marginBottom: '0.7rem',
-            letterSpacing: '0.5px',
-            textShadow: '0 2px 8px #f2652215',
+            marginTop: '2rem',
+            width: '100%',
+            padding: '0.75rem',
+            backgroundColor: '#ff5722',
+            color: '#fff',
+            border: 'none',
+            borderRadius: '10px',
+            fontSize: '1rem',
+            fontWeight: 'bold',
+            cursor: 'pointer',
           }}
         >
-          Fill Your Birth Details
-        </h1>
-        <KundliForm onSubmit={handleFormSubmit} />
-      </div>
-      <link
-        href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Merriweather:wght@400;700&display=swap"
-        rel="stylesheet"
-      />
+          {loading ? 'Generating...' : 'Generate Kundli'}
+        </button>
+      </form>
     </div>
   );
+};
+
+const labelStyle = {
+  display: 'block',
+  marginBottom: '0.5rem',
+  color: '#ff5722',
+  fontWeight: '600',
+  fontSize: '1rem',
+};
+
+const inputStyle = {
+  width: '100%',
+  padding: '0.6rem 0.8rem',
+  borderRadius: '8px',
+  border: '1px solid #ccc',
+  fontSize: '1rem',
+  marginBottom: '1rem',
+};
+
+const rowStyle = {
+  display: 'flex',
+  gap: '1rem',
+  marginBottom: '1rem',
+};
+
+const halfColStyle = {
+  flex: 1,
 };
 
 export default KundliFormPage;

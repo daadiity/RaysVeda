@@ -12,6 +12,8 @@ import ScrollToTop from './components/common/ScrollToTop'
 import KundliIntroPage from './pages/KundliIntroPage'
 import KundliFormPage from './pages/KundliFormPage'
 import KundliResultPage from './pages/KundliResultPage'
+import HawanPage from './pages/HawanPage'
+import BlogPage from './pages/BlogPage' // <-- Add this import
 
 function App() {
   const [scrolled, setScrolled] = useState(false)
@@ -38,6 +40,8 @@ function App() {
           <Route path="/services/kundli" element={<KundliIntroPage />} />
           <Route path="/services/kundli/form" element={<KundliFormPage />} />
           <Route path="/services/kundli/result" element={<KundliResultPage />} />
+          <Route path="/services/hawan" element={<HawanPage />} />
+          <Route path="/blog" element={<BlogPage />} /> {/* <-- Blog route */}
         </Routes>
       </main>
       <Footer />
