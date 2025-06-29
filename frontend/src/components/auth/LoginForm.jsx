@@ -1,144 +1,454 @@
-"use client"
+// "use client";
 
-import { useState } from "react"
-import { useNavigate } from "react-router-dom"
-import { Eye, EyeOff, BookOpen } from "lucide-react"
-import { adminAPI } from "../../services/api"
+// import { useState } from "react";
+// import { useNavigate } from "react-router-dom";
+// import { Eye, EyeOff, BookOpen } from "lucide-react";
+// import { adminAPI } from "../../services/api";
+// import axios from "axios";
+// import { useAuth } from "../../context/AuthContext"; // ⬅️ Make sure you have this
 
-const LoginForm = () => {
-  const navigate = useNavigate()
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  })
-  const [showPassword, setShowPassword] = useState(false)
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState("")
+// const LoginForm = () => {
+//   const navigate = useNavigate();
+//   const { login } = useAuth();
+
+//   const [formData, setFormData] = useState({
+//     emailOrPhone: "",
+//     password: "",
+//   });
+
+//   const [inputType, setInputType] = useState("");
+//   const [showPassword, setShowPassword] = useState(false);
+//   const [loading, setLoading] = useState(false);
+//   const [message, setMessage] = useState("");
+
+//   // Helpers
+//   const isEmail = (input) => input.includes("@");
+//   const isPhone = (input) => /^\d{10,}$/.test(input.replace(/\D/g, ""));
+
+//   const detectInputType = (value) => {
+//     if (isEmail(value)) return "email";
+//     if (isPhone(value)) return "phone";
+//     return "";
+//   };
+
+//   const handleChange = (e) => {
+//     const { name, value } = e.target;
+//     setFormData((prev) => ({ ...prev, [name]: value }));
+
+//     if (name === "emailOrPhone") {
+//       setInputType(detectInputType(value));
+//     }
+
+//     if (message) setMessage("");
+//   };
+
+//   const handleSubmit = async (e) => {
+//     e.preventDefault();
+//     setMessage("");
+//     setLoading(true);
+
+//     const input = formData.emailOrPhone.trim();
+//     const password = formData.password;
+
+//     if (!input || !password) {
+//       setMessage("Please provide email/phone and password");
+//       setLoading(false);
+//       return;
+//     }
+
+//     const requestData = { password };
+
+//     try {
+//       if (isEmail(input)) {
+//         requestData.email = input.toLowerCase();
+//       } else if (isPhone(input)) {
+//         requestData.phone = input.replace(/\D/g, "");
+//       } else {
+//         setMessage("Please enter a valid email address or phone number.");
+//         setLoading(false);
+//         return;
+//       }
+
+//       // Admin login: check by email match
+//       if (requestData.email === "admin@raysveda.com") {
+//         const response = await adminAPI.login({
+//           email: requestData.email,
+//           password: requestData.password,
+//         });
+
+//         if (response.success) {
+//           localStorage.setItem("adminToken", response.data.token);
+//           localStorage.setItem("adminUser", JSON.stringify(response.data.admin));
+//           navigate("/admin");
+//         } else {
+//           setMessage("Admin login failed.");
+//         }
+//       } else {
+//         // User login via general auth API
+//         const res = await axios.post("/api/auth/login", requestData);
+//         if (res.data.success) {
+//           const { user, token } = res.data;
+//           localStorage.setItem("token", token);
+//           localStorage.setItem("user", JSON.stringify(user));
+//           login(user); // context update
+//           navigate("/dashboard");
+//         } else {
+//           setMessage(res.data.message || "User login failed.");
+//         }
+//       }
+//     } catch (err) {
+//       console.error("Login error:", err);
+//       setMessage(err.response?.data?.message || "Login failed.");
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   return (
+//     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-50 to-orange-100">
+//       <div className="max-w-md w-full p-8 bg-white rounded-xl shadow-lg">
+//         <div className="text-center mb-6">
+//           <div className="flex justify-center mb-4">
+//             <BookOpen className="h-12 w-12 text-orange-500" />
+//           </div>
+//           <h2 className="text-3xl font-bold text-gray-900">RaysVeda</h2>
+//           <p className="mt-2 text-sm text-gray-600">Sign in to your account</p>
+//         </div>
+
+//         {message && (
+//           <div
+//             className={`mb-4 px-4 py-3 rounded-lg text-sm ${
+//               message.toLowerCase().includes("fail") || message.includes("valid")
+//                 ? "bg-red-50 text-red-700 border border-red-200"
+//                 : "bg-green-50 text-green-700 border border-green-200"
+//             }`}
+//           >
+//             {message}
+//           </div>
+//         )}
+
+//         <form onSubmit={handleSubmit} className="space-y-6">
+//           {/* Email or Phone */}
+//           <div>
+//             <label className="block text-sm font-medium text-gray-700">Email or Phone</label>
+//             <div className="relative mt-1">
+//               <input
+//                 type="text"
+//                 name="emailOrPhone"
+//                 value={formData.emailOrPhone}
+//                 onChange={handleChange}
+//                 required
+//                 className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500"
+//                 placeholder="email@example.com or 9876543210"
+//               />
+//               {inputType && (
+//                 <span
+//                   className={`absolute right-3 top-2 text-xs px-2 py-0.5 rounded-full ${
+//                     inputType === "email"
+//                       ? "bg-blue-100 text-blue-700"
+//                       : "bg-green-100 text-green-700"
+//                   }`}
+//                 >
+//                   {inputType === "email" ? "📧 Email" : "📱 Phone"}
+//                 </span>
+//               )}
+//             </div>
+//           </div>
+
+//           {/* Password */}
+//           <div>
+//             <label className="block text-sm font-medium text-gray-700">Password</label>
+//             <div className="relative mt-1">
+//               <input
+//                 type={showPassword ? "text" : "password"}
+//                 name="password"
+//                 value={formData.password}
+//                 onChange={handleChange}
+//                 required
+//                 className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500 pr-10"
+//                 placeholder="Enter your password"
+//               />
+//               <button
+//                 type="button"
+//                 onClick={() => setShowPassword(!showPassword)}
+//                 className="absolute right-2 top-2 text-gray-500"
+//               >
+//                 {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+//               </button>
+//             </div>
+//           </div>
+
+//           {/* Submit */}
+//           <button
+//             type="submit"
+//             disabled={loading}
+//             className="w-full py-2 px-4 bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-lg transition-all disabled:opacity-50"
+//           >
+//             {loading ? "Signing in..." : "Sign in"}
+//           </button>
+
+//           {/* Demo Admin Info */}
+//           <div className="mt-4 p-4 bg-gray-50 rounded-lg text-sm text-gray-600">
+//             <p className="font-medium">Admin Demo:</p>
+//             <p>Email: admin@raysveda.com</p>
+//             <p>Password: admin123</p>
+//           </div>
+//         </form>
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default LoginForm;
+
+
+
+
+import React, { useState } from "react";
+import axios from "axios";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
+
+export default function LoginForm() {
+  const [form, setForm] = useState({ emailOrPhone: "", password: "" });
+  const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [inputType, setInputType] = useState('');
+  const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    })
-    // Clear error when user starts typing
-    if (error) setError("")
-  }
+    const value = e.target.value;
+    setForm({ ...form, [e.target.name]: value });
+
+    // Detect input type for better UX
+    if (e.target.name === 'emailOrPhone') {
+      if (value.includes('@')) {
+        setInputType('email');
+      } else if (/^\d+$/.test(value.replace(/\D/g, '')) && value.replace(/\D/g, '').length >= 10) {
+        setInputType('phone');
+      } else {
+        setInputType('');
+      }
+    }
+
+    // Clear message when user starts typing
+    if (message) setMessage("");
+  };
+
+  // Helper functions
+  const isEmail = (input) => input.includes('@');
+  const isPhone = (input) => {
+    const cleanInput = input.replace(/\D/g, '');
+    return cleanInput.length >= 10 && /^\d+$/.test(cleanInput);
+  };
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    setLoading(true)
-    setError("")
+    e.preventDefault();
+    setMessage("");
+    setLoading(true);
+
+    // Validation
+    if (!form.emailOrPhone || !form.password) {
+      setMessage('Please provide email/phone and password');
+      setLoading(false);
+      return;
+    }
+
+    const inputValue = form.emailOrPhone.trim();
+    
+    if (!isEmail(inputValue) && !isPhone(inputValue)) {
+      setMessage('Please provide a valid email address or phone number');
+      setLoading(false);
+      return;
+    }
 
     try {
-      const response = await adminAPI.login(formData)
+      // Prepare request data based on input type
+      const requestData = { password: form.password };
 
-      if (response.success) {
-        // Store token and user data
-        localStorage.setItem("adminToken", response.data.token)
-        localStorage.setItem("adminUser", JSON.stringify(response.data.admin))
-
-        // Redirect to dashboard
-        navigate("/admin")
+      if (isEmail(inputValue)) {
+        requestData.email = inputValue.toLowerCase();
+        console.log('Attempting login with email:', requestData.email);
+      } else {
+        requestData.phone = inputValue.replace(/\D/g, ''); // Clean phone number
+        console.log('Attempting login with phone:', requestData.phone);
       }
-    } catch (error) {
-      console.error("Login error:", error)
-      setError(error.message || "Login failed. Please check your credentials.")
+
+      const res = await axios.post("/api/auth/login", requestData);
+      
+      if (res.data.success) {
+        const { user, token } = res.data;
+        
+        // Store token in localStorage
+        localStorage.setItem('token', token);
+        localStorage.setItem('user', JSON.stringify(user));
+        
+        login(user); // Update auth context
+        navigate("/dashboard"); // Redirect to dashboard
+      } else {
+        setMessage(res.data.message || "Login failed");
+      }
+    } catch (err) {
+      console.error("Login error:", err.response?.data || err.message);
+      setMessage(err.response?.data?.message || "Invalid credentials.");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-50 to-orange-100">
-      <div className="max-w-md w-full space-y-8 p-8 bg-white rounded-xl shadow-lg">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-100 via-orange-50 to-amber-50">
+      <div className="max-w-md w-full mx-4">
         {/* Header */}
-        <div className="text-center">
-          <div className="flex justify-center items-center mb-4">
-            <BookOpen className="h-12 w-12 text-orange-500" />
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-orange-600 to-red-600 rounded-full mb-4">
+            <span className="text-2xl text-white">🕉️</span>
           </div>
-          <h2 className="text-3xl font-bold text-gray-900">RaysVeda Admin</h2>
-          <p className="mt-2 text-sm text-gray-600">Sign in to your admin account</p>
+          <h1 className="text-3xl font-serif font-bold text-gray-800 mb-2">RaysVeda</h1>
+          <p className="text-gray-600">Welcome back to your spiritual journey</p>
         </div>
 
-        {/* Error Message */}
-        {error && <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">{error}</div>}
-
-        {/* Login Form */}
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div className="space-y-4">
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                Email Address
-              </label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                required
-                value={formData.email}
-                onChange={handleChange}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500"
-                placeholder="Enter your email"
-              />
-            </div>
-
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                Password
-              </label>
-              <div className="mt-1 relative">
-                <input
-                  id="password"
-                  name="password"
-                  type={showPassword ? "text" : "password"}
-                  required
-                  value={formData.password}
-                  onChange={handleChange}
-                  className="block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500 pr-10"
-                  placeholder="Enter your password"
-                />
-                <button
-                  type="button"
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  {showPassword ? (
-                    <EyeOff className="h-4 w-4 text-gray-400" />
-                  ) : (
-                    <Eye className="h-4 w-4 text-gray-400" />
-                  )}
-                </button>
-              </div>
-            </div>
+        {/* Login Card */}
+        <div className="bg-white rounded-2xl shadow-xl p-8 border border-orange-100">
+          <div className="text-center mb-6">
+            <h2 className="text-2xl font-bold text-gray-800 mb-2">Sign in to your account</h2>
           </div>
 
-          <div>
+          {message && (
+            <div className={`border px-4 py-3 rounded-lg mb-6 flex items-center ${
+              message.includes('Invalid') || message.includes('Error') || message.includes('provide')
+                ? 'bg-red-50 border-red-200 text-red-700'
+                : 'bg-green-50 border-green-200 text-green-700'
+            }`}>
+              <svg className="w-5 h-5 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+              </svg>
+              <span className="text-sm">{message}</span>
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Email/Phone Input */}
+            <div>
+              <label className="block text-gray-700 text-sm font-semibold mb-2">
+                Email or Phone Number
+              </label>
+              <div className="relative">
+                <input
+                  type="text"
+                  name="emailOrPhone" // CHANGED FROM "phone" to "emailOrPhone"
+                  value={form.emailOrPhone}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 pl-12 pr-20 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-300"
+                  placeholder="email@example.com or 9876543210"
+                  required
+                />
+                
+                {/* Dynamic Icon */}
+                <div className="absolute left-4 top-1/2 transform -translate-y-1/2">
+                  {inputType === 'email' ? (
+                    <svg className="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 12a4 4 0 10-8 0 4 4 0 018 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
+                    </svg>
+                  ) : inputType === 'phone' ? (
+                    <svg className="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                    </svg>
+                  ) : (
+                    <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                  )}
+                </div>
+
+                {/* Input Type Indicator */}
+                {inputType && (
+                  <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
+                    <span className={`text-xs px-2 py-1 rounded-full font-medium ${
+                      inputType === 'email' 
+                        ? 'bg-blue-100 text-blue-700' 
+                        : 'bg-green-100 text-green-700'
+                    }`}>
+                      {inputType === 'email' ? '📧 Email' : '📱 Phone'}
+                    </span>
+                  </div>
+                )}
+              </div>
+              
+              <div className="mt-2 flex items-center text-xs text-gray-500">
+                <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                </svg>
+                Use either your email address or phone number
+              </div>
+            </div>
+
+            {/* Password Input */}
+            <div>
+              <label className="block text-gray-700 text-sm font-semibold mb-2">
+                Password
+              </label>
+              <div className="relative">
+                <input
+                  type="password"
+                  name="password"
+                  value={form.password}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-300"
+                  placeholder="Enter your password"
+                  required
+                />
+                <div className="absolute left-4 top-1/2 transform -translate-y-1/2">
+                  <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            {/* Submit Button */}
             <button
               type="submit"
               disabled={loading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-orange-500 hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 disabled:from-orange-400 disabled:to-red-400 text-white font-bold py-3 px-6 rounded-lg transition-all duration-300 flex items-center justify-center shadow-lg hover:shadow-xl transform hover:scale-[1.02] disabled:transform-none"
             >
               {loading ? (
-                <div className="flex items-center">
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                  Signing in...
-                </div>
+                <>
+                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Signing In...
+                </>
               ) : (
-                "Sign in"
+                <>
+                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                  </svg>
+                  Login
+                </>
               )}
             </button>
-          </div>
 
-          {/* Demo Credentials */}
-          <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-            <p className="text-sm text-gray-600 font-medium mb-2">Demo Credentials:</p>
-            <p className="text-xs text-gray-500">Email: admin@raysveda.com</p>
-            <p className="text-xs text-gray-500">Password: admin123</p>
-          </div>
-        </form>
+            {/* Sign Up Link */}
+            <div className="text-center pt-4 border-t border-gray-200">
+              <span className="text-gray-600 text-sm">Don't have an account? </span>
+              <Link 
+                to="/signup" 
+                className="text-orange-600 hover:text-orange-700 font-semibold text-sm transition-colors hover:underline"
+              >
+                Sign up
+              </Link>
+            </div>
+          </form>
+        </div>
+
+        {/* Footer */}
+        <div className="text-center mt-6 text-sm text-gray-500">
+          <p>© 2024 RaysVeda. Your spiritual journey begins here.</p>
+        </div>
       </div>
     </div>
-  )
+  );
 }
-
-export default LoginForm

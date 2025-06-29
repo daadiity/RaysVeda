@@ -26,6 +26,9 @@ import SignupPage from './pages/SignupPage';
 import LoginPage from './pages/LoginPage';
 import UserDashboard from './pages/UserDashboard';
 import BookingHistory from "./pages/BookingHistory";
+import CharitableProgramPage from './pages/CharitableProgramPage';
+import CommunityServicesPage from './pages/CommunityServicesPage';
+import DonatePage from './pages/DonatePage';
 
 
 // import AdminLogin from "./pages/AdminLogin";
@@ -83,6 +86,12 @@ function App() {
           <Route path="/vidya/meditation" element={<Meditation />} />
           <Route path="/services/numerology" element={<Numerology />} />
           <Route path="/services/pran-pratishtha" element={<PranPratishtha />} />
+          
+          {/* Seva Bhav Routes - Updated to match header links */}
+          <Route path="/seva/charitable-programs" element={<CharitableProgramPage/>} />
+          <Route path="/seva/community-service" element={<CommunityServicesPage />} />
+          <Route path="/seva/donate" element={<DonatePage />} />
+          
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/admin/login" element={<LoginForm />} />
