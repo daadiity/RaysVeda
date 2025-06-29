@@ -37,7 +37,7 @@ import "./index.css"
 
 
 import AdminLayout from "./components/adminDashboardLayout/AdminLayout";
-import LoginForm from "./components/auth/LoginForm";
+// import LoginForm from "./components/auth/UserLoginForm";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import Dashboard from "./pages/admin/Dashboard";
 import Users from "./pages/admin/Users";
@@ -47,6 +47,7 @@ import Poojas from "./pages/admin/Poojas";
 import Reports from "./pages/admin/Reports";
 import Settings from "./pages/admin/Settings";
 import Notifications from "./pages/admin/Notifications";
+import AdminLoginForm from './components/auth/AdminLoginForm';
 
 // import AdminUsers from "./pages/AdminUsers";
 // import AdminBookings from "./pages/AdminBookings";
@@ -94,7 +95,7 @@ function App() {
           
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/login" element={<LoginPage />} />
-          <Route path="/admin/login" element={<LoginForm />} />
+          <Route path="/admin/login" element={<AdminLoginForm />} />
           <Route path="/dashboard" element={
             <ProtectedRoute>
               <UserDashboard />
