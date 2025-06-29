@@ -62,7 +62,12 @@ const userSchema = new mongoose.Schema(
   {
     timestamps: true,
   },
-)
+);
+
+// Ensure email is always unique
+userSchema.index({ email: 1 }, { unique: true });
+// Ensure phone is unique when present
+userSchema.index({ phone: 1 }, { unique: true, sparse: true });
 
 // Update totalBookings and totalSpent when booking is created/updated
 userSchema.methods.updateStats = async function () {

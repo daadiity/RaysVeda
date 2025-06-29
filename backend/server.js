@@ -1,61 +1,90 @@
 const dotenv = require("dotenv");
-const express = require('express');
-const cors = require('cors');
-const bodyParser = require('body-parser');
-const mongoose = require('mongoose');
+const express = require("express");
+const mongoose = require("mongoose");
+const cors = require("cors");
 const path = require("path");
+const bodyParser = require("body-parser"); // ✅ Added
 
 // Load environment variables
-dotenv.config()
+dotenv.config();
 
 const app = express();
 
-// Middleware
-app.use(cors());
-app.use(express.json({ limit: "10mb" }))
-app.use(express.urlencoded({ extended: true, limit: "10mb" }))
+// Enhanced CORS configuration
+const corsOptions = {
+  origin: ['http://localhost:5174', 'http://localhost:5000', 'http://127.0.0.1:5174'],
+  credentials: true,
+  optionsSuccessStatus: 200,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+};
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
 
-// Serve static files (for uploaded images)
-app.use("/uploads", express.static(path.join(__dirname, "uploads")))
+// Stripe Webhook (must be before any body parser)
+const webhookRoute = require('./routes/webhook');
+app.use('/api/webhook', express.raw({ type: 'application/json' }), webhookRoute);
 
-// MongoDB Connection
+// Body parser middleware (after Stripe raw parser)
+app.use(express.json({ limit: "10mb" }));
+app.use(express.urlencoded({ extended: true, limit: "10mb" }));
+app.use(bodyParser.json());
+
+// Request logging middleware (only in development)
+if (process.env.NODE_ENV === "development") {
+  app.use((req, res, next) => {
+    console.log(`${req.method} ${req.path}`);
+    if (req.method === 'POST' && req.path === '/api/auth/login') {
+      console.log('Login request body keys:', Object.keys(req.body));
+      console.log('Content-Type:', req.headers['content-type']);
+    }
+    next();
+  });
+}
+
+// Serve static files (uploads)
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
+// MongoDB connection
 mongoose.connect(process.env.MONGODB_URI)
   .then(() => console.log('✅ MongoDB connected'))
   .catch(err => console.error('❌ MongoDB connection error:', err));
 
-// API Routes
+// Main routes
 app.use('/api/numerology', require('./routes/numerologyRoutes'));
 app.use('/api/auth', require('./routes/auth'));
-// app.use('/api', require('./routes/poojaBooking'));
+app.use('/api', require('./routes/poojaBooking'));
+app.use('/api/bookings', require('./routes/booking'));
 
-// Admin Routes
-app.use("/api/admin", require("./routes/admin"))
-app.use("/api/admin/users", require("./routes/users"))
-app.use("/api/admin/bookings", require("./routes/bookings"))
-app.use("/api/admin/poojas", require("./routes/poojas"))
-app.use("/api/admin/reports", require("./routes/reports"))
-app.use("/api/admin/notifications", require("./routes/notifications"))
-app.use("/api/admin/settings", require("./routes/settings"))
-app.use("/api/admin/dashboard", require("./routes/dashboard"))
+// Admin routes
+app.use("/api/admin", require("./routes/admin"));
+app.use("/api/admin/users", require("./routes/users"));
+app.use("/api/admin/bookings", require("./routes/bookings"));
+app.use("/api/admin/poojas", require("./routes/poojas"));
+app.use("/api/admin/reports", require("./routes/reports"));
+app.use("/api/admin/notifications", require("./routes/notifications"));
+app.use("/api/admin/settings", require("./routes/settings"));
+app.use("/api/admin/dashboard", require("./routes/dashboard"));
 
-// Import the webhook route
-const webhookRoute = require('./routes/webhook'); // Import the webhook route
-
-// 🟡 Must be BEFORE JSON parsing (Stripe webhook)
-app.use('/api/webhook', express.raw({ type: 'application/json' }), webhookRoute);
-
-// ✅ JSON Body Parser (after raw)
-app.use(bodyParser.json());
+// Health check
+app.get('/api/health', (req, res) => {
+  res.json({
+    status: 'OK',
+    message: 'Server is running',
+    timestamp: new Date().toISOString(),
+    cors: 'enabled'
+  });
+});
 
 // Error handling middleware
 app.use((error, req, res, next) => {
-  console.error("Error:", error)
+  console.error("Error:", error);
   res.status(error.status || 500).json({
     success: false,
     message: error.message || "Internal server error",
     ...(process.env.NODE_ENV === "development" && { stack: error.stack }),
-  })
-})
+  });
+});
 
 // 404 handler
 app.use((req, res) => {
@@ -65,6 +94,12 @@ app.use((req, res) => {
   });
 });
 
-// Server Start
+// Server start
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`);
+  console.log(`🌐 Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`🔓 CORS enabled for: ${corsOptions.origin.join(', ')}`);
+});
+
+module.exports = app;
