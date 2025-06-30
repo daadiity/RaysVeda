@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const mongoose = require("mongoose");
+const Pooja = require("../models/Pooja");
 
 const User = require("../models/User");
 const Booking = require("../models/Booking");
@@ -121,6 +122,8 @@ const getDashboardStats = async (req, res) => {
   }
 };
 
+
+
 const getAllPoojas = async (req, res) => {
   try {
     const { page = 1, limit = 10, search = "" } = req.query;
@@ -141,10 +144,37 @@ const getAllPoojas = async (req, res) => {
 
     const total = await Pooja.countDocuments(query);
 
-    res.json({ poojas, total });
+    console.log("Fetched Poojas:", poojas.length, "Total:", total);
+    return res.status(200).json({ poojas, total }); // ✅ Send response once and exit
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Server Error" });
+    console.error("Error fetching poojas:", err);
+    if (!res.headersSent) {
+      return res.status(500).json({ message: "Server Error" });
+    }
+  }
+};
+
+
+
+const updatePoojaStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { isActive } = req.body;
+
+    const pooja = await Pooja.findByIdAndUpdate(
+      id,
+      { isActive },
+      { new: true }
+    );
+
+    if (!pooja) {
+      return res.status(404).json({ message: "Pooja not found" });
+    }
+
+    res.json({ message: "Pooja status updated", pooja });
+  } catch (err) {
+    console.error("Error updating pooja status:", err);
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -225,7 +255,6 @@ const getAllPoojas = async (req, res) => {
 //     res.status(500).json({ message: "Error generating report" });
 //   }
 // };
-
 
 const generateReport = async (req, res) => {
   try {
@@ -315,7 +344,9 @@ const generateReport = async (req, res) => {
 
       summary = {
         totalBookings,
-        averageBookingsPerDay: (totalBookings / Object.keys(grouped).length).toFixed(2),
+        averageBookingsPerDay: (
+          totalBookings / Object.keys(grouped).length
+        ).toFixed(2),
       };
     } else if (type === "users") {
       const users = await User.find({
@@ -338,7 +369,9 @@ const generateReport = async (req, res) => {
 
       summary = {
         totalUsers,
-        averageUsersPerDay: (totalUsers / Object.keys(grouped).length).toFixed(2),
+        averageUsersPerDay: (totalUsers / Object.keys(grouped).length).toFixed(
+          2
+        ),
       };
     } else if (type === "poojas") {
       const bookings = await Booking.find({
@@ -359,7 +392,8 @@ const generateReport = async (req, res) => {
 
       summary = {
         totalPoojas: Object.keys(grouped).length,
-        mostBooked: details.sort((a, b) => b.bookings - a.bookings)[0]?.pooja || "N/A",
+        mostBooked:
+          details.sort((a, b) => b.bookings - a.bookings)[0]?.pooja || "N/A",
       };
     } else {
       return res.status(400).json({ message: "Invalid report type" });
@@ -372,11 +406,11 @@ const generateReport = async (req, res) => {
   }
 };
 
-
 const downloadReport = async (req, res) => {
-  return res.status(501).json({ message: "Download report not implemented yet." });
+  return res
+    .status(501)
+    .json({ message: "Download report not implemented yet." });
 };
-
 
 module.exports = {
   adminLogin,
@@ -387,5 +421,6 @@ module.exports = {
   getDashboardStats,
   getAllPoojas,
   generateReport,
-  downloadReport
+  downloadReport,
+  updatePoojaStatus
 };

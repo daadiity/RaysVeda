@@ -34,21 +34,26 @@ const Poojas = () => {
       };
       const response = await adminAPI.getPoojas(params);
 
-      console.log("Poojas API Response:", response.data);
+      console.log("✅ Poojas API Response:", response);
 
-      // ✅ FIX HERE
-      setPoojas(response.data?.poojas || response.data || []);
-      setTotalCount(response.data?.total || 0);
+      if (
+        response?.poojas &&
+        Array.isArray(response.poojas) &&
+        typeof response.total === "number"
+      ) {
+        setPoojas(response.poojas);
+        setTotalCount(response.total);
+      } else {
+        console.warn("⚠️ Unexpected Poojas response format:", response?.data);
+        setPoojas([]);
+        setTotalCount(0);
+      }
     } catch (error) {
-      console.error("Error fetching poojas:", error);
+      console.error("❌ Error fetching poojas:", error);
       alert("Failed to load poojas. Please try again.");
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleAddPooja = () => {
-    setAddModalOpen(true);
   };
 
   const handleEditPooja = (poojaId) => {
@@ -69,6 +74,11 @@ const Poojas = () => {
       }
     }
   };
+
+  const handleAddPooja = () => {
+    setAddModalOpen(true);
+  };
+
 
   const handleToggleStatus = async (poojaId, currentStatus) => {
     try {

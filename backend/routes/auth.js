@@ -82,7 +82,9 @@ router.post('/login', async (req, res) => {
     }
 
     // Check if user exists
-    const user = await User.findOne(userQuery);
+    // const user = await User.findOne(userQuery);
+    const user = await User.findOne(userQuery).select("+password");
+
     console.log('User query:', JSON.stringify(userQuery));
     console.log('User found:', user ? `Yes (${user.email})` : 'No');
 
