@@ -3,7 +3,7 @@ import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
-export default function LoginForm() {
+export default function UserLoginForm() {
   const [form, setForm] = useState({ emailOrPhone: "", password: "" });
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);

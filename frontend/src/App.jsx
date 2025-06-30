@@ -97,7 +97,7 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/admin/login" element={<AdminLoginForm />} />
           <Route path="/dashboard" element={
-            <ProtectedRoute>
+            <ProtectedRoute role="user">
               <UserDashboard />
             </ProtectedRoute>
           } />
@@ -126,7 +126,7 @@ function App() {
           <Route
             path="/admin"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute role="admin">
                 <AdminLayout />
               </ProtectedRoute>
             }
