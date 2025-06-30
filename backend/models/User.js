@@ -1,4 +1,4 @@
-const mongoose = require("mongoose")
+const mongoose = require("mongoose");
 
 const userSchema = new mongoose.Schema(
   {
@@ -19,7 +19,12 @@ const userSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
-    address: {
+    password: {
+      type: String,
+      required: true,
+      select: false, // hides it from normal `.find()` unless explicitly selected
+    },
+    address: { 
       street: String,
       city: String,
       state: String,
@@ -61,7 +66,7 @@ const userSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-  },
+  }
 );
 
 // Ensure email is always unique
@@ -71,7 +76,7 @@ userSchema.index({ phone: 1 }, { unique: true, sparse: true });
 
 // Update totalBookings and totalSpent when booking is created/updated
 userSchema.methods.updateStats = async function () {
-  const Booking = mongoose.model("Booking")
+  const Booking = mongoose.model("Booking");
 
   const stats = await Booking.aggregate([
     { $match: { user: this._id, status: { $in: ["confirmed", "completed"] } } },
@@ -83,19 +88,19 @@ userSchema.methods.updateStats = async function () {
         lastBookingDate: { $max: "$date" },
       },
     },
-  ])
+  ]);
 
   if (stats.length > 0) {
-    this.totalBookings = stats[0].totalBookings
-    this.totalSpent = stats[0].totalSpent
-    this.lastBookingDate = stats[0].lastBookingDate
+    this.totalBookings = stats[0].totalBookings;
+    this.totalSpent = stats[0].totalSpent;
+    this.lastBookingDate = stats[0].lastBookingDate;
   } else {
-    this.totalBookings = 0
-    this.totalSpent = 0
-    this.lastBookingDate = null
+    this.totalBookings = 0;
+    this.totalSpent = 0;
+    this.lastBookingDate = null;
   }
 
-  await this.save()
-}
+  await this.save();
+};
 
-module.exports = mongoose.model("User", userSchema)
+module.exports = mongoose.model("User", userSchema);

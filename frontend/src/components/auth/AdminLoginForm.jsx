@@ -1,6 +1,3 @@
-
-
-
 "use client";
 
 import { useState } from "react";
@@ -22,7 +19,8 @@ const LoginForm = () => {
 
   const isEmail = (input) => input.includes("@");
   const isPhone = (input) => /^\d{10,}$/.test(input.replace(/\D/g, ""));
-  const detectInputType = (val) => (isEmail(val) ? "email" : isPhone(val) ? "phone" : "");
+  const detectInputType = (val) =>
+    isEmail(val) ? "email" : isPhone(val) ? "phone" : "";
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -38,6 +36,7 @@ const LoginForm = () => {
 
     const input = formData.emailOrPhone.trim();
     const password = formData.password;
+
     if (!input || !password) {
       setMessage("Please provide email/phone and password");
       setLoading(false);
@@ -45,37 +44,36 @@ const LoginForm = () => {
     }
 
     const requestData = { password };
+
     try {
       if (isEmail(input)) requestData.email = input.toLowerCase();
       else if (isPhone(input)) requestData.phone = input.replace(/\D/g, "");
       else throw new Error("Enter a valid email or phone");
 
-      if (requestData.email === "admin@raysveda.com") {
-        const res = await adminAPI.login({
-          email: requestData.email,
-          password: requestData.password,
-        });
-        if (res.success) {
-          localStorage.setItem("adminToken", res.data.token);
-          localStorage.setItem("adminUser", JSON.stringify(res.data.admin));
-          navigate("/admin");
-        } else {
-          throw new Error("Admin login failed");
-        }
+      // Enforce only admin login
+      if (!requestData.email) {
+        throw new Error("Only admins can log in here via email");
+      }
+
+      const res = await adminAPI.login({
+        email: requestData.email,
+        password: requestData.password,
+      });
+
+      if (res.success) {
+        localStorage.setItem("adminToken", res.data.token);
+        localStorage.setItem("adminUser", JSON.stringify(res.data.admin));
+        navigate("/admin");
       } else {
-        const res = await axios.post("/api/auth/login", requestData);
-        if (res.data.success) {
-          localStorage.setItem("token", res.data.token);
-          localStorage.setItem("user", JSON.stringify(res.data.user));
-          login(res.data.user);
-          navigate("/dashboard");
-        } else {
-          throw new Error(res.data.message || "Login failed");
-        }
+        throw new Error(res.message || "Admin login failed");
       }
     } catch (err) {
       console.error("Login error:", err);
-      setMessage(err.response?.data?.message || err.message || "Login failed.");
+      setMessage(
+        err.response?.data?.message ||
+          err.message ||
+          "Login failed. Only admins can access this portal."
+      );
     } finally {
       setLoading(false);
     }
@@ -88,19 +86,25 @@ const LoginForm = () => {
           <div className="flex justify-center mb-4">
             <BookOpen className="h-12 w-12 text-orange-500" />
           </div>
-          <h2 className="text-3xl font-bold text-gray-900 font-serif">Admin Login</h2>
-          <p className="mt-1 text-sm text-gray-600">Welcome back to RaysVeda Admin Panel</p>
+          <h2 className="text-3xl font-bold text-gray-900 font-serif">
+            Admin Login
+          </h2>
+          <p className="mt-1 text-sm text-gray-600">
+            Welcome back to RaysVeda Admin Panel
+          </p>
         </div>
 
         {message && (
           <div
             className={`flex items-center gap-2 mb-5 px-4 py-3 text-sm rounded-lg border ${
-              message.toLowerCase().includes("fail") || message.includes("valid")
+              message.toLowerCase().includes("fail") ||
+              message.includes("valid")
                 ? "bg-red-50 text-red-700 border-red-200"
                 : "bg-green-50 text-green-700 border-green-200"
             }`}
           >
-            {message.toLowerCase().includes("fail") || message.includes("valid") ? (
+            {message.toLowerCase().includes("fail") ||
+            message.includes("valid") ? (
               <AlertCircle className="w-5 h-5" />
             ) : (
               <CheckCircle className="w-5 h-5" />
@@ -141,7 +145,9 @@ const LoginForm = () => {
 
           {/* Password */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Password
+            </label>
             <div className="relative">
               <input
                 type={showPassword ? "text" : "password"}
@@ -157,7 +163,11 @@ const LoginForm = () => {
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-2 top-2 text-gray-500"
               >
-                {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                {showPassword ? (
+                  <EyeOff className="w-5 h-5" />
+                ) : (
+                  <Eye className="w-5 h-5" />
+                )}
               </button>
             </div>
           </div>
@@ -177,9 +187,6 @@ const LoginForm = () => {
 };
 
 export default LoginForm;
-
-
-
 
 // "use client";
 
@@ -361,7 +368,6 @@ export default LoginForm;
 
 // export default LoginForm;
 
-
 // "use client";
 
 // import { useState } from "react";
@@ -452,7 +458,7 @@ export default LoginForm;
 //           />
 //         </div>
 
-//         {/* Login Form Side */} 
+//         {/* Login Form Side */}
 //         <motion.div
 //           initial={{ opacity: 0, x: 20 }}
 //           animate={{ opacity: 1, x: 0 }}
