@@ -36,7 +36,6 @@ const Numerology = () => {
     try {
       const response = await axios.post('http://localhost:3000/api/numerology', formData);
       setGeminiResponse(response.data.data);
-
       setFormData({
         name: '',
         birthDate: '',
@@ -80,7 +79,6 @@ const Numerology = () => {
           </div>
         </div>
       </section>
-
 
       {/* About */}
       <section className="py-16 bg-white">
@@ -235,7 +233,6 @@ const Numerology = () => {
                 </div>
               </form>
             ) : (
-
               <div className="mt-6">
                 <h3 className="text-xl font-bold text-orange-600 mb-2">Your Numerology Reading</h3>
                 <div className="max-h-64 overflow-y-auto bg-white border border-orange-300 rounded-md shadow-inner p-4 space-y-3">

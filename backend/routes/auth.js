@@ -2,7 +2,9 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+
 const { sendWelcomeEmail } = require('../services/emailService'); // Add this import
+
 const router = express.Router();
 
 // Enhanced login route with email/phone flexibility
@@ -13,6 +15,7 @@ router.post('/login', async (req, res) => {
     console.log('Content-Type:', req.headers['content-type']);
 
     const { emailOrPhone, password } = req.body;
+
 
 
     // Validate input

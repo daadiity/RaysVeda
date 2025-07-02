@@ -34,6 +34,11 @@ import BookingHistory from "./pages/BookingHistory";
 import CharitableProgramPage from './pages/CharitableProgramPage';
 import CommunityServicesPage from './pages/CommunityServicesPage';
 import DonatePage from './pages/DonatePage';
+import Numerology from './pages/Numerology';
+import VastuPage from "./pages/VastuPage";
+import KundliPage from './pages/KundliPage';
+import HawanPage from './pages/HawanPage';
+import BlogPage from './pages/BlogPage';
 
 
 
@@ -96,7 +101,6 @@ function App() {
           <Route path="/services/kundli" element={<KundliPage />} />
           <Route path="/services/hawan" element={<HawanPage />} />
           <Route path="/blog" element={<BlogPage />} />
-
           {/* Seva Bhav Routes - Updated to match header links */}
           <Route path="/seva/charitable-programs" element={<CharitableProgramPage />} />
           <Route path="/seva/community-service" element={<CommunityServicesPage />} />
