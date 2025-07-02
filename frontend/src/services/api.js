@@ -37,8 +37,8 @@ api.interceptors.response.use(
 // Admin API endpoints
 export const adminAPI = {
   // Search functions
-  searchUsers: (params) => axios.get("/api/admin/search/users", { params }),
-  searchBookings: (params) => axios.get("/api/admin/search/bookings", { params }),
+  searchUsers: (params) => api.get("/admin/search/users", { params }),
+  searchBookings: (params) => api.get("/admin/search/bookings", { params }),
 
   // Authentication
   login: (credentials) => api.post("/admin/login", credentials),
