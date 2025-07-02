@@ -49,11 +49,17 @@ try {
   const authRoutes = require('./routes/auth');
   const poojaBookingRoutes = require('./routes/poojaBooking');
   const bookingRoutes = require('./routes/booking'); // Add this line
+  const kundliRoutes = require('./routes/kundli'); // Add this import with other route imports
 
   // Use routes
   app.use('/api/auth', authRoutes);
-  app.use('/api', poojaBookingRoutes);
+  app.use('/api/pooja', poojaBookingRoutes);
   app.use('/api/bookings', bookingRoutes); // Add this line
+  app.use('/api/kundli', kundliRoutes); // Add this route registration with other routes
+ 
+  //Numerology route
+  app.use('/api/numerology', require('./routes/numerologyRoutes'));
+
 
   console.log('Routes loaded successfully');
   console.log('Auth routes available at: /api/auth/register, /api/auth/login');

@@ -1,64 +1,38 @@
 import React, { useState } from 'react';
-import { useAuth } from '../../context/AuthContext';
-import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
-const SignupForm = ({ onClose, switchToLogin }) => {
-  const { login } = useAuth();
+const SignupForm = () => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    password: '',
-    confirmPassword: '',
     phone: '',
-    address: ''
+    address: '',
+    password: '',
+    confirmPassword: ''
   });
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
-
-  // Configure axios defaults
-  axios.defaults.baseURL = 'http://localhost:5000';
+  const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value
     });
-    // Clear error when user starts typing
-    if (error) setError('');
   };
 
   const validateForm = () => {
-    if (!formData.name.trim()) {
-      setError('Name is required');
-      return false;
-    }
-    if (!formData.email.trim()) {
-      setError('Email is required');
-      return false;
-    }
-    if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      setError('Please enter a valid email address');
-      return false;
-    }
-    if (!formData.password) {
-      setError('Password is required');
-      return false;
-    }
-    if (formData.password.length < 6) {
-      setError('Password must be at least 6 characters long');
-      return false;
-    }
     if (formData.password !== formData.confirmPassword) {
       setError('Passwords do not match');
       return false;
     }
-    if (!formData.phone.trim()) {
-      setError('Phone number is required');
+    if (formData.password.length < 6) {
+      setError('Password must be at least 6 characters');
       return false;
     }
-    if (!/^\+?[\d\s-()]{10,}$/.test(formData.phone)) {
-      setError('Please enter a valid phone number');
+    if (!/^\d{10}$/.test(formData.phone)) {
+      setError('Phone number must be 10 digits');
       return false;
     }
     return true;
@@ -67,269 +41,404 @@ const SignupForm = ({ onClose, switchToLogin }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    setSuccess('');
     
-    if (!validateForm()) {
-      return;
-    }
-
+    if (!validateForm()) return;
+    
     setLoading(true);
 
     try {
-      console.log('Sending signup request to:', 'http://localhost:5000/api/auth/register');
-
-      const response = await axios.post('/api/auth/register', {
-        name: formData.name.trim(),
-        email: formData.email.trim().toLowerCase(),
-        password: formData.password,
-        phone: formData.phone.trim(),
-        address: formData.address.trim()
-      }, {
-        headers: {
-          'Content-Type': 'application/json'
-        }
+      console.log('Signup attempt with:', { 
+        name: formData.name, 
+        email: formData.email, 
+        phone: formData.phone 
       });
 
-      console.log('Signup response:', response.data);
+      const response = await fetch('http://localhost:3000/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          address: formData.address,
+          password: formData.password
+        }),
+      });
 
-      if (response.data.success) {
-        setSuccess('Account created successfully! Welcome to RaysVeda!');
-        
-        // Store token and user data
-        localStorage.setItem('token', response.data.token);
-        
-        // Update auth context
-        login(response.data.user, response.data.token);
-        
-        // Close modal immediately after successful signup
-        setTimeout(() => {
-          onClose();
-          // Optional: Show a welcome message or redirect
-          // window.location.reload(); // Uncomment if you want to refresh the page
-        }, 1000); // Reduced to 1 second for better UX
+      const data = await response.json();
+      console.log('Signup response:', data);
 
+      if (data.success) {
+        alert('Account created successfully! Please login.');
+        navigate('/login');
       } else {
-        setError(response.data.message || 'Registration failed');
+        setError(data.message || 'Registration failed');
       }
-
-    } catch (err) {
-      console.error('Signup error:', err);
-      console.error('Error response:', err.response?.data);
-      
-      if (err.response?.status === 404) {
-        setError('Registration service not available. Please try again later.');
-      } else if (err.response?.data?.message) {
-        setError(err.response.data.message);
-      } else if (err.code === 'ERR_NETWORK') {
-        setError('Network error. Please check your connection and try again.');
-      } else {
-        setError('Registration failed. Please try again.');
-      }
+    } catch (error) {
+      console.error('Signup error:', error);
+      setError('Network error. Please check your connection.');
     } finally {
       setLoading(false);
     }
   };
 
-  // Handle close button click
-  const handleClose = () => {
-    // Reset form data when closing
-    setFormData({
-      name: '',
-      email: '',
-      password: '',
-      confirmPassword: '',
-      phone: '',
-      address: ''
-    });
-    setError('');
-    setSuccess('');
-    onClose();
-  };
-
-  // Handle escape key press
-  const handleKeyDown = (e) => {
-    if (e.key === 'Escape') {
-      handleClose();
-    }
-  };
-
   return (
-    <div 
-      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
-      onClick={(e) => {
-        // Close modal when clicking outside
-        if (e.target === e.currentTarget) {
-          handleClose();
-        }
-      }}
-      onKeyDown={handleKeyDown}
-      tabIndex={-1}
-    >
-      <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md relative max-h-[90vh] overflow-y-auto">
-        <button
-          onClick={handleClose}
-          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-2xl font-bold z-10 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors"
-          aria-label="Close"
-        >
-          ×
-        </button>
-        
-        <h2 className="text-3xl font-bold text-center mb-6 text-orange-700">
-          Create Account
-        </h2>
+    <div style={{
+      background: 'linear-gradient(135deg, #ff6b35 0%, #f7931e 100%)',
+      minHeight: '100vh',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      fontFamily: "'Poppins', sans-serif",
+      padding: '2rem 1rem'
+    }}>
+      <div style={{
+        background: 'rgba(255, 255, 255, 0.95)',
+        backdropFilter: 'blur(10px)',
+        borderRadius: '20px',
+        padding: '2.5rem',
+        width: '100%',
+        maxWidth: '500px',
+        boxShadow: '0 20px 40px rgba(0, 0, 0, 0.1)',
+        border: '1px solid rgba(255, 255, 255, 0.2)',
+        maxHeight: '90vh',
+        overflowY: 'auto'
+      }}>
+        <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+          <h2 style={{
+            color: '#333',
+            fontSize: '2.2rem',
+            fontWeight: '600',
+            marginBottom: '0.5rem'
+          }}>Create Account</h2>
+          <p style={{
+            color: '#666',
+            fontSize: '1rem'
+          }}>Join RaysVeda spiritual community</p>
+        </div>
 
         {error && (
-          <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-600 rounded-lg text-sm">
+          <div style={{
+            background: '#fee',
+            color: '#c33',
+            padding: '1rem',
+            borderRadius: '8px',
+            marginBottom: '1rem',
+            border: '1px solid #fcc',
+            textAlign: 'center'
+          }}>
             {error}
           </div>
         )}
 
-        {success && (
-          <div className="mb-4 p-3 bg-green-50 border border-green-200 text-green-600 rounded-lg text-sm">
-            {success}
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
-              Full Name *
-            </label>
+        <form onSubmit={handleSubmit}>
+          <div style={{ marginBottom: '1.5rem' }}>
+            <label style={{
+              display: 'block',
+              marginBottom: '0.5rem',
+              color: '#555',
+              fontWeight: '500',
+              fontSize: '0.95rem'
+            }}>Full Name *</label>
             <input
               type="text"
-              id="name"
               name="name"
               value={formData.name}
               onChange={handleChange}
               required
-              disabled={loading || success}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
               placeholder="Enter your full name"
-              autoComplete="name"
+              style={{
+                width: '100%',
+                padding: '0.75rem',
+                border: '2px solid #ddd',
+                borderRadius: '8px',
+                fontSize: '1rem',
+                transition: 'all 0.3s',
+                outline: 'none',
+                background: '#fafafa'
+              }}
+              onFocus={(e) => {
+                e.target.style.borderColor = '#ff6b35';
+                e.target.style.background = '#fff';
+              }}
+              onBlur={(e) => {
+                e.target.style.borderColor = '#ddd';
+                e.target.style.background = '#fafafa';
+              }}
             />
           </div>
 
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-              Email Address *
-            </label>
+          <div style={{ marginBottom: '1.5rem' }}>
+            <label style={{
+              display: 'block',
+              marginBottom: '0.5rem',
+              color: '#555',
+              fontWeight: '500',
+              fontSize: '0.95rem'
+            }}>Email Address *</label>
             <input
               type="email"
-              id="email"
               name="email"
               value={formData.email}
               onChange={handleChange}
               required
-              disabled={loading || success}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
-              placeholder="Enter your email"
-              autoComplete="email"
+              placeholder="Enter your email address"
+              style={{
+                width: '100%',
+                padding: '0.75rem',
+                border: '2px solid #ddd',
+                borderRadius: '8px',
+                fontSize: '1rem',
+                transition: 'all 0.3s',
+                outline: 'none',
+                background: '#fafafa'
+              }}
+              onFocus={(e) => {
+                e.target.style.borderColor = '#ff6b35';
+                e.target.style.background = '#fff';
+              }}
+              onBlur={(e) => {
+                e.target.style.borderColor = '#ddd';
+                e.target.style.background = '#fafafa';
+              }}
             />
           </div>
 
-          <div>
-            <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
-              Phone Number *
-            </label>
+          <div style={{ marginBottom: '1.5rem' }}>
+            <label style={{
+              display: 'block',
+              marginBottom: '0.5rem',
+              color: '#555',
+              fontWeight: '500',
+              fontSize: '0.95rem'
+            }}>Phone Number *</label>
             <input
               type="tel"
-              id="phone"
               name="phone"
               value={formData.phone}
               onChange={handleChange}
               required
-              disabled={loading || success}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
-              placeholder="Enter your phone number"
-              autoComplete="tel"
+              placeholder="Enter 10-digit phone number"
+              maxLength="10"
+              style={{
+                width: '100%',
+                padding: '0.75rem',
+                border: '2px solid #ddd',
+                borderRadius: '8px',
+                fontSize: '1rem',
+                transition: 'all 0.3s',
+                outline: 'none',
+                background: '#fafafa'
+              }}
+              onFocus={(e) => {
+                e.target.style.borderColor = '#ff6b35';
+                e.target.style.background = '#fff';
+              }}
+              onBlur={(e) => {
+                e.target.style.borderColor = '#ddd';
+                e.target.style.background = '#fafafa';
+              }}
             />
           </div>
 
-          <div>
-            <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-1">
-              Address (Optional)
-            </label>
+          <div style={{ marginBottom: '1.5rem' }}>
+            <label style={{
+              display: 'block',
+              marginBottom: '0.5rem',
+              color: '#555',
+              fontWeight: '500',
+              fontSize: '0.95rem'
+            }}>Address (Optional)</label>
             <textarea
-              id="address"
               name="address"
               value={formData.address}
               onChange={handleChange}
-              rows="2"
-              disabled={loading || success}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
               placeholder="Enter your address"
-              autoComplete="address-line1"
+              rows="2"
+              style={{
+                width: '100%',
+                padding: '0.75rem',
+                border: '2px solid #ddd',
+                borderRadius: '8px',
+                fontSize: '1rem',
+                transition: 'all 0.3s',
+                outline: 'none',
+                background: '#fafafa',
+                resize: 'vertical',
+                minHeight: '60px'
+              }}
+              onFocus={(e) => {
+                e.target.style.borderColor = '#ff6b35';
+                e.target.style.background = '#fff';
+              }}
+              onBlur={(e) => {
+                e.target.style.borderColor = '#ddd';
+                e.target.style.background = '#fafafa';
+              }}
             />
           </div>
 
-          <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-              Password *
-            </label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              required
-              disabled={loading || success}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
-              placeholder="Create a password (min 6 characters)"
-              autoComplete="new-password"
-            />
+          <div style={{ marginBottom: '1.5rem' }}>
+            <label style={{
+              display: 'block',
+              marginBottom: '0.5rem',
+              color: '#555',
+              fontWeight: '500',
+              fontSize: '0.95rem'
+            }}>Password *</label>
+            <div style={{ position: 'relative' }}>
+              <input
+                type={showPassword ? 'text' : 'password'}
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                required
+                placeholder="Create a strong password"
+                style={{
+                  width: '100%',
+                  padding: '0.75rem',
+                  paddingRight: '3rem',
+                  border: '2px solid #ddd',
+                  borderRadius: '8px',
+                  fontSize: '1rem',
+                  transition: 'all 0.3s',
+                  outline: 'none',
+                  background: '#fafafa'
+                }}
+                onFocus={(e) => {
+                  e.target.style.borderColor = '#ff6b35';
+                  e.target.style.background = '#fff';
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = '#ddd';
+                  e.target.style.background = '#fafafa';
+                }}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                style={{
+                  position: 'absolute',
+                  right: '10px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  background: 'none',
+                  border: 'none',
+                  color: '#666',
+                  cursor: 'pointer',
+                  fontSize: '0.9rem'
+                }}
+              >
+                {showPassword ? '🙈' : '👁️'}
+              </button>
+            </div>
           </div>
 
-          <div>
-            <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
-              Confirm Password *
-            </label>
+          <div style={{ marginBottom: '2rem' }}>
+            <label style={{
+              display: 'block',
+              marginBottom: '0.5rem',
+              color: '#555',
+              fontWeight: '500',
+              fontSize: '0.95rem'
+            }}>Confirm Password *</label>
             <input
               type="password"
-              id="confirmPassword"
               name="confirmPassword"
               value={formData.confirmPassword}
               onChange={handleChange}
               required
-              disabled={loading || success}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
               placeholder="Confirm your password"
-              autoComplete="new-password"
+              style={{
+                width: '100%',
+                padding: '0.75rem',
+                border: '2px solid #ddd',
+                borderRadius: '8px',
+                fontSize: '1rem',
+                transition: 'all 0.3s',
+                outline: 'none',
+                background: '#fafafa'
+              }}
+              onFocus={(e) => {
+                e.target.style.borderColor = '#ff6b35';
+                e.target.style.background = '#fff';
+              }}
+              onBlur={(e) => {
+                e.target.style.borderColor = '#ddd';
+                e.target.style.background = '#fafafa';
+              }}
             />
           </div>
 
-          <div className="flex gap-3 pt-2">
-            <button
-              type="button"
-              onClick={handleClose}
-              className="flex-1 bg-gray-200 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-300 transition-colors font-medium"
-              disabled={loading}
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={loading || success}
-              className="flex-1 bg-orange-600 text-white py-2 px-4 rounded-lg hover:bg-orange-700 focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium"
-            >
-              {loading ? 'Creating Account...' : success ? 'Success!' : 'Create Account'}
-            </button>
-          </div>
+          <button
+            type="submit"
+            disabled={loading}
+            style={{
+              width: '100%',
+              padding: '0.85rem',
+              background: loading ? '#ccc' : 'linear-gradient(135deg, #ff6b35, #f7931e)',
+              color: 'white',
+              border: 'none',
+              borderRadius: '8px',
+              fontSize: '1.1rem',
+              fontWeight: '600',
+              cursor: loading ? 'not-allowed' : 'pointer',
+              transition: 'all 0.3s',
+              boxShadow: loading ? 'none' : '0 4px 15px rgba(255, 107, 53, 0.3)',
+              transform: loading ? 'none' : 'translateY(0)',
+            }}
+            onMouseOver={(e) => {
+              if (!loading) {
+                e.target.style.transform = 'translateY(-2px)';
+                e.target.style.boxShadow = '0 6px 20px rgba(255, 107, 53, 0.4)';
+              }
+            }}
+            onMouseOut={(e) => {
+              if (!loading) {
+                e.target.style.transform = 'translateY(0)';
+                e.target.style.boxShadow = '0 4px 15px rgba(255, 107, 53, 0.3)';
+              }
+            }}
+          >
+            {loading ? (
+              <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <span style={{ marginRight: '0.5rem' }}>Creating Account...</span>
+                <span style={{ animation: 'spin 1s linear infinite' }}>⟳</span>
+              </span>
+            ) : (
+              'Create Account'
+            )}
+          </button>
         </form>
 
-        <div className="mt-6 text-center">
-          <p className="text-gray-600">
-            Already have an account?{' '}
-            <button
-              onClick={switchToLogin}
-              className="text-orange-600 hover:text-orange-700 font-medium"
-              disabled={loading || success}
-            >
-              Sign In
-            </button>
-          </p>
-        </div>
+        <p style={{
+          textAlign: 'center',
+          marginTop: '1.5rem',
+          color: '#666',
+          fontSize: '0.95rem'
+        }}>
+          Already have an account?{' '}
+          <span
+            onClick={() => navigate('/login')}
+            style={{
+              color: '#ff6b35',
+              cursor: 'pointer',
+              fontWeight: '600',
+              textDecoration: 'underline'
+            }}
+          >
+            Sign In
+          </span>
+        </p>
       </div>
+
+      <style>{`
+        @keyframes spin {
+          100% { transform: rotate(360deg); }
+        }
+      `}</style>
     </div>
   );
 };

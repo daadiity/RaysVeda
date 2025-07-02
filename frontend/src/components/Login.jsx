@@ -13,7 +13,7 @@ const Login = ({ onClose, onSwitchToSignup }) => {
   const { login } = useAuth();
 
   // Configure axios defaults
-  axios.defaults.baseURL = 'http://localhost:5000';
+  axios.defaults.baseURL = 'http://localhost:5173';
 
   // Phone number normalization function
   const normalizePhoneNumber = (phone) => {

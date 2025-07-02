@@ -1,248 +1,494 @@
-import React, { useState } from "react";
-import axios from "axios";
-import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext";
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 
-export default function LoginForm() {
-  const [form, setForm] = useState({ emailOrPhone: "", password: "" });
-  const [message, setMessage] = useState("");
+const LoginForm = () => {
+  const [formData, setFormData] = useState({
+    emailOrPhone: '',
+    password: ''
+  });
+  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [inputType, setInputType] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [inputType, setInputType] = useState(''); // 'email' or 'phone'
   const navigate = useNavigate();
   const { login } = useAuth();
 
   const handleChange = (e) => {
     const value = e.target.value;
-    setForm({ ...form, [e.target.name]: value });
+    setFormData({
+      ...formData,
+      [e.target.name]: value
+    });
 
-    // Detect input type for better UX
+    // Auto-detect input type for better UX
     if (e.target.name === 'emailOrPhone') {
       if (value.includes('@')) {
         setInputType('email');
-      } else if (/^\d+$/.test(value.replace(/\D/g, '')) && value.replace(/\D/g, '').length >= 10) {
+      } else if (/^\d/.test(value)) {
         setInputType('phone');
       } else {
         setInputType('');
       }
     }
-
-    // Clear message when user starts typing
-    if (message) setMessage("");
-  };
-
-  // Helper functions
-  const isEmail = (input) => input.includes('@');
-  const isPhone = (input) => {
-    const cleanInput = input.replace(/\D/g, '');
-    return cleanInput.length >= 10 && /^\d+$/.test(cleanInput);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setMessage("");
+    setError('');
     setLoading(true);
 
-    // Validation
-    if (!form.emailOrPhone || !form.password) {
-      setMessage('Please provide email/phone and password');
-      setLoading(false);
-      return;
-    }
-
-    const inputValue = form.emailOrPhone.trim();
-    
-    if (!isEmail(inputValue) && !isPhone(inputValue)) {
-      setMessage('Please provide a valid email address or phone number');
-      setLoading(false);
-      return;
-    }
-
     try {
-      // Prepare request data based on input type
-      const requestData = { password: form.password };
-
-      if (isEmail(inputValue)) {
-        requestData.email = inputValue.toLowerCase();
-        console.log('Attempting login with email:', requestData.email);
-      } else {
-        requestData.phone = inputValue.replace(/\D/g, ''); // Clean phone number
-        console.log('Attempting login with phone:', requestData.phone);
-      }
-
-      const res = await axios.post("/api/auth/login", requestData);
+      console.log('Login attempt with:', { 
+        emailOrPhone: formData.emailOrPhone,
+        inputType: inputType 
+      });
       
-      if (res.data.success) {
-        const { user, token } = res.data;
-        
-        // Store token in localStorage
-        localStorage.setItem('token', token);
-        localStorage.setItem('user', JSON.stringify(user));
-        
-        login(user); // Update auth context
-        navigate("/dashboard"); // Redirect to dashboard
+      const response = await fetch('http://localhost:3000/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          emailOrPhone: formData.emailOrPhone,
+          password: formData.password
+        }),
+      });
+
+      const data = await response.json();
+      console.log('Login response:', data);
+
+      if (data.success) {
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        login(data.user, data.token);
+        navigate('/dashboard');
       } else {
-        setMessage(res.data.message || "Login failed");
+        setError(data.message || 'Login failed');
       }
-    } catch (err) {
-      console.error("Login error:", err.response?.data || err.message);
-      setMessage(err.response?.data?.message || "Invalid credentials.");
+    } catch (error) {
+      console.error('Login error:', error);
+      setError('Network error. Please check your connection.');
     } finally {
       setLoading(false);
     }
   };
 
+  const getPlaceholder = () => {
+    if (inputType === 'email') return 'Enter your email address';
+    if (inputType === 'phone') return 'Enter your phone number';
+    return 'Email address or phone number';
+  };
+
+  const getInputIcon = () => {
+    if (inputType === 'email') return '📧';
+    if (inputType === 'phone') return '📱';
+    return '👤';
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-100 via-orange-50 to-amber-50">
-      <div className="max-w-md w-full mx-4">
+    <div style={{
+      background: 'linear-gradient(135deg, #ff6b35 0%, #f7931e 100%)',
+      minHeight: '100vh',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      fontFamily: "'Poppins', sans-serif",
+      padding: '2rem 1rem'
+    }}>
+      {/* Background decoration */}
+      <div style={{
+        position: 'absolute',
+        top: '10%',
+        left: '10%',
+        width: '100px',
+        height: '100px',
+        background: 'rgba(255, 255, 255, 0.1)',
+        borderRadius: '50%',
+        animation: 'float 6s ease-in-out infinite'
+      }}></div>
+      <div style={{
+        position: 'absolute',
+        top: '20%',
+        right: '15%',
+        width: '60px',
+        height: '60px',
+        background: 'rgba(255, 255, 255, 0.1)',
+        borderRadius: '50%',
+        animation: 'float 4s ease-in-out infinite reverse'
+      }}></div>
+      <div style={{
+        position: 'absolute',
+        bottom: '15%',
+        left: '20%',
+        width: '80px',
+        height: '80px',
+        background: 'rgba(255, 255, 255, 0.1)',
+        borderRadius: '50%',
+        animation: 'float 5s ease-in-out infinite'
+      }}></div>
+
+      <div style={{
+        background: 'rgba(255, 255, 255, 0.98)',
+        backdropFilter: 'blur(20px)',
+        borderRadius: '25px',
+        padding: '3rem',
+        width: '100%',
+        maxWidth: '450px',
+        boxShadow: '0 25px 50px rgba(0, 0, 0, 0.15)',
+        border: '1px solid rgba(255, 255, 255, 0.3)',
+        position: 'relative',
+        overflow: 'hidden'
+      }}>
+        {/* Decorative top bar */}
+        <div style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          height: '4px',
+          background: 'linear-gradient(90deg, #ff6b35, #f7931e, #ff6b35)',
+          backgroundSize: '200% 100%',
+          animation: 'shimmer 2s linear infinite'
+        }}></div>
+
         {/* Header */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-orange-600 to-red-600 rounded-full mb-4">
-            <span className="text-2xl text-white">🕉️</span>
-          </div>
-          <h1 className="text-3xl font-serif font-bold text-gray-800 mb-2">RaysVeda</h1>
-          <p className="text-gray-600">Welcome back to your spiritual journey</p>
+        <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
+          <div style={{
+            fontSize: '3rem',
+            marginBottom: '1rem',
+            animation: 'bounce 2s infinite'
+          }}>🕉️</div>
+          <h2 style={{
+            color: '#333',
+            fontSize: '2.5rem',
+            fontWeight: '700',
+            marginBottom: '0.5rem',
+            background: 'linear-gradient(135deg, #ff6b35, #f7931e)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text'
+          }}>Welcome Back</h2>
+          <p style={{
+            color: '#666',
+            fontSize: '1.1rem',
+            fontWeight: '400'
+          }}>Sign in to continue your spiritual journey</p>
         </div>
 
-        {/* Login Card */}
-        <div className="bg-white rounded-2xl shadow-xl p-8 border border-orange-100">
-          <div className="text-center mb-6">
-            <h2 className="text-2xl font-bold text-gray-800 mb-2">Sign in to your account</h2>
+        {error && (
+          <div style={{
+            background: 'linear-gradient(135deg, #ffe6e6, #ffcccc)',
+            color: '#d63384',
+            padding: '1rem',
+            borderRadius: '12px',
+            marginBottom: '1.5rem',
+            border: '1px solid #f5c6cb',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem',
+            animation: 'slideIn 0.3s ease-out'
+          }}>
+            <span>⚠️</span>
+            <span>{error}</span>
           </div>
+        )}
 
-          {message && (
-            <div className={`border px-4 py-3 rounded-lg mb-6 flex items-center ${
-              message.includes('Invalid') || message.includes('Error') || message.includes('provide')
-                ? 'bg-red-50 border-red-200 text-red-700'
-                : 'bg-green-50 border-green-200 text-green-700'
-            }`}>
-              <svg className="w-5 h-5 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-              </svg>
-              <span className="text-sm">{message}</span>
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Email/Phone Input */}
-            <div>
-              <label className="block text-gray-700 text-sm font-semibold mb-2">
-                Email or Phone Number
-              </label>
-              <div className="relative">
-                <input
-                  type="text"
-                  name="emailOrPhone" // CHANGED FROM "phone" to "emailOrPhone"
-                  value={form.emailOrPhone}
-                  onChange={handleChange}
-                  className="w-full px-4 py-3 pl-12 pr-20 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-300"
-                  placeholder="email@example.com or 9876543210"
-                  required
-                />
-                
-                {/* Dynamic Icon */}
-                <div className="absolute left-4 top-1/2 transform -translate-y-1/2">
-                  {inputType === 'email' ? (
-                    <svg className="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 12a4 4 0 10-8 0 4 4 0 018 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
-                    </svg>
-                  ) : inputType === 'phone' ? (
-                    <svg className="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                    </svg>
-                  ) : (
-                    <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                    </svg>
-                  )}
+        <form onSubmit={handleSubmit}>
+          {/* Email/Phone Input */}
+          <div style={{ marginBottom: '2rem' }}>
+            <label style={{
+              display: 'block',
+              marginBottom: '0.75rem',
+              color: '#333',
+              fontWeight: '600',
+              fontSize: '1rem'
+            }}>
+              Email or Phone Number
+            </label>
+            <div style={{ position: 'relative' }}>
+              <span style={{
+                position: 'absolute',
+                left: '1rem',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                fontSize: '1.2rem',
+                zIndex: 1
+              }}>
+                {getInputIcon()}
+              </span>
+              <input
+                type="text"
+                name="emailOrPhone"
+                value={formData.emailOrPhone}
+                onChange={handleChange}
+                required
+                placeholder={getPlaceholder()}
+                style={{
+                  width: '100%',
+                  padding: '1rem 1rem 1rem 3rem',
+                  border: `2px solid ${inputType === 'email' ? '#28a745' : inputType === 'phone' ? '#007bff' : '#ddd'}`,
+                  borderRadius: '12px',
+                  fontSize: '1.1rem',
+                  transition: 'all 0.3s ease',
+                  outline: 'none',
+                  background: 'rgba(248, 249, 250, 0.8)',
+                  backdropFilter: 'blur(10px)'
+                }}
+                onFocus={(e) => {
+                  e.target.style.borderColor = '#ff6b35';
+                  e.target.style.background = '#fff';
+                  e.target.style.transform = 'translateY(-2px)';
+                  e.target.style.boxShadow = '0 8px 25px rgba(255, 107, 53, 0.15)';
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = inputType === 'email' ? '#28a745' : inputType === 'phone' ? '#007bff' : '#ddd';
+                  e.target.style.background = 'rgba(248, 249, 250, 0.8)';
+                  e.target.style.transform = 'translateY(0)';
+                  e.target.style.boxShadow = 'none';
+                }}
+              />
+              {/* Input type indicator */}
+              {inputType && (
+                <div style={{
+                  position: 'absolute',
+                  right: '1rem',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  background: inputType === 'email' ? '#28a745' : '#007bff',
+                  color: 'white',
+                  padding: '0.25rem 0.5rem',
+                  borderRadius: '8px',
+                  fontSize: '0.75rem',
+                  fontWeight: '600',
+                  animation: 'fadeIn 0.3s ease-out'
+                }}>
+                  {inputType === 'email' ? 'EMAIL' : 'PHONE'}
                 </div>
-
-                {/* Input Type Indicator */}
-                {inputType && (
-                  <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
-                    <span className={`text-xs px-2 py-1 rounded-full font-medium ${
-                      inputType === 'email' 
-                        ? 'bg-blue-100 text-blue-700' 
-                        : 'bg-green-100 text-green-700'
-                    }`}>
-                      {inputType === 'email' ? '📧 Email' : '📱 Phone'}
-                    </span>
-                  </div>
-                )}
-              </div>
-              
-              <div className="mt-2 flex items-center text-xs text-gray-500">
-                <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-                </svg>
-                Use either your email address or phone number
-              </div>
-            </div>
-
-            {/* Password Input */}
-            <div>
-              <label className="block text-gray-700 text-sm font-semibold mb-2">
-                Password
-              </label>
-              <div className="relative">
-                <input
-                  type="password"
-                  name="password"
-                  value={form.password}
-                  onChange={handleChange}
-                  className="w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-300"
-                  placeholder="Enter your password"
-                  required
-                />
-                <div className="absolute left-4 top-1/2 transform -translate-y-1/2">
-                  <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                  </svg>
-                </div>
-              </div>
-            </div>
-
-            {/* Submit Button */}
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 disabled:from-orange-400 disabled:to-red-400 text-white font-bold py-3 px-6 rounded-lg transition-all duration-300 flex items-center justify-center shadow-lg hover:shadow-xl transform hover:scale-[1.02] disabled:transform-none"
-            >
-              {loading ? (
-                <>
-                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  Signing In...
-                </>
-              ) : (
-                <>
-                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
-                  </svg>
-                  Login
-                </>
               )}
-            </button>
-
-            {/* Sign Up Link */}
-            <div className="text-center pt-4 border-t border-gray-200">
-              <span className="text-gray-600 text-sm">Don't have an account? </span>
-              <Link 
-                to="/signup" 
-                className="text-orange-600 hover:text-orange-700 font-semibold text-sm transition-colors hover:underline"
-              >
-                Sign up
-              </Link>
             </div>
-          </form>
-        </div>
+            {/* Helper text */}
+            <p style={{
+              fontSize: '0.85rem',
+              color: '#666',
+              marginTop: '0.5rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem'
+            }}>
+              💡 You can use email or phone number (with or without country code)
+            </p>
+          </div>
+
+          {/* Password Input */}
+          <div style={{ marginBottom: '2rem' }}>
+            <label style={{
+              display: 'block',
+              marginBottom: '0.75rem',
+              color: '#333',
+              fontWeight: '600',
+              fontSize: '1rem'
+            }}>Password</label>
+            <div style={{ position: 'relative' }}>
+              <span style={{
+                position: 'absolute',
+                left: '1rem',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                fontSize: '1.2rem',
+                zIndex: 1
+              }}>
+                🔒
+              </span>
+              <input
+                type={showPassword ? 'text' : 'password'}
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                required
+                placeholder="Enter your password"
+                style={{
+                  width: '100%',
+                  padding: '1rem 3.5rem 1rem 3rem',
+                  border: '2px solid #ddd',
+                  borderRadius: '12px',
+                  fontSize: '1.1rem',
+                  transition: 'all 0.3s ease',
+                  outline: 'none',
+                  background: 'rgba(248, 249, 250, 0.8)',
+                  backdropFilter: 'blur(10px)'
+                }}
+                onFocus={(e) => {
+                  e.target.style.borderColor = '#ff6b35';
+                  e.target.style.background = '#fff';
+                  e.target.style.transform = 'translateY(-2px)';
+                  e.target.style.boxShadow = '0 8px 25px rgba(255, 107, 53, 0.15)';
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = '#ddd';
+                  e.target.style.background = 'rgba(248, 249, 250, 0.8)';
+                  e.target.style.transform = 'translateY(0)';
+                  e.target.style.boxShadow = 'none';
+                }}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                style={{
+                  position: 'absolute',
+                  right: '1rem',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  background: 'none',
+                  border: 'none',
+                  fontSize: '1.2rem',
+                  cursor: 'pointer',
+                  color: '#666',
+                  transition: 'all 0.3s',
+                  padding: '0.25rem'
+                }}
+                onMouseOver={(e) => e.target.style.color = '#ff6b35'}
+                onMouseOut={(e) => e.target.style.color = '#666'}
+              >
+                {showPassword ? '🙈' : '👁️'}
+              </button>
+            </div>
+          </div>
+
+          {/* Submit Button */}
+          <button
+            type="submit"
+            disabled={loading}
+            style={{
+              width: '100%',
+              padding: '1rem',
+              background: loading ? 
+                'linear-gradient(135deg, #ccc, #999)' : 
+                'linear-gradient(135deg, #ff6b35, #f7931e)',
+              color: 'white',
+              border: 'none',
+              borderRadius: '12px',
+              fontSize: '1.2rem',
+              fontWeight: '700',
+              cursor: loading ? 'not-allowed' : 'pointer',
+              transition: 'all 0.3s ease',
+              boxShadow: loading ? 'none' : '0 8px 25px rgba(255, 107, 53, 0.3)',
+              transform: loading ? 'none' : 'translateY(0)',
+              position: 'relative',
+              overflow: 'hidden'
+            }}
+            onMouseOver={(e) => {
+              if (!loading) {
+                e.target.style.transform = 'translateY(-3px)';
+                e.target.style.boxShadow = '0 12px 35px rgba(255, 107, 53, 0.4)';
+              }
+            }}
+            onMouseOut={(e) => {
+              if (!loading) {
+                e.target.style.transform = 'translateY(0)';
+                e.target.style.boxShadow = '0 8px 25px rgba(255, 107, 53, 0.3)';
+              }
+            }}
+          >
+            {loading ? (
+              <span style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center',
+                gap: '0.5rem'
+              }}>
+                <span style={{ 
+                  animation: 'spin 1s linear infinite',
+                  display: 'inline-block'
+                }}>⟳</span>
+                Signing In...
+              </span>
+            ) : (
+              <span style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center',
+                gap: '0.5rem'
+              }}>
+                <span>🚀</span>
+                Sign In
+              </span>
+            )}
+          </button>
+        </form>
 
         {/* Footer */}
-        <div className="text-center mt-6 text-sm text-gray-500">
-          <p>© 2024 RaysVeda. Your spiritual journey begins here.</p>
+        <div style={{
+          textAlign: 'center',
+          marginTop: '2rem',
+          padding: '1.5rem 0',
+          borderTop: '1px solid #e9ecef'
+        }}>
+          <p style={{
+            color: '#666',
+            fontSize: '1rem',
+            margin: '0 0 1rem 0'
+          }}>
+            Don't have an account?
+          </p>
+          <button
+            onClick={() => navigate('/signup')}
+            style={{
+              background: 'transparent',
+              border: '2px solid #ff6b35',
+              color: '#ff6b35',
+              padding: '0.75rem 2rem',
+              borderRadius: '25px',
+              fontSize: '1rem',
+              fontWeight: '600',
+              cursor: 'pointer',
+              transition: 'all 0.3s ease'
+            }}
+            onMouseOver={(e) => {
+              e.target.style.background = '#ff6b35';
+              e.target.style.color = 'white';
+              e.target.style.transform = 'translateY(-2px)';
+            }}
+            onMouseOut={(e) => {
+              e.target.style.background = 'transparent';
+              e.target.style.color = '#ff6b35';
+              e.target.style.transform = 'translateY(0)';
+            }}
+          >
+            Create Account
+          </button>
         </div>
       </div>
+
+      {/* Animations */}
+      <style>{`
+        @keyframes float {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-20px); }
+        }
+        @keyframes shimmer {
+          0% { background-position: -200% 0; }
+          100% { background-position: 200% 0; }
+        }
+        @keyframes bounce {
+          0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+          40% { transform: translateY(-10px); }
+          60% { transform: translateY(-5px); }
+        }
+        @keyframes slideIn {
+          from { opacity: 0; transform: translateY(-10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        @keyframes spin {
+          100% { transform: rotate(360deg); }
+        }
+      `}</style>
     </div>
   );
-}
+};
+
+export default LoginForm;

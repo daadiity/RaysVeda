@@ -18,8 +18,8 @@ export default function BookPoojaForm({ selectedPuja, onClose }) {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
 
-  // Configure axios defaults
-  axios.defaults.baseURL = 'http://localhost:5000';
+  // FIXED: Configure axios defaults to use backend port
+  axios.defaults.baseURL = 'http://localhost:3000'; // Changed from 5173 to 3000
   axios.defaults.withCredentials = true;
 
   // Auto-fill form when selectedPuja is provided
@@ -69,12 +69,10 @@ export default function BookPoojaForm({ selectedPuja, onClose }) {
       return;
     }
 
-    // Get the amount from selectedPuja or use default
     const amount = selectedPuja ? selectedPuja.amount : 1101;
     const formattedTime = formatTime(form.time);
 
     try {
-      // Get token from localStorage
       const token = localStorage.getItem('token');
       
       if (!token) {
@@ -83,17 +81,24 @@ export default function BookPoojaForm({ selectedPuja, onClose }) {
         return;
       }
 
-      console.log('Sending booking request with data:', {
-        ...form,
-        time: formattedTime,
-        amount: amount,
-      });
+      // FIXED: Map form fields correctly to match backend expectations
+      const bookingData = {
+        user: user._id || user.id, // Add user ID to link booking
+        name: form.name,
+        gotra: form.gotra,
+        address: form.address,
+        phone: form.phone,
+        email: form.email,
+        poojaType: form.poojaType,
+        date: form.date,           // Backend expects 'date', not 'preferredDate'
+        time: formattedTime,       // Backend expects 'time', not 'preferredTime'
+        amount: amount
+      };
 
-      const res = await axios.post("/api/book-pooja", {
-        ...form,
-        time: formattedTime,
-        amount: amount,
-      }, {
+      console.log('Sending booking request with data:', bookingData);
+
+      // FIXED: Use the correct endpoint that matches your backend routes
+      const res = await axios.post("/api/pooja/book", bookingData, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -103,11 +108,11 @@ export default function BookPoojaForm({ selectedPuja, onClose }) {
       console.log('Booking response:', res.data);
 
       if (res.data.success) {
-        const { orderId, currency, key } = res.data;
+        const { orderId, currency, key } = res.data; // Use the structure from your backend
 
         const options = {
           key,
-          amount: amount * 100, // Convert to paise
+          amount: amount * 100,
           currency,
           name: "RaysVeda",
           description: `Booking for ${form.poojaType}`,
@@ -126,6 +131,7 @@ export default function BookPoojaForm({ selectedPuja, onClose }) {
           },
           notes: {
             poojaType: form.poojaType,
+            name: form.name,
             gotra: form.gotra,
             address: form.address,
             date: form.date,
