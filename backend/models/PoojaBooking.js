@@ -1,7 +1,11 @@
 const mongoose = require('mongoose');
 
 const poojaBookingSchema = new mongoose.Schema({
-  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  user: { 
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: 'User', 
+    required: false  // Changed from true to false to allow bookings without user
+  },
   name: { type: String, required: true },
   gotra: { type: String },
   address: { type: String, required: true },

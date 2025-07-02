@@ -1,140 +1,350 @@
-import React from 'react';
-
-const fontFamily = "'Poppins', 'Merriweather', serif";
-const orangeGradient = 'linear-gradient(to right, #ff9800, #f26522)';
-const cardBg = 'rgba(255, 255, 255, 0.95)';
-const orange = '#f26522';
-const borderRadius = '1.5rem';
+import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import { useAuth } from '../context/AuthContext';
 
 const HawanPage = () => {
+  const [scrollY, setScrollY] = useState(0);
+  const { user } = useAuth();
+
+  // Handle scroll for animations
+  useEffect(() => {
+    const handleScroll = () => setScrollY(window.scrollY);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   return (
-    <div style={{ background: '#fff7ea', fontFamily }}>
-      {/* Gradient Header */}
-      <div
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-amber-50 dark:from-gray-900 dark:to-gray-800">
+      {/* Hero Section */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
+        className="relative overflow-hidden bg-gradient-to-r from-orange-500 to-amber-600 dark:from-orange-600 dark:to-amber-700"
         style={{
-          background: orangeGradient,
-          padding: '3rem 1rem',
-          borderBottomLeftRadius: '120px 40px',
-          borderBottomRightRadius: '120px 40px',
-          textAlign: 'center',
-          color: 'white',
+          background: 'linear-gradient(135deg, #ff6b35 0%, #f7931e 100%)',
+          clipPath: 'ellipse(100% 100% at 50% 0%)'
         }}
       >
-        <h1 style={{ fontSize: '2.5rem', fontWeight: 'bold' }}>Hawan: The Sacred Fire Ritual</h1>
-        <p style={{ maxWidth: '800px', margin: '1rem auto', fontSize: '1.1rem' }}>
-          Hawan (or Homa/Yajna) is a powerful Vedic fire ritual performed in Hindu traditions to invoke divine blessings,
-          purify the surroundings, and spiritually uplift the participants.
-        </p>
-      </div>
+        <div className="absolute inset-0 bg-black opacity-10"></div>
+        <div className="relative container mx-auto px-4 py-20 text-center text-white">
+          <motion.div
+            initial={{ scale: 0.5, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ delay: 0.3, duration: 0.6 }}
+            className="mb-6"
+          >
+            <span className="text-8xl">🔥</span>
+          </motion.div>
+          
+          <motion.h1
+            initial={{ y: 30, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.5, duration: 0.6 }}
+            className="text-5xl md:text-6xl font-bold mb-6 text-shadow-lg"
+            style={{ fontFamily: "'Poppins', sans-serif" }}
+          >
+            Sacred Hawan Rituals
+          </motion.h1>
+          
+          <motion.p
+            initial={{ y: 30, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.7, duration: 0.6 }}
+            className="text-xl md:text-2xl max-w-3xl mx-auto leading-relaxed opacity-90"
+          >
+            Experience the divine power of Vedic fire ceremonies for purification, 
+            blessings, and spiritual transformation
+          </motion.p>
 
-      {/* Content */}
-      <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '3rem 1.2rem' }}>
-        <div
-          style={{
-            background: cardBg,
-            borderRadius,
-            border: `2px solid ${orange}`,
-            padding: '2rem',
-            boxShadow: '0 0 24px rgba(0,0,0,0.1)',
-            lineHeight: '1.7',
-          }}
-        >
-          <h2 style={{ color: orange, marginBottom: '1rem' }}>🛕 What is Hawan?</h2>
-          <p>
-            Hawan is an ancient Vedic ritual involving fire offerings to the deities through the medium of Agni (fire).
-            It is symbolic of purification, devotion, and transformation. The sacred fire is believed to act as a conduit between the earthly realm and the divine.
-          </p>
-
-          <img
-            src="https://sanity-admin.rudraksha-ratna.com/static/images/blogs/havan%2Bkund.jpg"
-            alt="Havan Kund"
-            style={{
-              width: '100%',
-              borderRadius: '1rem',
-              margin: '2rem 0',
-              maxHeight: '380px',
-              objectFit: 'cover',
-              boxShadow: '0 4px 14px rgba(0,0,0,0.1)',
-            }}
-          />
-
-          <h2 style={{ color: orange, margin: '2rem 0 1rem' }}>📋 Purpose and Symbolism</h2>
-          <ul style={{ paddingLeft: '1.2rem' }}>
-            <li>✨ Purifies body, mind, and environment</li>
-            <li>✨ Connects with divine through mantra and Agni</li>
-            <li>✨ Represents surrender, transformation, and inner cleansing</li>
-            <li>✨ Restores harmony in home and nature</li>
-          </ul>
-
-          <h2 style={{ color: orange, margin: '2rem 0 1rem' }}>🙏 Types of Hawan</h2>
-          <ul style={{ paddingLeft: '1.2rem' }}>
-            <li>🔹 <strong>Griha Pravesh Havan</strong>: For new home blessings</li>
-            <li>🔹 <strong>Navagraha Havan</strong>: Planetary alignment and peace</li>
-            <li>🔹 <strong>Rudra Havan</strong>: Appeasing Lord Shiva</li>
-            <li>🔹 <strong>Mahamrityunjaya Havan</strong>: Health and protection</li>
-          </ul>
-
-          <img
-            src="https://rgyan-flutter200503-dev.s3.ap-south-1.amazonaws.com/web/pg/eblogs/2017/11/4.jpg"
-            alt="Hawan Ceremony"
-            style={{
-              width: '100%',
-              borderRadius: '1rem',
-              margin: '2rem 0',
-              maxHeight: '380px',
-              objectFit: 'cover',
-              boxShadow: '0 4px 14px rgba(0,0,0,0.1)',
-            }}
-          />
-
-          <h2 style={{ color: orange, margin: '2rem 0 1rem' }}>🛠 Setup and Ingredients</h2>
-          <ul style={{ paddingLeft: '1.2rem' }}>
-            <li>🔸 Havan Kund (brick or copper altar)</li>
-            <li>🔸 Pure Ghee, mango wood, dry cow dung cakes</li>
-            <li>🔸 Samagri (fragrant herbs, flowers, seeds)</li>
-            <li>🔸 Mantra texts or priest for recitation</li>
-          </ul>
-
-          <h2 style={{ color: orange, margin: '2rem 0 1rem' }}>📖 Steps to Perform Hawan</h2>
-          <ol style={{ paddingLeft: '1.5rem' }}>
-            <li>🪔 Sankalp – Setting the spiritual intention</li>
-            <li>🪔 Ganesh Pujan – Removing obstacles</li>
-            <li>🪔 Agni Sthapan – Igniting the sacred fire</li>
-            <li>🪔 Ahuti – Offering samagri while chanting mantras</li>
-            <li>🪔 Purnahuti – Final offering symbolizing completion</li>
-            <li>🪔 Aarti and Shanti Mantra – Seeking peace and blessings</li>
-            <li>🪔 Prasad distribution – Sharing sanctified offerings</li>
-          </ol>
-
-          <h2 style={{ color: orange, margin: '2rem 0 1rem' }}>🌟 Benefits of Hawan</h2>
-          <ul style={{ paddingLeft: '1.2rem' }}>
-            <li>✔ Detoxifies air and body through herbal smoke</li>
-            <li>✔ Enhances focus and positive vibrations</li>
-            <li>✔ Invokes divine blessings for peace, prosperity, and health</li>
-            <li>✔ Elevates the energy of the home and its people</li>
-          </ul>
-
-          <h2 style={{ color: orange, margin: '2rem 0 1rem' }}>🔬 Scientific Relevance</h2>
-          <p>
-            Modern studies suggest that Hawan smoke contains antibacterial properties that purify the atmosphere.
-            The ritual enhances mindfulness, reduces stress, and aligns brain waves through mantra vibrations.
-          </p>
-
-          <h2 style={{ color: orange, margin: '2rem 0 1rem' }}>🎉 When is Hawan Performed?</h2>
-          <ul style={{ paddingLeft: '1.2rem' }}>
-            <li>🗓 During festivals like Navratri, Diwali, and Shivratri</li>
-            <li>🎂 On birthdays, anniversaries, or after childbirth</li>
-            <li>🏡 At housewarming, marriage, or business openings</li>
-            <li>🌅 As a daily ritual for spiritual discipline (Agnihotra)</li>
-          </ul>
+          <motion.div
+            initial={{ y: 30, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.9, duration: 0.6 }}
+            className="mt-8"
+          >
+            <button className="bg-white text-orange-600 px-8 py-4 rounded-full font-semibold text-lg hover:bg-orange-50 transition-all duration-300 transform hover:scale-105 shadow-xl">
+              🙏 Book Hawan Ceremony
+            </button>
+          </motion.div>
         </div>
-      </div>
+      </motion.div>
 
-      {/* Font Import */}
-      <link
-        href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Merriweather:wght@400;700&display=swap"
-        rel="stylesheet"
-      />
+      {/* What is Hawan Section */}
+      <motion.section
+        initial={{ opacity: 0, y: 50 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
+        viewport={{ once: true }}
+        className="container mx-auto px-4 py-16"
+      >
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl font-bold text-gray-800 dark:text-white mb-4">
+              🛕 What is Hawan?
+            </h2>
+            <div className="w-24 h-1 bg-gradient-to-r from-orange-500 to-amber-500 mx-auto rounded-full"></div>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+            <motion.div
+              initial={{ x: -50, opacity: 0 }}
+              whileInView={{ x: 0, opacity: 1 }}
+              transition={{ duration: 0.6 }}
+              viewport={{ once: true }}
+            >
+              <div className="bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-2xl border border-orange-100 dark:border-gray-700">
+                <p className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
+                  Hawan is an ancient Vedic ritual involving fire offerings to the deities through 
+                  the medium of Agni (fire). It is symbolic of purification, devotion, and transformation. 
+                  The sacred fire is believed to act as a conduit between the earthly realm and the divine.
+                </p>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  {[
+                    { emoji: '✨', text: 'Purification' },
+                    { emoji: '🙏', text: 'Divine Connection' },
+                    { emoji: '🔄', text: 'Transformation' },
+                    { emoji: '☮️', text: 'Inner Peace' }
+                  ].map((item, index) => (
+                    <div key={index} className="flex items-center space-x-2 p-3 bg-orange-50 dark:bg-gray-700 rounded-xl">
+                      <span className="text-2xl">{item.emoji}</span>
+                      <span className="font-medium text-gray-700 dark:text-gray-300">{item.text}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ x: 50, opacity: 0 }}
+              whileInView={{ x: 0, opacity: 1 }}
+              transition={{ duration: 0.6 }}
+              viewport={{ once: true }}
+              className="relative"
+            >
+              <img
+                src="https://sanity-admin.rudraksha-ratna.com/static/images/blogs/havan%2Bkund.jpg"
+                alt="Sacred Havan Kund"
+                className="w-full h-96 object-cover rounded-3xl shadow-2xl"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-3xl"></div>
+            </motion.div>
+          </div>
+        </div>
+      </motion.section>
+
+      {/* Types of Hawan */}
+      <section className="bg-gradient-to-r from-orange-100 to-amber-100 dark:from-gray-800 dark:to-gray-700 py-16">
+        <div className="container mx-auto px-4">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            viewport={{ once: true }}
+            className="text-center mb-12"
+          >
+            <h2 className="text-4xl font-bold text-gray-800 dark:text-white mb-4">
+              🙏 Types of Sacred Hawan
+            </h2>
+            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+              Each type of Hawan serves a specific purpose and brings unique blessings
+            </p>
+          </motion.div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-7xl mx-auto">
+            {[
+              {
+                title: 'Griha Pravesh Havan',
+                emoji: '🏠',
+                description: 'Blessing new homes with positive energy and divine protection',
+                color: 'from-blue-500 to-blue-600'
+              },
+              {
+                title: 'Navagraha Havan',
+                emoji: '🌟',
+                description: 'Planetary alignment for peace and cosmic harmony',
+                color: 'from-purple-500 to-purple-600'
+              },
+              {
+                title: 'Rudra Havan',
+                emoji: '🕉️',
+                description: 'Appeasing Lord Shiva for strength and spiritual growth',
+                color: 'from-green-500 to-green-600'
+              },
+              {
+                title: 'Mahamrityunjaya',
+                emoji: '💪',
+                description: 'Health, protection, and victory over obstacles',
+                color: 'from-red-500 to-red-600'
+              }
+            ].map((type, index) => (
+              <motion.div
+                key={index}
+                initial={{ y: 50, opacity: 0 }}
+                whileInView={{ y: 0, opacity: 1 }}
+                transition={{ delay: index * 0.1, duration: 0.6 }}
+                viewport={{ once: true }}
+                whileHover={{ scale: 1.05, rotate: 1 }}
+                className="bg-white dark:bg-gray-800 rounded-3xl p-6 shadow-xl hover:shadow-2xl transition-all duration-300 cursor-pointer border border-orange-100 dark:border-gray-700"
+              >
+                <div className={`w-16 h-16 rounded-full bg-gradient-to-r ${type.color} flex items-center justify-center text-3xl mb-4 mx-auto`}>
+                  {type.emoji}
+                </div>
+                <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-3 text-center">
+                  {type.title}
+                </h3>
+                <p className="text-gray-600 dark:text-gray-300 text-center leading-relaxed">
+                  {type.description}
+                </p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Hawan Process */}
+      <section className="container mx-auto px-4 py-16">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          viewport={{ once: true }}
+          className="text-center mb-12"
+        >
+          <h2 className="text-4xl font-bold text-gray-800 dark:text-white mb-4">
+            📖 Sacred Hawan Process
+          </h2>
+          <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+            Follow the divine steps of this ancient ritual
+          </p>
+        </motion.div>
+
+        <div className="max-w-4xl mx-auto">
+          {[
+            { step: '1', title: 'Sankalp', desc: 'Setting the spiritual intention and purpose', icon: '🎯' },
+            { step: '2', title: 'Ganesh Pujan', desc: 'Removing obstacles and seeking blessings', icon: '🐘' },
+            { step: '3', title: 'Agni Sthapan', desc: 'Igniting the sacred fire with mantras', icon: '🔥' },
+            { step: '4', title: 'Ahuti', desc: 'Offering samagri while chanting sacred mantras', icon: '🌿' },
+            { step: '5', title: 'Purnahuti', desc: 'Final offering symbolizing completion', icon: '🙏' },
+            { step: '6', title: 'Aarti & Prasad', desc: 'Seeking blessings and sharing sanctified offerings', icon: '🪔' }
+          ].map((process, index) => (
+            <motion.div
+              key={index}
+              initial={{ x: index % 2 === 0 ? -50 : 50, opacity: 0 }}
+              whileInView={{ x: 0, opacity: 1 }}
+              transition={{ delay: index * 0.1, duration: 0.6 }}
+              viewport={{ once: true }}
+              className={`flex items-center mb-8 ${index % 2 === 0 ? 'flex-row' : 'flex-row-reverse'}`}
+            >
+              <div className="flex-1">
+                <div className={`bg-white dark:bg-gray-800 rounded-3xl p-6 shadow-xl ${index % 2 === 0 ? 'mr-8' : 'ml-8'}`}>
+                  <div className="flex items-center mb-4">
+                    <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-amber-500 rounded-full flex items-center justify-center text-white font-bold text-xl mr-4">
+                      {process.step}
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-bold text-gray-800 dark:text-white">{process.title}</h3>
+                      <p className="text-gray-600 dark:text-gray-300">{process.desc}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="text-6xl">{process.icon}</div>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
+      {/* Benefits Section */}
+      <section className="bg-gradient-to-r from-orange-500 to-amber-600 py-16 text-white">
+        <div className="container mx-auto px-4">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            viewport={{ once: true }}
+            className="text-center mb-12"
+          >
+            <h2 className="text-4xl font-bold mb-4">🌟 Benefits of Hawan</h2>
+            <p className="text-xl opacity-90 max-w-3xl mx-auto">
+              Experience profound transformation through this sacred practice
+            </p>
+          </motion.div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto">
+            {[
+              { icon: '🌬️', title: 'Air Purification', desc: 'Detoxifies air through herbal smoke' },
+              { icon: '🧘', title: 'Mental Clarity', desc: 'Enhances focus and positive vibrations' },
+              { icon: '🙏', title: 'Divine Blessings', desc: 'Invokes peace, prosperity, and health' },
+              { icon: '⚡', title: 'Energy Elevation', desc: 'Raises the energy of home and people' }
+            ].map((benefit, index) => (
+              <motion.div
+                key={index}
+                initial={{ y: 50, opacity: 0 }}
+                whileInView={{ y: 0, opacity: 1 }}
+                transition={{ delay: index * 0.1, duration: 0.6 }}
+                viewport={{ once: true }}
+                whileHover={{ scale: 1.05 }}
+                className="bg-white/10 backdrop-blur-lg rounded-3xl p-6 text-center hover:bg-white/20 transition-all duration-300"
+              >
+                <div className="text-5xl mb-4">{benefit.icon}</div>
+                <h3 className="text-xl font-bold mb-2">{benefit.title}</h3>
+                <p className="opacity-90">{benefit.desc}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Call to Action */}
+      <section className="container mx-auto px-4 py-16">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          viewport={{ once: true }}
+          className="bg-gradient-to-r from-orange-100 to-amber-100 dark:from-gray-800 dark:to-gray-700 rounded-3xl p-12 text-center max-w-4xl mx-auto"
+        >
+          <div className="text-6xl mb-6">🔥</div>
+          <h2 className="text-3xl font-bold text-gray-800 dark:text-white mb-4">
+            Ready to Experience Sacred Hawan?
+          </h2>
+          <p className="text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-2xl mx-auto">
+            Book your personalized Hawan ceremony with our experienced priests and 
+            invite divine blessings into your life
+          </p>
+          
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="bg-gradient-to-r from-orange-500 to-amber-600 text-white px-8 py-4 rounded-full font-semibold text-lg shadow-xl hover:shadow-2xl transition-all duration-300"
+            >
+              🙏 Book Hawan Now
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="border-2 border-orange-500 text-orange-600 dark:text-orange-400 px-8 py-4 rounded-full font-semibold text-lg hover:bg-orange-50 dark:hover:bg-gray-700 transition-all duration-300"
+            >
+              📞 Consult Priest
+            </motion.button>
+          </div>
+        </motion.div>
+      </section>
+
+      {/* Floating Elements */}
+      <div className="fixed bottom-8 right-8 z-50">
+        <motion.button
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+          className="bg-gradient-to-r from-orange-500 to-amber-600 text-white p-4 rounded-full shadow-2xl hover:shadow-3xl transition-all duration-300"
+          title="Quick Book Hawan"
+        >
+          <span className="text-2xl">🔥</span>
+        </motion.button>
+      </div>
     </div>
   );
 };

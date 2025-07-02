@@ -72,7 +72,7 @@ const HomePage = () => {
       description: "Personalized astrological consultations and guidance for life decisions.",
       image: "https://i.pinimg.com/736x/e7/b0/55/e7b05536587efbcfb2dc52fe7147d4c7.jpg",
       icon: "🔮",
-      link: "/astrology",
+      link: "/services/kundli",
       features: ["Birth Chart Analysis", "Future Predictions", "Remedial Solutions"]
     },
     {
@@ -81,7 +81,7 @@ const HomePage = () => {
       description: "Guided meditation sessions for inner peace and spiritual growth.",
       image: "https://i.pinimg.com/736x/e7/d6/e7/e7d6e7d0fead9db0b91a16a86e2a35b1.jpg",
       icon: "🧘‍♂️",
-      link: "/meditation",
+      link: "/vidya/meditation",
       features: ["Guided Sessions", "Breathing Techniques", "Mindfulness Training"]
     },
     {
@@ -90,7 +90,7 @@ const HomePage = () => {
       description: "Join our spiritual community for support and shared experiences.",
       image: "https://i.pinimg.com/736x/0c/ee/65/0cee65871ca0195397d91131ad9c3e7e.jpg",
       icon: "👥",
-      link: "/community",
+      link: "/about",
       features: ["Spiritual Groups", "Events & Workshops", "Online Forums"]
     }
   ]
@@ -198,9 +198,9 @@ const HomePage = () => {
       setTimeout(() => setShowLoginMsg(false), 3000)
       return
     }
-    // If user is logged in, redirect to puja page or open booking form
-    // You can either navigate to puja page or open a booking modal
-    navigate('/pujas') // or implement booking logic here
+    // CHANGED: Instead of navigating, set selected puja and show booking form
+    setSelectedPuja(puja)
+    setShowBooking(true)
   }
 
   return (
