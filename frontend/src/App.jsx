@@ -15,9 +15,10 @@ import AboutPage from './pages/AboutPage';
 import ContactPage from './pages/ContactPage';
 
 
-import KundliIntroPage from './pages/KundliIntroPage';
-import KundliFormPage from './pages/KundliFormPage';
-import KundliResultPage from './pages/KundliResultPage';
+import VastuPage from "./pages/VastuPage";
+import KundliPage from "./pages/KundliPage";
+import HawanPage from "./pages/HawanPage";
+import BlogPage from "./pages/BlogPage";
 
 import Vedas from './pages/Vedas';
 import SacredMantras from './pages/SacredMantras';
