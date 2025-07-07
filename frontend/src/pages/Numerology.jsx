@@ -5,8 +5,10 @@ const Numerology = () => {
 
 
 
+
   const [formVisible, setFormVisible] = useState(false);
   const [formType, setFormType] = useState('');
+
 
 
   const [formData, setFormData] = useState({
@@ -16,6 +18,7 @@ const Numerology = () => {
     serviceType: 'Life Path Analysis',
     message: '',
   });
+
   const [geminiResponse, setGeminiResponse] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -27,11 +30,13 @@ const Numerology = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+
     setLoading(true);
     setGeminiResponse('');
     try {
       const response = await axios.post('http://localhost:3000/api/numerology', formData);
       setGeminiResponse(response.data.data);
+
       setFormData({
         name: '',
         birthDate: '',
@@ -40,18 +45,22 @@ const Numerology = () => {
         message: '',
       });
 
+      setFormVisible(false); // Hide the form after submission
     } catch (error) {
       console.error('Error submitting request:', error);
       alert('Failed to generate numerology reading.');
     } finally {
       setLoading(false);
 
+
     }
   };
 
   return (
     <div className="bg-orange-50 min-h-screen">
+
       {/* Hero */}
+
 
       <section className="relative h-[60vh] overflow-hidden">
         <div className="absolute inset-0">
@@ -72,6 +81,7 @@ const Numerology = () => {
         </div>
       </section>
 
+
       {/* About */}
       <section className="py-16 bg-white">
         <div className="container mx-auto px-4">
@@ -82,6 +92,7 @@ const Numerology = () => {
             and future opportunities.
 
             It is a powerful tool for self-discovery and personal growth, helping you understand your strengths,
+
 
           </p>
         </div>
@@ -96,7 +107,6 @@ const Numerology = () => {
             Our Numerology Services
           </h2>
           <div className="grid md:grid-cols-3 gap-8">
-
 
             <div className="bg-white p-6 rounded-lg shadow-lg">
               <h3 className="text-xl font-bold text-gray-800 mb-4">Life Path Analysis</h3>
@@ -117,10 +127,10 @@ const Numerology = () => {
               </p>
             </div>
 
-
           </div>
         </div>
       </section>
+
 
 
       {/* CTA */}
@@ -131,6 +141,7 @@ const Numerology = () => {
           <p className="text-lg mb-8">
             Unlock the secrets of your destiny with our expert numerologists.
           </p>
+
 
 
           <div className="flex justify-center gap-4 flex-wrap">
@@ -224,7 +235,7 @@ const Numerology = () => {
                 </div>
               </form>
             ) : (
-              
+
               <div className="mt-6">
                 <h3 className="text-xl font-bold text-orange-600 mb-2">Your Numerology Reading</h3>
                 <div className="max-h-64 overflow-y-auto bg-white border border-orange-300 rounded-md shadow-inner p-4 space-y-3">
@@ -235,10 +246,11 @@ const Numerology = () => {
                     ))}
                 </div>
               </div>
-              
+
             )}
           </div>
         </div>
+
 
       )}
     </div>

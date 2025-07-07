@@ -311,13 +311,13 @@ const DonatePage = () => {
                   <button className="w-full px-4 py-3 bg-gradient-to-r from-orange-600 to-amber-600 text-white rounded-xl hover:from-orange-700 hover:to-amber-700 transition-all duration-300 font-bold shadow-lg hover:shadow-xl transform hover:scale-105">
                     🎯 Donate Now
                   </button>
+
                 </div>
               </motion.div>
             ))}
           </div>
         </div>
       </section>
-
       {/* Ritual Donations Section */}
       <section ref={ritualRef} className="py-20 px-4 bg-gradient-to-br from-orange-50 to-amber-50">
         <div className="max-w-7xl mx-auto">
@@ -610,3 +610,4 @@ const DonatePage = () => {
 }
 
 export default DonatePage
+

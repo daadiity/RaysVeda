@@ -1,9 +1,5 @@
 const express = require('express');
 const router = express.Router();
-
-
-
-
 // @route   POST /api/numerology
 // @desc    Create a new numerology request
 const { GoogleGenerativeAI } = require('@google/generative-ai');
@@ -37,6 +33,7 @@ Give a detailed numerology reading in simple language.IN less tha 50 words.also 
   } catch (error) {
     console.error('Gemini API error:', error);
     res.status(500).json({ success: false, error: 'Gemini API failed.' });
+
 
   }
 });

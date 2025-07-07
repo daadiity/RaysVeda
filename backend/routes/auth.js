@@ -35,7 +35,7 @@ router.post('/login', async (req, res) => {
       user = await User.findOne({ email: emailOrPhone }).select('+password');
     } else {
       console.log('🔍 Searching by phone:', emailOrPhone);
-      
+
       const phoneVariations = [
         emailOrPhone,
         emailOrPhone.startsWith('+91') ? emailOrPhone : `+91${emailOrPhone}`,
@@ -49,10 +49,65 @@ router.post('/login', async (req, res) => {
 
       console.log('📱 Phone variations:', phoneVariations);
       // IMPORTANT: Explicitly select password field
-      user = await User.findOne({ 
-        phone: { $in: phoneVariations } 
+      user = await User.findOne({
+        phone: { $in: phoneVariations }
       }).select('+password');
     }
+
+
+    // Build query to find user by email OR phone
+    let userQuery = {};
+    let identifier = '';
+
+    if (email) {
+      // Validate email format
+      if (!email.includes('@')) {
+        return res.status(400).json({
+          success: false,
+          message: 'Please provide a valid email address'
+        });
+      }
+      const normalizedEmail = email.trim().toLowerCase();
+
+      // Try multiple email queries to handle different storage formats
+      userQuery = {
+        $or: [
+          { email: normalizedEmail },
+          { email: email.trim() }, // Original case
+          { email: email.toLowerCase() }, // Just lowercase
+          { email: email } // Exact match
+        ]
+      };
+      identifier = normalizedEmail;
+      console.log('Looking for user with email variations:', normalizedEmail);
+    } else if (phone) {
+      // Validate and normalize phone
+      const cleanPhone = phone.replace(/\D/g, ''); // Remove non-digits
+      if (cleanPhone.length < 10) {
+        return res.status(400).json({
+          success: false,
+          message: 'Please provide a valid phone number'
+        });
+      }
+
+      // Try multiple phone formats
+      userQuery = {
+        $or: [
+          { phone: cleanPhone },
+          { phone: phone.trim() },
+          { phone: phone }
+        ]
+      };
+      identifier = cleanPhone;
+      console.log('Looking for user with phone variations:', cleanPhone);
+    }
+
+    // Check if user exists
+    // const user = await User.findOne(userQuery);
+    const user = await User.findOne(userQuery).select("+password");
+
+    console.log('User query:', JSON.stringify(userQuery));
+    console.log('User found:', user ? `Yes (${user.email})` : 'No');
 
 
     if (!user) {
@@ -92,7 +147,7 @@ router.post('/login', async (req, res) => {
     console.log('✅ Password validated');
 
     const token = jwt.sign(
-      { 
+      {
         userId: user._id,
         email: user.email,
         role: user.role || 'user'
