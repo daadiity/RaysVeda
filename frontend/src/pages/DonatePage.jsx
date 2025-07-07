@@ -65,7 +65,7 @@ const DonatePage = () => {
       title: 'Gau Mata Food Donation',
       description: 'Provide nutritious fodder and food to sacred cows in need across various gaushalas',
       impact: '₹501 can feed 10 cows for a day',
-      image: 'https://images.unsplash.com/photo-1560114928-40f1f1eb26a0?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80',
+      image: 'https://i.pinimg.com/736x/cf/e5/85/cfe585936d97e24e86840d9042f71f5a.jpg',
       raised: 80,
       goal: 800000,
       icon: '🐄', // Using emoji instead of FaCow
@@ -77,7 +77,7 @@ const DonatePage = () => {
       title: 'Cow Shelter & Protection',
       description: 'Support shelter construction and maintenance for abandoned and injured cows',
       impact: '₹5001 can shelter and care for a cow for a month',
-      image: 'https://images.unsplash.com/photo-1516467508483-a7212febe31a?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80',
+      image: 'https://i.pinimg.com/736x/cf/3f/80/cf3f80890f3fac103b19ccd05debd059.jpg',
       raised: 55,
       goal: 1200000,
       icon: '🏠',
@@ -89,7 +89,7 @@ const DonatePage = () => {
       title: 'Cow Medical Treatment',
       description: 'Emergency medical care and treatment for sick and injured sacred cows',
       impact: '₹2001 can provide medical treatment for 3 cows',
-      image: 'https://images.unsplash.com/photo-1605627079748-36be8f8e8dc1?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80',
+      image: 'https://i.pinimg.com/736x/fd/a0/d5/fda0d531dce93c8e68561116a5522520.jpg',
       raised: 40,
       goal: 600000,
       icon: '💊',
@@ -104,7 +104,7 @@ const DonatePage = () => {
       title: 'Daily Temple Aarti',
       description: 'Sponsor daily aarti and prayers at our sacred temple for divine blessings',
       amount: 1001,
-      image: 'https://images.unsplash.com/photo-1516467508483-a7212febe31a?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
+      image: 'https://i.pinimg.com/736x/e3/87/a7/e387a7afdf04e6d7d45f043004a414c0.jpg',
       benefits: ['Daily prayers in your name', 'Spiritual blessings', 'Divine protection'],
       icon: '🪔'
     },
@@ -113,7 +113,7 @@ const DonatePage = () => {
       title: 'Prasadam Distribution',
       description: 'Sponsor prasadam distribution to devotees and community members',
       amount: 2501,
-      image: 'https://images.unsplash.com/photo-1581833971358-2c8b550f87b3?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
+      image: 'https://i.pinimg.com/736x/75/61/76/756176f084852845710b7d093d45abe4.jpg',
       benefits: ['Blessed prasadam distribution', 'Community service', 'Spiritual merit'],
       icon: '🍯'
     },
@@ -122,7 +122,7 @@ const DonatePage = () => {
       title: 'Special Puja Sponsorship',
       description: 'Sponsor special pujas and ceremonies for specific intentions and blessings',
       amount: 5001,
-      image: 'https://images.unsplash.com/photo-1596785419491-1c9cd1aa2b86?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
+      image: 'https://i.pinimg.com/736x/50/5b/c6/505bc6ed30fa193b23414bf36fc4653a.jpg',
       benefits: ['Customized puja ritual', 'Personalized prayers', 'Sacred offerings'],
       icon: '🕉️'
     },

@@ -5,6 +5,15 @@ import { useAuth } from "../context/AuthContext";
 export default function BookPoojaForm({ selectedPuja, onClose }) {
   const { user } = useAuth();
 
+  // ADD DEBUG LOGGING
+  console.log('🔍 BookPoojaForm Debug:', {
+    user: user,
+    hasUser: !!user,
+    userId: user?._id,
+    userAltId: user?.id,
+    token: !!localStorage.getItem('token')
+  });
+
   const [form, setForm] = useState({
     name: "",
     gotra: "",
@@ -63,11 +72,22 @@ export default function BookPoojaForm({ selectedPuja, onClose }) {
     setMessage("");
     setLoading(true);
 
-    if (!user || !user._id) {
+    // IMPROVED USER CHECK - Check for both _id and id properties
+    if (!user || (!user._id && !user.id)) {
       setMessage("You must be logged in to book a pooja.");
       setLoading(false);
       return;
     }
+
+
+    // Get user ID (try both _id and id)
+    const userId = user._id || user.id;
+    
+    console.log('🔍 User check:', {
+      userExists: !!user,
+      userId: userId,
+      userObject: user
+    });
 
     const amount = selectedPuja ? selectedPuja.amount : 1101;
     const formattedTime = formatTime(form.time);
@@ -83,22 +103,26 @@ export default function BookPoojaForm({ selectedPuja, onClose }) {
 
       // FIXED: Map form fields correctly to match backend expectations
       const bookingData = {
-        user: user._id || user.id, // Add user ID to link booking
+
+        user: userId, // Use the userId we determined above
+
         name: form.name,
         gotra: form.gotra,
         address: form.address,
         phone: form.phone,
         email: form.email,
         poojaType: form.poojaType,
-        date: form.date,           // Backend expects 'date', not 'preferredDate'
-        time: formattedTime,       // Backend expects 'time', not 'preferredTime'
+
+        date: form.date,
+        time: formattedTime,
         amount: amount
       };
 
-      console.log('Sending booking request with data:', bookingData);
+      console.log('📤 Sending booking request with data:', bookingData);
 
-      // FIXED: Use the correct endpoint that matches your backend routes
-      const res = await axios.post("/api/pooja/book", bookingData, {
+      // Use the correct endpoint that matches your backend routes
+      const res = await axios.post("/api/pooja/book-pooja", bookingData, {
+
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
