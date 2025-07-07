@@ -17,7 +17,6 @@ router.post('/login', async (req, res) => {
     const { emailOrPhone, password } = req.body;
 
 
-
     // Validate input
 
     if (!emailOrPhone || !password) {

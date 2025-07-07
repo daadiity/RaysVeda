@@ -6,6 +6,7 @@ const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
+
 router.post('/', async (req, res) => {
   const { name, birthDate, email, serviceType, message } = req.body;
 
@@ -32,7 +33,6 @@ Give a detailed numerology reading in simple language.IN less tha 50 words.also 
   } catch (error) {
     console.error('Gemini API error:', error);
     res.status(500).json({ success: false, error: 'Gemini API failed.' });
-
 
   }
 });

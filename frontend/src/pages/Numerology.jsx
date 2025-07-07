@@ -5,10 +5,8 @@ const Numerology = () => {
 
 
 
-
   const [formVisible, setFormVisible] = useState(false);
   const [formType, setFormType] = useState('');
-
 
 
   const [formData, setFormData] = useState({
@@ -30,7 +28,6 @@ const Numerology = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-
     setLoading(true);
     setGeminiResponse('');
     try {
@@ -51,7 +48,6 @@ const Numerology = () => {
     } finally {
       setLoading(false);
 
-
     }
   };
 
@@ -59,7 +55,6 @@ const Numerology = () => {
     <div className="bg-orange-50 min-h-screen">
 
       {/* Hero */}
-
 
       <section className="relative h-[60vh] overflow-hidden">
         <div className="absolute inset-0">
@@ -90,7 +85,6 @@ const Numerology = () => {
             and future opportunities.
 
             It is a powerful tool for self-discovery and personal growth, helping you understand your strengths,
-
 
           </p>
         </div>
@@ -130,7 +124,6 @@ const Numerology = () => {
       </section>
 
 
-
       {/* CTA */}
 
       <section className="py-16 bg-orange-600 text-white text-center">
@@ -139,7 +132,6 @@ const Numerology = () => {
           <p className="text-lg mb-8">
             Unlock the secrets of your destiny with our expert numerologists.
           </p>
-
 
 
           <div className="flex justify-center gap-4 flex-wrap">
@@ -247,7 +239,6 @@ const Numerology = () => {
             )}
           </div>
         </div>
-
 
       )}
     </div>

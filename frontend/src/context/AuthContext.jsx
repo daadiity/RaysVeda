@@ -40,6 +40,24 @@ export const AuthProvider = ({ children }) => {
     setLoading(false);
   }, []);
 
+
+  // In your AuthContext or useAuth hook, add logging
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    const userData = localStorage.getItem('user');
+    
+    console.log('🔍 Auth Debug:', {
+      hasToken: !!token,
+      hasUserData: !!userData,
+      userData: userData ? JSON.parse(userData) : null
+    });
+    
+    if (token && userData) {
+      const parsedUser = JSON.parse(userData);
+      setUser(parsedUser);
+    }
+  }, []);
+
   const login = (userData, token) => {
     console.log('AuthContext - Logging in user:', userData);
     localStorage.setItem('adminToken', token);

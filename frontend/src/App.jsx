@@ -34,11 +34,7 @@ import BookingHistory from "./pages/BookingHistory";
 import CharitableProgramPage from './pages/CharitableProgramPage';
 import CommunityServicesPage from './pages/CommunityServicesPage';
 import DonatePage from './pages/DonatePage';
-import Numerology from './pages/Numerology';
-import VastuPage from "./pages/VastuPage";
-import KundliPage from './pages/KundliPage';
-import HawanPage from './pages/HawanPage';
-import BlogPage from './pages/BlogPage';
+
 
 
 
