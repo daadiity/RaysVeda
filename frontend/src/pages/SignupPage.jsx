@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import SignupForm from '../components/auth/SignupForm';
-import LoginForm from '../components/auth/LoginForm';
+import LoginForm from '../components/auth/UserLoginForm';
 
 const SignupPage = () => {
   const [showLogin, setShowLogin] = useState(false);
