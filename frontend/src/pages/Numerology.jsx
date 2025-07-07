@@ -2,8 +2,13 @@ import React, { useState } from 'react';
 import axios from 'axios';
 
 const Numerology = () => {
+
+
+
   const [formVisible, setFormVisible] = useState(false);
   const [formType, setFormType] = useState('');
+
+
   const [formData, setFormData] = useState({
     name: '',
     birthDate: '',
@@ -14,12 +19,14 @@ const Numerology = () => {
   const [geminiResponse, setGeminiResponse] = useState('');
   const [loading, setLoading] = useState(false);
 
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     setLoading(true);
     setGeminiResponse('');
     try {
@@ -32,17 +39,20 @@ const Numerology = () => {
         serviceType: 'Life Path Analysis',
         message: '',
       });
+
     } catch (error) {
       console.error('Error submitting request:', error);
       alert('Failed to generate numerology reading.');
     } finally {
       setLoading(false);
+
     }
   };
 
   return (
     <div className="bg-orange-50 min-h-screen">
       {/* Hero */}
+
       <section className="relative h-[60vh] overflow-hidden">
         <div className="absolute inset-0">
           <img
@@ -70,40 +80,59 @@ const Numerology = () => {
             Numerology is the ancient study of numbers and their influence on our lives. By analyzing
             your birth date and name, numerology can reveal insights about your personality, life path,
             and future opportunities.
+
+            It is a powerful tool for self-discovery and personal growth, helping you understand your strengths,
+
           </p>
         </div>
       </section>
 
+
       {/* Services */}
+
       <section className="py-16 bg-orange-100">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">
             Our Numerology Services
           </h2>
           <div className="grid md:grid-cols-3 gap-8">
-            {['Life Path Analysis', 'Name Numerology', 'Compatibility Check'].map((title, i) => (
-              <div key={i} className="bg-white p-6 rounded-lg shadow-lg">
-                <h3 className="text-xl font-bold text-gray-800 mb-4">{title}</h3>
-                <p className="text-gray-600">
-                  {title === 'Life Path Analysis'
-                    ? "Understand your life's purpose and the challenges you may face."
-                    : title === 'Name Numerology'
-                    ? 'Discover the hidden meaning behind your name and its impact on your life.'
-                    : 'Find out how compatible you are with your partner, friends, or colleagues.'}
-                </p>
-              </div>
-            ))}
+
+
+            <div className="bg-white p-6 rounded-lg shadow-lg">
+              <h3 className="text-xl font-bold text-gray-800 mb-4">Life Path Analysis</h3>
+              <p className="text-gray-600">
+                Understand your life's purpose and the challenges you may face.
+              </p>
+            </div>
+            <div className="bg-white p-6 rounded-lg shadow-lg">
+              <h3 className="text-xl font-bold text-gray-800 mb-4">Name Numerology</h3>
+              <p className="text-gray-600">
+                Discover the hidden meaning behind your name and its impact on your life.
+              </p>
+            </div>
+            <div className="bg-white p-6 rounded-lg shadow-lg">
+              <h3 className="text-xl font-bold text-gray-800 mb-4">Compatibility Check</h3>
+              <p className="text-gray-600">
+                Find out how compatible you are with your partner, friends, or colleagues.
+              </p>
+            </div>
+
+
           </div>
         </div>
       </section>
 
+
       {/* CTA */}
+
       <section className="py-16 bg-orange-600 text-white text-center">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold mb-4">Book Your Numerology Session Today</h2>
           <p className="text-lg mb-8">
             Unlock the secrets of your destiny with our expert numerologists.
           </p>
+
+
           <div className="flex justify-center gap-4 flex-wrap">
             <button
               onClick={() => {
@@ -210,6 +239,7 @@ const Numerology = () => {
             )}
           </div>
         </div>
+
       )}
     </div>
   );

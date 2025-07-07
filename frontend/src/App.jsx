@@ -1,16 +1,22 @@
-import { useState, useEffect } from 'react'
-import { Routes, Route } from 'react-router-dom'
-import Header from './components/layout/Header'
-import Footer from './components/layout/Footer'
-import HomePage from './pages/HomePage'
-import PujaPage from './pages/PujaPage'
-import ServicesPage from './pages/ServicesPage'
-import AboutPage from './pages/AboutPage'
-import ContactPage from './pages/ContactPage'
-import WhatsAppButton from './components/common/WhatsAppButton'
-import ScrollToTop from './components/common/ScrollToTop'
-import Vedas from './pages/Vedas'
-import SacredMantras from './pages/SacredMantras'
+import { useState, useEffect } from 'react';
+import { Routes, Route } from 'react-router-dom';
+
+import Header from './components/layout/Header';
+import Footer from './components/layout/Footer';
+import WhatsAppButton from './components/common/WhatsAppButton';
+import ScrollToTop from './components/common/ScrollToTop';
+
+import HomePage from './pages/HomePage';
+import PujaPage from './pages/PujaPage';
+import ServicesPage from './pages/ServicesPage';
+import AboutPage from './pages/AboutPage';
+import ContactPage from './pages/ContactPage';
+
+
+
+import Vedas from './pages/Vedas';
+import SacredMantras from './pages/SacredMantras';
+
 import Meditation from './pages/Meditation';
 import PranPratishtha from "./pages/PranPratishtha";
 import SignupPage from './pages/SignupPage';
@@ -21,11 +27,15 @@ import BookingHistory from "./pages/BookingHistory";
 import CharitableProgramPage from './pages/CharitableProgramPage';
 import CommunityServicesPage from './pages/CommunityServicesPage';
 import DonatePage from './pages/DonatePage';
+
 import Numerology from './pages/Numerology';
+
+
 import VastuPage from "./pages/VastuPage";
 import KundliPage from './pages/KundliPage';
 import HawanPage from './pages/HawanPage';
 import BlogPage from './pages/BlogPage';
+
 
 
 function App() {

@@ -2,6 +2,7 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const { sendWelcomeEmail } = require('../services/emailService'); // Add this import
 const router = express.Router();
 
 // Enhanced login route with email/phone flexibility
@@ -13,7 +14,9 @@ router.post('/login', async (req, res) => {
 
     const { emailOrPhone, password } = req.body;
 
+
     // Validate input
+
     if (!emailOrPhone || !password) {
       return res.status(400).json({
         success: false,
@@ -21,56 +24,36 @@ router.post('/login', async (req, res) => {
       });
     }
 
+
     const inputValue = emailOrPhone.trim();
+
     let user;
 
-    // Check if input is email or phone
-    const isEmail = inputValue.includes('@');
-    
-    if (isEmail) {
-      console.log('🔍 Searching by email:', inputValue);
-      user = await User.findOne({ 
-        email: inputValue.toLowerCase() 
-      });
+    if (emailOrPhone.includes('@')) {
+      console.log('🔍 Searching by email:', emailOrPhone);
+      // IMPORTANT: Explicitly select password field
+      user = await User.findOne({ email: emailOrPhone }).select('+password');
     } else {
-      // Handle phone number - normalize different formats
-      console.log('🔍 Searching by phone:', inputValue);
+      console.log('🔍 Searching by phone:', emailOrPhone);
       
-      // Remove all non-digit characters
-      let normalizedPhone = inputValue.replace(/\D/g, '');
-      
-      // Handle different phone formats
-      const phoneVariations = [];
-      
-      // If starts with 91, use as is
-      if (normalizedPhone.startsWith('91')) {
-        phoneVariations.push(normalizedPhone);
-        phoneVariations.push(normalizedPhone.substring(2)); // Remove country code
-      }
-      // If 10 digits, add variations
-      else if (normalizedPhone.length === 10) {
-        phoneVariations.push(normalizedPhone);
-        phoneVariations.push(`91${normalizedPhone}`);
-        phoneVariations.push(`+91${normalizedPhone}`);
-      }
-      // If starts with 0, remove it
-      else if (normalizedPhone.startsWith('0') && normalizedPhone.length === 11) {
-        const withoutZero = normalizedPhone.substring(1);
-        phoneVariations.push(withoutZero);
-        phoneVariations.push(`91${withoutZero}`);
-        phoneVariations.push(`+91${withoutZero}`);
-        phoneVariations.push(normalizedPhone); // Also try with zero
-      }
-      // Add original input
-      phoneVariations.push(inputValue);
-      
-      console.log('Phone variations to search:', phoneVariations);
-      
-      // Search with all phone variations
-      user = await User.findOne({
-        phone: { $in: phoneVariations }
-      });
+      const phoneVariations = [
+        emailOrPhone,
+        emailOrPhone.startsWith('+91') ? emailOrPhone : `+91${emailOrPhone}`,
+        emailOrPhone.startsWith('+91') ? emailOrPhone.slice(3) : emailOrPhone,
+        emailOrPhone.replace(/^\+91/, ''),
+        emailOrPhone.replace(/^91/, ''),
+        emailOrPhone.length === 10 ? `+91${emailOrPhone}` : emailOrPhone,
+        emailOrPhone.startsWith('0') ? emailOrPhone.slice(1) : emailOrPhone,
+        emailOrPhone.startsWith('0') ? `+91${emailOrPhone.slice(1)}` : emailOrPhone
+      ];
+
+      console.log('📱 Phone variations:', phoneVariations);
+      // IMPORTANT: Explicitly select password field
+      user = await User.findOne({ 
+        phone: { $in: phoneVariations } 
+      }).select('+password');
     }
+
 
     if (!user) {
       console.log('❌ User not found');
@@ -82,10 +65,23 @@ router.post('/login', async (req, res) => {
 
     console.log('✅ User found:', user.email);
 
-    // Verify password
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-    
-    if (!isPasswordValid) {
+    console.log('🔐 Password check:', {
+      hasPassword: !!user.password,
+      passwordType: typeof user.password,
+      passwordLength: user.password ? user.password.length : 0
+    });
+
+    // Check if password exists
+    if (!user.password) {
+      console.log('❌ User password is missing from database');
+      return res.status(401).json({
+        success: false,
+        message: 'Account setup incomplete. Please contact support.'
+      });
+    }
+
+    const isValidPassword = await bcrypt.compare(password, user.password);
+    if (!isValidPassword) {
       console.log('❌ Invalid password');
       return res.status(401).json({
         success: false,
@@ -95,29 +91,28 @@ router.post('/login', async (req, res) => {
 
     console.log('✅ Password validated');
 
-    // Generate JWT token
     const token = jwt.sign(
       { 
-        id: user._id, 
+        userId: user._id,
         email: user.email,
-        phone: user.phone
+        role: user.role || 'user'
       },
       process.env.JWT_SECRET,
-      { expiresIn: '7d' }
+      { expiresIn: '24h' }
     );
 
-    // Return success response
+    console.log('✅ Login successful for:', user.email);
+
     res.json({
       success: true,
       message: 'Login successful',
       token,
       user: {
-        _id: user._id,
         id: user._id,
-        email: user.email,
         name: user.name,
+        email: user.email,
         phone: user.phone,
-        address: user.address
+        role: user.role || 'user'
       }
     });
 
@@ -127,13 +122,14 @@ router.post('/login', async (req, res) => {
     console.error('🚨 Login error:', error);
     res.status(500).json({
       success: false,
-      message: 'Server error during login',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+      message: 'Server error during login'
     });
   }
 });
 
-// Keep existing register route...
+
+// Updated register route with email
+
 router.post('/register', async (req, res) => {
   try {
     console.log('=== REGISTRATION REQUEST ===');
@@ -152,17 +148,25 @@ router.post('/register', async (req, res) => {
     // Normalize email and phone
     const normalizedEmail = email.toLowerCase().trim();
     let normalizedPhone = phone.replace(/\D/g, '');
-    
+
     // Remove leading zero if present
     if (normalizedPhone.startsWith('0') && normalizedPhone.length === 11) {
       normalizedPhone = normalizedPhone.substring(1);
     }
-    
+
     // Remove country code if present
     if (normalizedPhone.startsWith('91') && normalizedPhone.length === 12) {
       normalizedPhone = normalizedPhone.substring(2);
     }
 
+    // Always store phone with +91 prefix for consistency
+    if (normalizedPhone.length === 10) {
+      normalizedPhone = `+91${normalizedPhone}`;
+    } else if (normalizedPhone.length === 12 && normalizedPhone.startsWith('91')) {
+      normalizedPhone = `+${normalizedPhone}`;
+    } else if (!normalizedPhone.startsWith('+91')) {
+      normalizedPhone = `+91${normalizedPhone}`;
+    }
     // Check if user already exists
     const existingUser = await User.findOne({
       $or: [
@@ -187,7 +191,7 @@ router.post('/register', async (req, res) => {
     const newUser = new User({
       name: name.trim(),
       email: normalizedEmail,
-      phone: normalizedPhone, // Store normalized phone
+      phone: normalizedPhone,
       address: address?.trim() || '',
       password: hashedPassword
     });
@@ -196,9 +200,23 @@ router.post('/register', async (req, res) => {
 
     console.log('✅ User registered successfully:', normalizedEmail);
 
+    // 📧 SEND WELCOME EMAIL
+    try {
+      const emailResult = await sendWelcomeEmail(normalizedEmail, name.trim());
+      if (emailResult.success) {
+        console.log('✅ Welcome email sent to:', normalizedEmail);
+      } else {
+        console.error('❌ Failed to send welcome email:', emailResult.error);
+      }
+    } catch (emailError) {
+      console.error('❌ Email sending error:', emailError);
+      // Don't fail registration if email fails
+    }
+
     res.status(201).json({
       success: true,
-      message: 'User registered successfully',
+      message: 'User registered successfully! Welcome email sent.',
+
       user: {
         id: newUser._id,
         name: newUser.name,
@@ -209,7 +227,6 @@ router.post('/register', async (req, res) => {
 
   } catch (error) {
     console.error('🚨 Registration error:', error);
-    
     if (error.code === 11000) {
       return res.status(400).json({
         success: false,
