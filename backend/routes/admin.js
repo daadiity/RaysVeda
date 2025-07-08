@@ -4,7 +4,7 @@ const Admin = require("../models/Admin");
 const User = require("../models/User");
 const Booking = require("../models/Booking");
 const Pooja = require("../models/Pooja");
-const auth = require("../middleware/authAdmin");
+const auth = require("../middleware/auth");
 const upload = require("../middleware/upload");
 const adminController = require("../controllers/admin.controller");
 

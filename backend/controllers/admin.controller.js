@@ -13,12 +13,12 @@ const adminLogin = async (req, res) => {
     const admin = await User.findOne({ email });
 
     if (!admin || !admin.isAdmin) {
-      return res.status(401).json({ message: "Not authorized as admin" });
+      return res.status(401).json({ success: false, message: "Not authorized as admin" });
     }
 
     const isMatch = await bcrypt.compare(password, admin.password);
     if (!isMatch) {
-      return res.status(401).json({ message: "Invalid credentials" });
+      return res.status(401).json({ success: false, message: "Invalid credentials" });
     }
 
     const token = jwt.sign(
@@ -27,12 +27,25 @@ const adminLogin = async (req, res) => {
       { expiresIn: "1d" }
     );
 
-    res.json({ token });
+    return res.status(200).json({
+      success: true,
+      message: "Admin login successful",
+      data: {
+        token,
+        admin: {
+          _id: admin._id,
+          name: admin.name,
+          email: admin.email,
+          role: "admin",
+        },
+      },
+    });
   } catch (err) {
     console.error("Admin login error:", err);
-    res.status(500).json({ message: "Server error during admin login" });
+    res.status(500).json({ success: false, message: "Server error during admin login" });
   }
 };
+
 
 const getAllUsers = async (req, res) => {
   try {
@@ -177,84 +190,6 @@ const updatePoojaStatus = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
-
-// const generateReport = async (req, res) => {
-//   try {
-//     const { type } = req.params;
-//     const { dateRange } = req.query;
-
-//     // Get start and end date based on dateRange
-//     let startDate = new Date();
-//     let endDate = new Date();
-
-//     switch (dateRange) {
-//       case "last7days":
-//         startDate.setDate(endDate.getDate() - 7);
-//         break;
-//       case "last30days":
-//         startDate.setDate(endDate.getDate() - 30);
-//         break;
-//       case "last3months":
-//         startDate.setMonth(endDate.getMonth() - 3);
-//         break;
-//       case "last6months":
-//         startDate.setMonth(endDate.getMonth() - 6);
-//         break;
-//       case "lastyear":
-//         startDate.setFullYear(endDate.getFullYear() - 1);
-//         break;
-//       default:
-//         startDate.setDate(endDate.getDate() - 30); // fallback to 30 days
-//     }
-
-//     let summary = {};
-//     let details = [];
-
-//     if (type === "revenue") {
-//       const bookings = await Booking.find({
-//         date: { $gte: startDate, $lte: endDate },
-//       });
-
-//       const totalRevenue = bookings.reduce(
-//         (acc, b) => acc + (b.amount || 0),
-//         0
-//       );
-//       const totalBookings = bookings.length;
-//       const averageBookingValue = totalBookings
-//         ? (totalRevenue / totalBookings).toFixed(2)
-//         : 0;
-//       const growthRate = 12.5; // Placeholder – you can calculate it properly later
-
-//       const grouped = {};
-//       bookings.forEach((b) => {
-//         const dateKey = b.date.toISOString().split("T")[0];
-//         grouped[dateKey] = grouped[dateKey] || { value: 0, bookings: 0 };
-//         grouped[dateKey].value += b.amount || 0;
-//         grouped[dateKey].bookings += 1;
-//       });
-
-//       details = Object.entries(grouped).map(([date, data]) => ({
-//         date,
-//         value: data.value,
-//         bookings: data.bookings,
-//       }));
-
-//       summary = {
-//         totalRevenue,
-//         totalBookings,
-//         averageBookingValue,
-//         growthRate,
-//       };
-//     }
-
-//     // Add logic for "bookings", "users", and "poojas" types if needed
-
-//     res.json({ summary, details });
-//   } catch (err) {
-//     console.error("Error generating report:", err);
-//     res.status(500).json({ message: "Error generating report" });
-//   }
-// };
 
 const generateReport = async (req, res) => {
   try {
