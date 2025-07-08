@@ -1,25 +1,35 @@
-const jwt = require("jsonwebtoken");
-const User = require("../models/User");
+const jwt = require("jsonwebtoken")
+const Admin = require("../models/Admin")
 
-const authUser = async (req, res, next) => {
+const auth = async (req, res, next) => {
   try {
-    const token = req.header("Authorization")?.replace("Bearer ", "");
+    const token = req.header("Authorization")?.replace("Bearer ", "")
+
     if (!token) {
-      return res.status(401).json({ success: false, message: "No token provided" });
+      return res.status(401).json({
+        success: false,
+        message: "Access denied. No token provided.",
+      })
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await User.findById(decoded.userId);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || "your-secret-key")
+    const admin = await Admin.findById(decoded.id)
 
-    if (!user) {
-      return res.status(401).json({ success: false, message: "User not found" });
+    if (!admin || !admin.isActive) {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid token or admin account is inactive.",
+      })
     }
 
-    req.user = user;
-    next();
-  } catch (err) {
-    res.status(401).json({ success: false, message: "Invalid token" });
+    req.admin = admin
+    next()
+  } catch (error) {
+    res.status(401).json({
+      success: false,
+      message: "Invalid token.",
+    })
   }
-};
+}
 
-module.exports = authUser;
+module.exports = auth
