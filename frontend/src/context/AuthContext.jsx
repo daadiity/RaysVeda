@@ -19,15 +19,11 @@ export const AuthProvider = ({ children }) => {
     const token = localStorage.getItem('token');
     const userData = localStorage.getItem('user');
     
-    console.log('AuthContext - Checking stored session...');
-    console.log('Token exists:', !!token);
-    console.log('User data exists:', !!userData);
-    
     if (token && userData) {
       try {
         const parsedUser = JSON.parse(userData);
-        console.log('AuthContext - Restored user:', parsedUser);
         setUser(parsedUser);
+        console.log('Restored user session:', parsedUser.email);
       } catch (error) {
         console.error('Error parsing stored user data:', error);
         localStorage.removeItem('token');
@@ -41,48 +37,31 @@ export const AuthProvider = ({ children }) => {
     setLoading(false);
   }, []);
 
-
-  // In your AuthContext or useAuth hook, add logging
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    const userData = localStorage.getItem('user');
-    
-    console.log('🔍 Auth Debug:', {
-      hasToken: !!token,
-      hasUserData: !!userData,
-      userData: userData ? JSON.parse(userData) : null
-    });
-    
-    if (token && userData) {
-      const parsedUser = JSON.parse(userData);
-      setUser(parsedUser);
-    }
-  }, []);
-
-  const login = (userData, token) => {
-    console.log('AuthContext - Logging in user:', userData);
-    localStorage.setItem('token', token);
-    localStorage.setItem('user', JSON.stringify(userData));
+  const login = (userData) => {
     setUser(userData);
+    console.log('User logged in:', userData.email);
   };
 
   const logout = () => {
-    console.log('AuthContext - Logging out user');
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     setUser(null);
+    console.log('User logged out');
   };
 
-  const value = {
-    user,
-    login,
-    logout,
-    loading
-  };
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
+      </div>
+    );
+  }
 
   return (
-    <AuthContext.Provider value={value}>
+    <AuthContext.Provider value={{ user, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
 };
+
+export default AuthContext;
