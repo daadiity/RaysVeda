@@ -56,6 +56,8 @@ app.use('/api/numerology', require('./routes/numerologyRoutes'));
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api', require('./routes/poojaBooking'));
 app.use('/api/bookings', require('./routes/booking'));
+app.use("/api/pooja", require("./routes/poojaBooking"));
+
 
 // Admin routes
 app.use("/api/admin", require("./routes/admin"));
