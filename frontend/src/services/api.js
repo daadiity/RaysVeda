@@ -7,12 +7,12 @@ const api = axios.create({
 });
 
 
-// Public API
-// Public fetch for PujaPage
-export const fetchActivePujas = async () => {
-  const response = await api.get("/poojas/public/active"); // ✅ use `api` not `axios`
-  return response.data; // Return just the list
-};
+// // Public API
+// // Public fetch for PujaPage
+// export const fetchActivePujas = async () => {
+//   const response = await api.get("/poojas/public/active"); // ✅ use `api` not `axios`
+//   return response.data; // Return just the list
+// };
 
 
 // Add request interceptor to include admin auth token
@@ -48,42 +48,42 @@ export const adminAPI = {
   searchUsers: (params) => api.get("/admin/search/users", { params }),
   searchBookings: (params) => api.get("/admin/search/bookings", { params }),
 
-  // ✅ FIXED: Guest booking - now uses api instance
-  createGuestRazorpayOrder: ({
-    name,
-    email,
-    phone,
-    pooja,
-    amount,
-  }) =>
-    api.post("/guest-checkout", {
-      name,
-      email,
-      phone,
-      pooja,
-      amount,
-    }),
+  // // ✅ FIXED: Guest booking - now uses api instance
+  // createGuestRazorpayOrder: ({
+  //   name,
+  //   email,
+  //   phone,
+  //   pooja,
+  //   amount,
+  // }) =>
+  //   api.post("/guest-checkout", {
+  //     name,
+  //     email,
+  //     phone,
+  //     pooja,
+  //     amount,
+  //   }),
 
-  confirmGuestBooking: ({
-    name,
-    email,
-    phone,
-    razorpayPaymentId,
-    razorpayOrderId,
-    razorpaySignature,
-    pooja,
-    amount,
-  }) =>
-    api.post("/confirm-payment", {
-      name,
-      email,
-      phone,
-      razorpayPaymentId,
-      razorpayOrderId,
-      razorpaySignature,
-      pooja,
-      amount,
-    }),
+  // confirmGuestBooking: ({
+  //   name,
+  //   email,
+  //   phone,
+  //   razorpayPaymentId,
+  //   razorpayOrderId,
+  //   razorpaySignature,
+  //   pooja,
+  //   amount,
+  // }) =>
+  //   api.post("/confirm-payment", {
+  //     name,
+  //     email,
+  //     phone,
+  //     razorpayPaymentId,
+  //     razorpayOrderId,
+  //     razorpaySignature,
+  //     pooja,
+  //     amount,
+  //   }),
 
   // Auth
   login: (credentials) => api.post("/admin/login", credentials),

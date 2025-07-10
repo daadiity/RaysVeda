@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { adminAPI } from "../services/api";
+import publicAPI from "../services/publicAPI";
 
 const GuestBookingForm = ({ selectedPuja, onClose }) => {
   const { _id: id, name: pujaTitle, price: amount } = selectedPuja || {};
@@ -25,7 +25,7 @@ const GuestBookingForm = ({ selectedPuja, onClose }) => {
       console.log("Amount:", amount);
 
       // Step 1: Create Razorpay order via backend
-      const response = await adminAPI.createGuestRazorpayOrder({
+      const response = await publicAPI.createGuestRazorpayOrder({
         name,
         email,
         phone,
@@ -41,6 +41,9 @@ const GuestBookingForm = ({ selectedPuja, onClose }) => {
         throw new Error("Invalid Razorpay order response");
       }
 
+      console.log("Razorpay key:", import.meta.env.VITE_RAZORPAY_KEY);
+
+
       // Step 2: Open Razorpay payment window
       const options = {
         key: import.meta.env.VITE_RAZORPAY_KEY,
@@ -53,7 +56,7 @@ const GuestBookingForm = ({ selectedPuja, onClose }) => {
         handler: async function (response) {
           try {
             // Step 3: Confirm payment with backend
-            await adminAPI.confirmGuestBooking({
+            await publicAPI.confirmGuestBooking({
               name,
               email,
               phone,
@@ -70,12 +73,21 @@ const GuestBookingForm = ({ selectedPuja, onClose }) => {
             onClose();
           } catch (err) {
             console.error("Payment confirmation failed:", err);
-            alert("❌ Payment succeeded but confirmation failed. Contact support.");
+            alert(
+              "❌ Payment succeeded but confirmation failed. Contact support."
+            );
           }
         },
         theme: { color: "#ff6b35" },
       };
 
+      if (typeof window.Razorpay === "undefined") {
+        console.error("❌ Razorpay SDK not loaded");
+        alert("Payment gateway failed to load. Please refresh the page.");
+        return;
+      }
+
+      console.log("Opening Razorpay with options:", options); //
       const rzp = new window.Razorpay(options);
       rzp.open();
     } catch (err) {
