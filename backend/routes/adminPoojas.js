@@ -4,6 +4,9 @@ const auth = require("../middleware/auth")
 
 const router = express.Router()
 
+
+
+
 // Get all poojas with pagination and search
 router.get("/", auth, async (req, res) => {
   try {
@@ -55,6 +58,26 @@ router.get("/", auth, async (req, res) => {
     })
   }
 })
+
+
+// Public route - get all active poojas (no auth required)
+// Get all active poojas (public)
+// router.get("/public/active", async (req, res) => {
+//   try {
+//     const poojas = await Pooja.find({ isActive: true }).sort({ createdAt: -1 });
+
+//     res.json({
+//       success: true,
+//       data: poojas,
+//     });
+//   } catch (error) {
+//     res.status(500).json({
+//       success: false,
+//       message: "Server error",
+//       error: error.message,
+//     });
+//   }
+// });
 
 // Get pooja by ID
 router.get("/:id", auth, async (req, res) => {
@@ -197,5 +220,10 @@ router.get("/categories/list", auth, async (req, res) => {
     })
   }
 })
+
+
+
+
+
 
 module.exports = router

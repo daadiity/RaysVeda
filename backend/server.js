@@ -58,12 +58,25 @@ app.use('/api', require('./routes/poojaBooking'));
 app.use('/api/bookings', require('./routes/booking'));
 app.use("/api/pooja", require("./routes/poojaBooking"));
 
+// Public routes
+app.use("/api/poojas", require("./routes/publicPoojas"));
+
+
+// Guest user routes
+const guestCheckoutRoutes = require("./routes/guestCheckout");
+app.use("/api", guestCheckoutRoutes);
+// const guestBookingRoutes = require("./routes/guestBooking");
+// app.use("/api", guestBookingRoutes);
+const userRoutes = require("./routes/users");
+app.use("/api/users", userRoutes);
+
+
 
 // Admin routes
 app.use("/api/admin", require("./routes/admin"));
 app.use("/api/admin/users", require("./routes/users"));
 app.use("/api/admin/bookings", require("./routes/bookings"));
-app.use("/api/admin/poojas", require("./routes/poojas"));
+app.use("/api/admin/poojas", require("./routes/adminPoojas"));
 app.use("/api/admin/reports", require("./routes/reports"));
 app.use("/api/admin/notifications", require("./routes/notifications"));
 app.use("/api/admin/settings", require("./routes/settings"));

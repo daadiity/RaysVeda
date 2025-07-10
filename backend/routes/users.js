@@ -1,6 +1,7 @@
 const express = require("express")
 const User = require("../models/User")
 const auth = require("../middleware/auth")
+const { completeUserProfile } = require("../controllers/user.controller");
 
 const router = express.Router()
 
@@ -181,5 +182,7 @@ router.patch("/:id/status", auth, async (req, res) => {
     })
   }
 })
+
+router.post("/complete-profile", completeUserProfile);
 
 module.exports = router

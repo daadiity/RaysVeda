@@ -544,4 +544,21 @@ router.post('/register', async (req, res) => {
   }
 });
 
+router.post("/reset-password", async (req, res) => {
+  const { email, password } = req.body;
+  try {
+    const user = await User.findOne({ email });
+    if (!user) return res.status(404).json({ error: "User not found" });
+
+    user.password = password; // hashed via pre-save hook
+    await user.save();
+
+    res.json({ message: "Password updated successfully" });
+  } catch (err) {
+    console.error("Password reset error:", err);
+    res.status(500).json({ error: "Failed to reset password" });
+  }
+});
+
+
 module.exports = router;

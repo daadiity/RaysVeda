@@ -2,11 +2,20 @@ import axios from "axios";
 
 // Create axios instance with base configuration
 const api = axios.create({
-  baseURL: "http://localhost:3000/api", // process.env.REACT_APP_API_URL -- uncomment for production
+  baseURL: "http://localhost:3000/api", // Replace with env var in prod
   timeout: 10000,
 });
 
-// Add request interceptor to include auth token
+
+// Public API
+// Public fetch for PujaPage
+export const fetchActivePujas = async () => {
+  const response = await api.get("/poojas/public/active"); // ✅ use `api` not `axios`
+  return response.data; // Return just the list
+};
+
+
+// Add request interceptor to include admin auth token
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("adminToken");
@@ -15,17 +24,14 @@ api.interceptors.request.use(
     }
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
-// Add response interceptor to handle errors
+// Add response interceptor to return only `data` and handle 401
 api.interceptors.response.use(
-  (response) => response.data, // Return only the data part
+  (response) => response.data,
   (error) => {
     if (error.response?.status === 401) {
-      // Token expired or invalid
       localStorage.removeItem("adminToken");
       localStorage.removeItem("adminUser");
       window.location.href = "/admin/login";
@@ -34,13 +40,52 @@ api.interceptors.response.use(
   }
 );
 
-// Admin API endpoints
-export const adminAPI = {
-  // Search functions
-  searchUsers: (params) => axios.get("/api/admin/search/users", { params }),
-  searchBookings: (params) => axios.get("/api/admin/search/bookings", { params }),
 
-  // Authentication
+
+// Main admin API object
+export const adminAPI = {
+  // Search
+  searchUsers: (params) => api.get("/admin/search/users", { params }),
+  searchBookings: (params) => api.get("/admin/search/bookings", { params }),
+
+  // ✅ FIXED: Guest booking - now uses api instance
+  createGuestRazorpayOrder: ({
+    name,
+    email,
+    phone,
+    pooja,
+    amount,
+  }) =>
+    api.post("/guest-checkout", {
+      name,
+      email,
+      phone,
+      pooja,
+      amount,
+    }),
+
+  confirmGuestBooking: ({
+    name,
+    email,
+    phone,
+    razorpayPaymentId,
+    razorpayOrderId,
+    razorpaySignature,
+    pooja,
+    amount,
+  }) =>
+    api.post("/confirm-payment", {
+      name,
+      email,
+      phone,
+      razorpayPaymentId,
+      razorpayOrderId,
+      razorpaySignature,
+      pooja,
+      amount,
+    }),
+
+  // Auth
   login: (credentials) => api.post("/admin/login", credentials),
   logout: () => api.post("/admin/logout"),
   getProfile: () => api.get("/admin/profile"),
@@ -52,7 +97,7 @@ export const adminAPI = {
     api.get(`/admin/dashboard/recent-bookings?limit=${limit}`),
   getChartData: () => api.get("/admin/dashboard/charts"),
 
-  // Users Management
+  // Users
   getUsers: (params = {}) => api.get("/admin/users", { params }),
   getUserById: (id) => api.get(`/admin/users/${id}`),
   createUser: (data) => api.post("/admin/users", data),
@@ -61,7 +106,7 @@ export const adminAPI = {
   toggleUserStatus: (id, status) =>
     api.patch(`/admin/users/${id}/status`, { status }),
 
-  // Bookings Management
+  // Bookings
   getBookings: (params = {}) => api.get("/admin/bookings", { params }),
   getBookingById: (id) => api.get(`/admin/bookings/${id}`),
   createBooking: (data) => api.post("/admin/bookings", data),
@@ -70,7 +115,7 @@ export const adminAPI = {
     api.patch(`/admin/bookings/${id}/status`, { status }),
   deleteBooking: (id) => api.delete(`/admin/bookings/${id}`),
 
-  // Poojas Management
+  // Poojas
   getPoojas: (params = {}) => api.get("/admin/poojas", { params }),
   getPoojaById: (id) => api.get(`/admin/poojas/${id}`),
   createPooja: (data) => api.post("/admin/poojas", data),
@@ -101,15 +146,13 @@ export const adminAPI = {
   updateSettings: (section, data) =>
     api.put(`/admin/settings/${section}`, data),
 
-  // File Upload
+  // File upload
   uploadFile: (file, type = "general") => {
     const formData = new FormData();
     formData.append("file", file);
     formData.append("type", type);
     return api.post("/admin/upload", formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
+      headers: { "Content-Type": "multipart/form-data" },
     });
   },
 

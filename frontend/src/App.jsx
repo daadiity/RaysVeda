@@ -59,6 +59,10 @@ import AdminLoginForm from './components/auth/AdminLoginForm';
 // import AdminBookings from "./pages/AdminBookings";
 // import AdminStats from './pages/AdminStats';
 
+import ResetPasswordPage from './pages/ResetPasswordPage';
+import CompleteProfile from "./pages/CompleteProfile";
+
+
 
 function App() {
   const [scrolled, setScrolled] = useState(false);
@@ -96,6 +100,9 @@ function App() {
           <Route path="/services/kundli" element={<KundliPage />} />
           <Route path="/services/hawan" element={<HawanPage />} />
           <Route path="/blog" element={<BlogPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
+          <Route path="/complete-profile" element={<CompleteProfile />} />
+
 
           {/* Seva Bhav Routes - Updated to match header links */}
           <Route path="/seva/charitable-programs" element={<CharitableProgramPage />} />

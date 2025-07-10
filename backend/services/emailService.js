@@ -1,4 +1,4 @@
-const nodemailer = require('nodemailer');
+const nodemailer = require("nodemailer");
 
 // Create email transporter - FIXED: Use createTransport (not createTransporter)
 const createTransporter = () => {
@@ -7,8 +7,8 @@ const createTransporter = () => {
     port: parseInt(process.env.MAILTRAP_PORT),
     auth: {
       user: process.env.MAILTRAP_USER,
-      pass: process.env.MAILTRAP_PASS
-    }
+      pass: process.env.MAILTRAP_PASS,
+    },
   });
 };
 
@@ -17,10 +17,10 @@ const testEmailConnection = async () => {
   try {
     const transporter = createTransporter();
     await transporter.verify();
-    console.log('✅ Email service connected successfully');
+    console.log("✅ Email service connected successfully");
     return true;
   } catch (error) {
-    console.error('❌ Email connection failed:', error);
+    console.error("❌ Email connection failed:", error);
     return false;
   }
 };
@@ -285,41 +285,69 @@ const getWelcomeEmailTemplate = (userName) => {
   `;
 };
 
-// Send welcome email function
-const sendWelcomeEmail = async (userEmail, userName) => {
+// Modify existing function in emailService.js
+const sendWelcomeEmail = async (
+  userEmail,
+  userName,
+  tempPassword = null,
+  profileLink = null
+) => {
   try {
-    console.log('📧 Attempting to send welcome email to:', userEmail);
-    
+    console.log("📧 Attempting to send welcome email to:", userEmail);
+
     const transporter = createTransporter();
-    
+
+    let introHtml = `
+      <p style="font-size: 1.1rem;">Thank you for joining <strong>RaysVeda</strong> — your trusted platform for authentic Vedic traditions and spiritual practices.</p>
+    `;
+
+    if (tempPassword && profileLink) {
+      introHtml += `
+        <p><strong>Your Account Details:</strong></p>
+        <ul>
+          <li>Email: <strong>${userEmail}</strong></li>
+          <li>Temporary Password: <strong>${tempPassword}</strong></li>
+        </ul>
+        <p>Please click the link below to set your password and complete your profile:</p>
+        <p><a href="${profileLink}" target="_blank">${profileLink}</a></p>
+      `;
+    }
+
     const mailOptions = {
       from: `"${process.env.MAILTRAP_FROM_NAME}" <${process.env.MAILTRAP_FROM_EMAIL}>`,
       to: userEmail,
-      subject: '🕉️ Welcome to RaysVeda - Your Spiritual Journey Begins! 🙏',
-      html: getWelcomeEmailTemplate(userName)
+      subject: "🕉️ Welcome to RaysVeda - Your Spiritual Journey Begins! 🙏",
+      html: `
+        <html>
+        <body style="font-family: sans-serif; padding: 20px;">
+          <h2>Namaste ${userName} 🙏</h2>
+          ${introHtml}
+          <hr/>
+          <p style="font-size: 0.9rem; color: #888;">You are receiving this email because you interacted with RaysVeda. Contact us at support@raysveda.com</p>
+        </body>
+        </html>
+      `,
     };
 
     const result = await transporter.sendMail(mailOptions);
-    console.log('✅ Welcome email sent successfully to:', userEmail);
-    console.log('📧 Message ID:', result.messageId);
-    
-    return { 
-      success: true, 
+    console.log("✅ Welcome email sent successfully to:", userEmail);
+
+    return {
+      success: true,
       messageId: result.messageId,
-      recipient: userEmail 
+      recipient: userEmail,
     };
-    
   } catch (error) {
-    console.error('❌ Error sending welcome email:', error);
-    return { 
-      success: false, 
+    console.error("❌ Error sending welcome email:", error);
+    return {
+      success: false,
       error: error.message,
-      recipient: userEmail 
+      recipient: userEmail,
     };
   }
 };
 
 module.exports = {
   sendWelcomeEmail,
-  testEmailConnection
+  testEmailConnection,
 };
