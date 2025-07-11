@@ -12,7 +12,7 @@ const razorpay = new Razorpay({
 });
 
 // Utility: generate 8-character password
-const generateTempPassword = () => crypto.randomBytes(4).toString("hex");
+// const generateTempPassword = () => crypto.randomBytes(4).toString("hex");
 
 // POST /api/guest-checkout
 // POST /api/guest-checkout
@@ -45,6 +45,10 @@ exports.handleGuestCheckout = async (req, res) => {
       });
 
       isNewUser = true;
+
+      // Send welcome email
+      const completeLink = `${process.env.CLIENT_URL}/complete-profile?email=${email}`;
+      await sendWelcomeEmail(email, name, tempPassword, completeLink);
     }
 
     // 2. Set JWT cookie
@@ -60,10 +64,10 @@ exports.handleGuestCheckout = async (req, res) => {
     });
 
     // 3. Send welcome email if new
-    if (isNewUser) {
-      const completeLink = `${process.env.CLIENT_URL}/complete-profile`;
-      await sendWelcomeEmail(email, name, tempPassword, completeLink);
-    }
+    // if (isNewUser) {
+    //   const completeLink = `${process.env.CLIENT_URL}/complete-profile`;
+    //   await sendWelcomeEmail(email, name, tempPassword, completeLink);
+    // }
 
     // 4. Create booking
     const booking = await Booking.create({
@@ -85,6 +89,8 @@ exports.handleGuestCheckout = async (req, res) => {
       id: razorOrder.id,
       amount: razorOrder.amount,
       bookingId: booking._id,
+      userId: user._id,
+      currency: razorOrder.currency,
     });
   } catch (err) {
     console.error("Guest checkout error:", err);
